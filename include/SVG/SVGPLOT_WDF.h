@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+  #include"SVGPLOT.h"
+  
   void SVGPLOT_GRID__POLAR(SVG      *svg,
                            REAL8     Xmin,
                            REAL8     Xmax,

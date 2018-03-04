@@ -11,6 +11,8 @@
 #include<stdlib.h>
 #include<SVG/SVGPLOT.h>
 
+#define DAT_DIR "./test/dat/"
+
 int main(void){
   int    theta_num = 150;
   int    phi_num   = 130;
@@ -63,7 +65,7 @@ int main(void){
 
   SVGPLOT plt;
 
-  SVGPLOT__INITIALIZE_002(&plt,"test1.svg");
+  SVGPLOT__INITIALIZE_002(&plt,DAT_DIR "wdf1.svg");
   double X0,Y0,W,H;
   X0 = (plt.Xmin + plt.Xmax) / 2.0;
   Y0 = (plt.Ymin + plt.Ymax) / 2.0;
@@ -96,7 +98,7 @@ int main(void){
 
   SVGPLOT__FINALIZE(&plt);
 
-  SVGPLOT__INITIALIZE_002(&plt,"test2.svg");
+  SVGPLOT__INITIALIZE_002(&plt,DAT_DIR "wdf2.svg");
 
     X0 = (plt.Xmin + plt.Xmax) / 2.0;
   Y0 = (plt.Ymin + plt.Ymax) / 2.0;

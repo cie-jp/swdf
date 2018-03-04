@@ -27,7 +27,6 @@ extern "C" {
 #include"STATS.h"
 #include"SVGPLOT_DATA.h"
 #include"SVGPLOT_DATALIST.h"
-#include"SVGPLOT_WDF.h"
 
 typedef struct{
   CHAR      filename[2048];
@@ -161,6 +160,8 @@ typedef struct{
   // ==================================================================
   SVGPLOT_DATALIST list;
 }SVGPLOT;
+
+  #include"SVGPLOT_WDF.h"
 
 void SVGPLOT__INITIALIZE_001(SVGPLOT    *plt,
 			     const CHAR *filename,
