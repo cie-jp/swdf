@@ -27,6 +27,7 @@ extern "C" {
 #include"STATS.h"
 #include"SVGPLOT_DATA.h"
 #include"SVGPLOT_DATALIST.h"
+#include"SVGPLOT_WDF.h"
 
 typedef struct{
   CHAR      filename[2048];
