@@ -41,7 +41,7 @@ int main(void){
       y1 = sin(theta[k]) * sin(phi[l]);
       z1 = cos(theta[k]);
 
-      ftp[k * phi_num + l] = k * exp(15.0 * (x0 * x1 + y0 * y1 + z0 * z1));
+      ftp[k * phi_num + l]  = 0.6 * exp(35.0 * (x0 * x1 + y0 * y1 + z0 * z1));
     }
   }
 
@@ -57,7 +57,7 @@ int main(void){
       y1 = sin(theta[k]) * sin(phi[l]);
       z1 = cos(theta[k]);
 
-      ftp[k * phi_num + l] += k * exp(15.0 * (x0 * x1 + y0 * y1 + z0 * z1));
+      ftp[k * phi_num + l] += exp(35.0 * (x0 * x1 + y0 * y1 + z0 * z1));
     }
   }
   

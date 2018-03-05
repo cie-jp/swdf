@@ -101,7 +101,7 @@ void SVGPLOT_GRID__POLAR(SVG      *svg,
   
   SVG_STYLE__SET_001(borderstyle,"1.0","#000000","2.0",NULL,NULL,NULL,NULL,"none");
   
-  SVG_STYLE__SET_001(mgridstyle,"1.0","#AAAAAA","0.2",NULL,NULL,NULL,NULL,"none");
+  SVG_STYLE__SET_001(mgridstyle,"1.0","#AAAAAA","0.2","2,2",NULL,NULL,NULL,"none");
   
   X0 = (Xmin + Xmax) / 2.0;
   Y0 = (Ymin + Ymax) / 2.0;
@@ -212,7 +212,7 @@ void SVGPLOT_GRID__POLAR(SVG      *svg,
 void SVGPLOT_GRID__POLAR2(SVGPLOT *plt,int mode){
   SVG_STYLE gridstyle;
   
-  SVG_STYLE__SET_001(gridstyle,"1.0","#AAAAAA","0.5",NULL ,NULL,NULL,NULL,"none");
+  SVG_STYLE__SET_001(gridstyle,"1.0","#AAAAAA","0.4","5,2",NULL,NULL,NULL,"none");
 
   SVGPLOT_GRID__POLAR(&plt->svg,plt->Xmin,plt->Xmax,plt->Ymin,plt->Ymax,gridstyle,mode);
 }
