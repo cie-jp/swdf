@@ -38,6 +38,13 @@ extern "C" {
                                            int     p_num);     //(in)
   
 
+  void SVGPLOT__WDF(double      ftp  [],
+                    double      theta[],
+                    double      phi  [],
+                    int         theta_num,
+                    int         phi_num,
+                    const char *filename);
+      
 #ifdef __cplusplus
 }
 #endif

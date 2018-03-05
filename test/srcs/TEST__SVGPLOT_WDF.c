@@ -19,14 +19,6 @@ int main(void){
   double theta[theta_num];
   double phi  [  phi_num];
   double ftp  [theta_num * phi_num];
-  
-  int    x_num = 1000;
-  int    y_num = 1000;
-  double x[x_num];
-  double y[y_num];
-  double *fxy_north = malloc(sizeof(double) * x_num * y_num);
-  double *fxy_south = malloc(sizeof(double) * x_num * y_num);
-  
   int    k,l;
   
   for(k = 0;k < theta_num;k++){
@@ -53,88 +45,27 @@ int main(void){
     }
   }
 
-  CALCULATION__SPHERICAL_DISTRIBUTION(fxy_north,
-                                      fxy_south,
-                                      x,y,
-                                      x_num,y_num,
-                                      ftp,
-                                      theta,
-                                      phi,
-                                      theta_num,
-                                      phi_num);
+  theta0 =  25.0 / 180.0 * M_PI;
+  phi0   = 165.0 / 180.0 * M_PI;
 
-  SVGPLOT plt;
+  x0 = sin(theta0) * cos(phi0);
+  y0 = sin(theta0) * sin(phi0);
+  z0 = cos(theta0);
+  for(k = 0;k < theta_num;k++){
+    for(l = 0;l <   phi_num;l++){
+      x1 = sin(theta[k]) * cos(phi[l]);
+      y1 = sin(theta[k]) * sin(phi[l]);
+      z1 = cos(theta[k]);
 
-  SVGPLOT__INITIALIZE_002(&plt,DAT_DIR "wdf1.svg");
-  double X0,Y0,W,H;
-  X0 = (plt.Xmin + plt.Xmax) / 2.0;
-  Y0 = (plt.Ymin + plt.Ymax) / 2.0;
-  W  = (plt.Xmax - plt.Xmin);
-  H  = (plt.Ymax - plt.Ymin);
-
-  plt.Xmin = X0 - H / 2.0;
-  plt.Xmax = X0 + H / 2.0; 
+      ftp[k * phi_num + l] += k * exp(15.0 * (x0 * x1 + y0 * y1 + z0 * z1));
+    }
+  }
   
-  SVGPLOT_PALETTE__Create10(&plt.pal);
-  
-  SVGPLOT__XYZ_CONTOUR(&plt,x,x_num,y,y_num,fxy_north,-1.0,-1.0,0);
-  /*
-  SVGPLOT__XY_AUX(&plt,
-                  1,1,1,1,
-                  1,1,1,1,
-                  1,0,1,0,
-                  1);
-  */
-  SVGPLOT_GRID__POLAR2(&plt,0);
-  //SVGPLOT__XLABEL(&plt,"x",NULL);
-  //SVGPLOT__YLABEL(&plt,"y",NULL);
-  SVGPLOT__TITLE (&plt,"Wave Distribution Function");
-
-  SVGPLOT__COLORBAR(&plt,
-                    1,1,
-                    2,2,
-                    2,0,
-                    1);
-
-  SVGPLOT__FINALIZE(&plt);
-
-  SVGPLOT__INITIALIZE_002(&plt,DAT_DIR "wdf2.svg");
-
-    X0 = (plt.Xmin + plt.Xmax) / 2.0;
-  Y0 = (plt.Ymin + plt.Ymax) / 2.0;
-  W  = (plt.Xmax - plt.Xmin);
-  H  = (plt.Ymax - plt.Ymin);
-
-  plt.Xmin = X0 - H / 2.0;
-  plt.Xmax = X0 + H / 2.0; 
-
-  SVGPLOT_PALETTE__Create10(&plt.pal);
-
-  
-  SVGPLOT__XYZ_CONTOUR(&plt,x,x_num,y,y_num,fxy_south,-1.0,-1.0,0);
-  /*
-  SVGPLOT__XY_AUX(&plt,
-                  1,1,1,1,
-                  1,1,1,1,
-                  1,0,1,0,
-                  1);
-  */
-  SVGPLOT_GRID__POLAR2(&plt,1);
-
-  //SVGPLOT__XLABEL(&plt,"x",NULL);
-  //SVGPLOT__YLABEL(&plt,"y",NULL);
-  SVGPLOT__TITLE (&plt,"Wave Distribution Function");
-
-  SVGPLOT__COLORBAR(&plt,
-                    1,1,
-                    2,2,
-                    2,0,
-                    1);
-
-  SVGPLOT__FINALIZE(&plt);
-
-  free(fxy_north);
-  free(fxy_south);
-  
+  SVGPLOT__WDF(ftp,
+               theta,
+               phi,
+               theta_num,
+               phi_num,
+               DAT_DIR "wdf.svg");
   return 0;
 }
