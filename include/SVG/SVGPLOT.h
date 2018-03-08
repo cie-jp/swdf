@@ -162,6 +162,7 @@ typedef struct{
 }SVGPLOT;
 
   #include"SVGPLOT_WDF.h"
+  #include"SVGPLOT_HIST.h"
 
 void SVGPLOT__INITIALIZE_001(SVGPLOT    *plt,
 			     const CHAR *filename,
