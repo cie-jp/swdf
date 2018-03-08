@@ -1,0 +1,262 @@
+\documentclass[a4j]{jsarticle}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{comment}
+\usepackage{braket}
+
+
+\begin{document}
+\section{SVD法}
+単一平面波に対して, 電界と磁界がそれぞれ, 
+\begin{align}
+\bm{e}(t)&=\bm{E}\exp \left( \mathrm{j}(\omega t-\bm{k}\cdot \bm{r})\right) \\
+\bm{h}(t)&=\bm{H}\exp \left( \mathrm{j}(\omega t-\bm{k}\cdot \bm{r})\right) 
+\end{align}
+と与えられるとき, Maxwell方程式
+\begin{align}
+\nabla \times \bm{e}&=-\frac{\partial \bm{h}}{\partial t}
+\end{align}
+より, 
+\begin{align}
+-\mathrm{j}\bm{k}\times \bm{E}&=-\mathrm{j}\omega \bm{H}
+\end{align}
+が得られる. ここで伝搬ベクトル
+\begin{align}
+\bm{u}&=\frac{1}{|\bm{k}|}\bm{k}
+\end{align}
+により, 上式を表現すると
+\begin{align}
+\bm{u}\times \bm{E}&=Z\bm{H}\label{eqn:uE=ZH}
+\end{align}
+となる. ここで
+\begin{align}
+Z&=\frac{1}{n}Z_{0}
+\end{align}
+であり, $n$は屈折率, $Z_{0}$は真空中の特性インピーダンスを表す. 
+式(\ref{eqn:uE=ZH})は伝搬方向を推定するための基本式である. 
+式(\ref{eqn:uE=ZH})を成分ごとに書き出せば, 
+\begin{align}
+u_{y}E_{z}-u_{z}E_{y}&=ZH_{x}\nonumber\\
+u_{z}E_{x}-u_{x}E_{z}&=ZH_{y}\nonumber\\
+u_{x}E_{y}-u_{y}E_{x}&=ZH_{z}
+\end{align}
+となっている. また, 各成分に各電磁界成分の共役複素数を乗算することで, 以下の18の方程式群を得る. 
+\begin{align}
+u_{y}E_{z}E_{x}^{\ast}-u_{z}E_{y}E_{x}^{\ast}&=ZH_{x}E_{x}^{\ast}\nonumber\\
+u_{y}E_{z}E_{y}^{\ast}-u_{z}E_{y}E_{y}^{\ast}&=ZH_{x}E_{y}^{\ast}\nonumber\\
+u_{y}E_{z}E_{z}^{\ast}-u_{z}E_{y}E_{z}^{\ast}&=ZH_{x}E_{z}^{\ast}\nonumber\\
+%
+u_{z}E_{x}E_{x}^{\ast}-u_{x}E_{z}E_{x}^{\ast}&=ZH_{y}E_{x}^{\ast}\nonumber\\
+u_{z}E_{x}E_{y}^{\ast}-u_{x}E_{z}E_{y}^{\ast}&=ZH_{y}E_{y}^{\ast}\nonumber\\
+u_{z}E_{x}E_{z}^{\ast}-u_{x}E_{z}E_{z}^{\ast}&=ZH_{y}E_{z}^{\ast}\nonumber\\
+%
+u_{x}E_{y}E_{x}^{\ast}-u_{y}E_{x}E_{x}^{\ast}&=ZH_{z}E_{x}^{\ast}\nonumber\\
+u_{x}E_{y}E_{y}^{\ast}-u_{y}E_{x}E_{y}^{\ast}&=ZH_{z}E_{y}^{\ast}\nonumber\\
+u_{x}E_{y}E_{z}^{\ast}-u_{y}E_{x}E_{z}^{\ast}&=ZH_{z}E_{z}^{\ast}\nonumber\\
+%
+u_{y}E_{z}H_{x}^{\ast}-u_{z}E_{y}H_{x}^{\ast}&=ZH_{x}H_{x}^{\ast}\nonumber\\
+u_{y}E_{z}H_{y}^{\ast}-u_{z}E_{y}H_{y}^{\ast}&=ZH_{x}H_{y}^{\ast}\nonumber\\
+u_{y}E_{z}H_{z}^{\ast}-u_{z}E_{y}H_{z}^{\ast}&=ZH_{x}H_{z}^{\ast}\nonumber\\
+%
+u_{z}E_{x}H_{x}^{\ast}-u_{x}E_{z}H_{x}^{\ast}&=ZH_{y}H_{x}^{\ast}\nonumber\\
+u_{z}E_{x}H_{y}^{\ast}-u_{x}E_{z}H_{y}^{\ast}&=ZH_{y}H_{y}^{\ast}\nonumber\\
+u_{z}E_{x}H_{z}^{\ast}-u_{x}E_{z}H_{z}^{\ast}&=ZH_{y}H_{z}^{\ast}\nonumber\\
+%
+u_{x}E_{y}H_{x}^{\ast}-u_{y}E_{x}H_{x}^{\ast}&=ZH_{z}H_{x}^{\ast}\nonumber\\
+u_{x}E_{y}H_{y}^{\ast}-u_{y}E_{x}H_{y}^{\ast}&=ZH_{z}H_{y}^{\ast}\nonumber\\
+u_{x}E_{y}H_{z}^{\ast}-u_{y}E_{x}H_{z}^{\ast}&=ZH_{z}H_{z}^{\ast}\nonumber
+\end{align}
+これを, スペクトルマトリクスを用いて表現すれば
+\begin{align}
+u_{y}S_{2,0}-u_{z}S_{1,0}&=ZS_{3,0}\nonumber\\
+u_{y}S_{2,1}-u_{z}S_{1,1}&=ZS_{3,1}\nonumber\\
+u_{y}S_{2,2}-u_{z}S_{1,2}&=ZS_{3,2}\nonumber\\
+%
+u_{z}S_{0,0}-u_{x}S_{2,0}&=ZS_{4,0}\nonumber\\
+u_{z}S_{0,1}-u_{x}S_{2,1}&=ZS_{4,1}\nonumber\\
+u_{z}S_{0,2}-u_{x}S_{2,2}&=ZS_{4,2}\nonumber\\
+%
+u_{x}S_{1,0}-u_{y}S_{0,0}&=ZS_{5,0}\nonumber\\
+u_{x}S_{1,1}-u_{y}S_{0,1}&=ZS_{5,1}\nonumber\\
+u_{x}S_{1,2}-u_{y}S_{0,2}&=ZS_{5,2}\nonumber\\
+%
+u_{y}S_{2,3}-u_{z}S_{1,3}&=ZS_{3,3}\nonumber\\
+u_{y}S_{2,4}-u_{z}S_{1,4}&=ZS_{3,4}\nonumber\\
+u_{y}S_{2,5}-u_{z}S_{1,5}&=ZS_{3,5}\nonumber\\
+%
+u_{z}S_{0,3}-u_{x}S_{2,3}&=ZS_{4,3}\nonumber\\
+u_{z}S_{0,4}-u_{x}S_{2,4}&=ZS_{4,4}\nonumber\\
+u_{z}S_{0,5}-u_{x}S_{2,5}&=ZS_{4,5}\nonumber\\
+%
+u_{x}S_{1,3}-u_{y}S_{0,3}&=ZS_{5,3}\nonumber\\
+u_{x}S_{1,4}-u_{y}S_{0,4}&=ZS_{5,4}\nonumber\\
+u_{x}S_{1,5}-u_{y}S_{0,5}&=ZS_{5,5}\nonumber
+\end{align}
+となっている. $u_x$, $u_{y}$, $u_{z}$に関する方程式としてまとめれば以下のようになる. 
+\begin{align}
+\begin{bmatrix}
+0&S_{2,0}&-S_{1,0}\\
+0&S_{2,1}&-S_{1,1}\\
+0&S_{2,2}&-S_{1,2}\\
+-S_{2,0}&0&S_{0,0}\\
+-S_{2,1}&0&S_{0,1}\\
+-S_{2,2}&0&S_{0,2}\\
+S_{1,0}&-S_{0,0}&0\\
+S_{1,1}&-S_{0,1}&0\\
+S_{1,2}&-S_{0,2}&0\\
+%
+0&S_{2,3}&-S_{1,3}\\
+0&S_{2,4}&-S_{1,4}\\
+0&S_{2,5}&-S_{1,5}\\
+%
+-S_{2,3}&0&S_{0,3}\\
+-S_{2,4}&0&S_{0,4}\\
+-S_{2,5}&0&S_{0,5}\\
+%
+S_{1,3}&-S_{0,3}&0\\
+S_{1,4}&-S_{0,4}&0\\
+S_{1,5}&-S_{0,5}&0
+\end{bmatrix}
+\begin{bmatrix}
+u_x\\
+u_y\\
+u_z
+\end{bmatrix}
+&=Z
+\begin{bmatrix}
+S_{3,0}\\
+S_{3,1}\\
+S_{3,2}\\
+S_{4,0}\\
+S_{4,1}\\
+S_{4,2}\\
+S_{5,0}\\
+S_{5,1}\\
+S_{5,2}\\
+%
+S_{3,3}\\
+S_{3,4}\\
+S_{3,5}\\
+%
+S_{4,3}\\
+S_{4,4}\\
+S_{4,5}\\
+%
+S_{5,3}\\
+S_{5,4}\\
+S_{5,5}
+\end{bmatrix}
+\end{align}
+変数を用いて問題を簡潔に表せば
+\begin{align}
+\bm{A}\bm{u}&=Z\bm{b}\\
+\bm{A}
+&=
+\begin{bmatrix}
+0&S_{2,0}&-S_{1,0}\\
+0&S_{2,1}&-S_{1,1}\\
+0&S_{2,2}&-S_{1,2}\\
+-S_{2,0}&0&S_{0,0}\\
+-S_{2,1}&0&S_{0,1}\\
+-S_{2,2}&0&S_{0,2}\\
+S_{1,0}&-S_{0,0}&0\\
+S_{1,1}&-S_{0,1}&0\\
+S_{1,2}&-S_{0,2}&0\\
+%
+0&S_{2,3}&-S_{1,3}\\
+0&S_{2,4}&-S_{1,4}\\
+0&S_{2,5}&-S_{1,5}\\
+%
+-S_{2,3}&0&S_{0,3}\\
+-S_{2,4}&0&S_{0,4}\\
+-S_{2,5}&0&S_{0,5}\\
+%
+S_{1,3}&-S_{0,3}&0\\
+S_{1,4}&-S_{0,4}&0\\
+S_{1,5}&-S_{0,5}&0
+\end{bmatrix}, 
+\bm{u}
+=
+\begin{bmatrix}
+u_{x}\\
+u_{y}\\
+u_{z}
+\end{bmatrix}, 
+\bm{b}
+=
+\begin{bmatrix}
+S_{3,0}\\
+S_{3,1}\\
+S_{3,2}\\
+S_{4,0}\\
+S_{4,1}\\
+S_{4,2}\\
+S_{5,0}\\
+S_{5,1}\\
+S_{5,2}\\
+%
+S_{3,3}\\
+S_{3,4}\\
+S_{3,5}\\
+%
+S_{4,3}\\
+S_{4,4}\\
+S_{4,5}\\
+%
+S_{5,3}\\
+S_{5,4}\\
+S_{5,5}
+\end{bmatrix}
+\end{align}
+となっている. 上式の$\bm{A}$, $\bm{b}$は一般に複素ベクトルであるので, 実部と虚部で方程式を分ける, すなわち
+\begin{align}
+\bm{C}\bm{u}&=Z\bm{d}\label{eqn:Cu=Zd}\\
+\bm{C}&=
+\begin{bmatrix}
+\mathrm{Re}[\bm{A}]\\
+\mathrm{Im}[\bm{A}]
+\end{bmatrix}, 
+\bm{d}=
+\begin{bmatrix}
+\mathrm{Re}[\bm{b}]\\
+\mathrm{Im}[\bm{b}]
+\end{bmatrix}
+\end{align}
+とすることで, 36の実数の線形方程式群として扱うことができる. 
+
+この最小二乗解は一意に定まり, 
+\begin{align}
+\bm{u}&=Z(\bm{C}^{\mathrm{T}}\bm{C})^{-1}\bm{d}
+\end{align}
+となる. 通常は特性インピーダンス$Z$は屈折率が未知であるため値を知ることは困難であるが, 
+$\bm{u}$は単位ベクトルであるから比例定数としての役割しか果たさない$Z$は考慮しなくて構わない. 
+従って, 
+\begin{align}
+\bm{u}&=\frac{1}{|\bm{v}|}\bm{v}, \bm{v}=(\bm{C}^{\mathrm{T}}\bm{C})^{-1}\bm{d}\label{eqn:estimate_u}
+\end{align}
+から伝搬ベクトルを計算できる. この計算式に基づき伝搬ベクトルを計算する手法をSVD法という. 
+
+注意として, 以上で定めた伝搬ベクトル$\bm{u}$は比例定数を省く処理により, 絶対方向が確定していない. 
+絶対方向の判断には上記の計算に加えて, $Z$が非負値である性質を考慮する必要がある. 
+つまり, 式(\ref{eqn:Cu=Zd})から, 
+\begin{align}
+\bm{d}^{\mathrm{T}}\bm{C}\bm{u}&=Z\bm{d}^{\mathrm{T}}\bm{d}
+\end{align}
+が成り立つので, $Z$を次式で計算できる.  
+\begin{align}
+Z=\frac{\bm{d}^{\mathrm{T}}\bm{C}\bm{u}}{\bm{d}^{\mathrm{T}}\bm{d}}
+\end{align}
+上式で計算された$Z$がもし負になっていれば, 式(\ref{eqn:estimate_u})で求めた伝搬方向は逆向きであるとして反転させ絶対方向の推定結果とする(分母の$\bm{d}^{\mathrm{T}}\bm{d}$は常に正であるから符号判断だけであれば分子の計算のみを行えば良い). 
+この絶対方向の判断基準は単一平面波についての伝搬ベクトル推定手法であれば適用可能であるので, Means法で絶対方向を推定する際に用いることも可能である. 
+同様に, 屈折率が
+\begin{align}
+n&=\frac{Z_0}{|Z|}=\frac{\bm{d}^{\mathrm{T}}\bm{d}}{|\bm{d}^{\mathrm{T}}\bm{C}\bm{u}|}Z_0
+\end{align}
+から計算できる. 
+
+\end{document}
