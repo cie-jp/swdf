@@ -206,5 +206,6 @@ void SVGPLOT__HISTOGRAM(double      x[],
 		  title);
 
   SVGPLOT__FINALIZE(&plt);
-  
+
+  free(buf);
 }
