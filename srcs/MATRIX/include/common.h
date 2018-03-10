@@ -32,3 +32,4 @@
 #define T__MATRIX_INV               JOINT(TYPE,__MATRIX_INV)
 #define T__MATRIX_SOLVE             JOINT(TYPE,__MATRIX_SOLVE)
 #define T__MATRIX_PRINT             JOINT(TYPE,__MATRIX_PRINT)
+#define T__MATRIX_MUL               JOINT(TYPE,__MATRIX_MUL)

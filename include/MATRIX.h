@@ -76,7 +76,10 @@ extern "C" {
 
   void REAL__MATRIX_PRINT            (REAL A[],INT row,INT col,FILE *fp);
   void COMP__MATRIX_PRINT            (COMP A[],INT row,INT col,FILE *fp);
-  
+
+  void REAL__MATRIX_MUL              (REAL C[],REAL A[],INT Arow,INT Acol,REAL B[],INT Brow,INT Bcol);
+  void COMP__MATRIX_MUL              (COMP C[],COMP A[],INT Arow,INT Acol,COMP B[],INT Brow,INT Bcol);
+
   // ***********************************
   // 実行列の構造体宣言
   // ***********************************
