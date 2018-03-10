@@ -73,6 +73,10 @@ INT  REAL__LE      (REAL x,REAL y){
   return  x <= y;
 }
 
+void REAL__PRINT   (REAL x,FILE *fp){
+  fprintf(fp,"%10.5f",x);
+}
+
 COMP COMP__ZERO    (){
   return  COMPLEX__MAKE_ZERO();
 }
@@ -119,4 +123,8 @@ COMP COMP__DIV     (COMP x,COMP y){
 
 COMP COMP__FMA     (COMP x,COMP y,COMP z){
   return  COMPLEX__ADD(COMPLEX__MUL(x,y),z);
+}
+
+void COMP__PRINT   (COMP x,FILE *fp){
+  fprintf(fp,"(%10.5f,%10.5f)",COMPLEX__REAL(x),COMPLEX__IMAG(x));
 }

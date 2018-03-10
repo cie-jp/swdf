@@ -40,6 +40,8 @@ extern "C" {
   REAL REAL__DIV     (REAL x,REAL y);
   REAL REAL__FMA     (REAL x,REAL y,REAL z);
 
+  void REAL__PRINT   (REAL x,FILE *fp);
+  
   INT  REAL__GT      (REAL x,REAL y);
   INT  REAL__GE      (REAL x,REAL y);
   INT  REAL__LT      (REAL x,REAL y);
@@ -57,7 +59,9 @@ extern "C" {
   COMP COMP__MUL     (COMP x,COMP y);
   COMP COMP__DIV     (COMP x,COMP y);
   COMP COMP__FMA     (COMP x,COMP y,COMP z);
-  
+
+  void COMP__PRINT   (COMP x,FILE *fp);
+
   INT  REAL__MATRIX_LU_DECOMPOSITION (REAL A[],INT  n);
   INT  COMP__MATRIX_LU_DECOMPOSITION (COMP A[],INT  n);
 
@@ -70,6 +74,9 @@ extern "C" {
   INT  REAL__MATRIX_SOLVE            (REAL x[],REAL A[],REAL b[],INT  n);
   INT  COMP__MATRIX_SOLVE            (COMP x[],COMP A[],COMP b[],INT  n);
 
+  void REAL__MATRIX_PRINT            (REAL A[],INT row,INT col,FILE *fp);
+  void COMP__MATRIX_PRINT            (COMP A[],INT row,INT col,FILE *fp);
+  
   // ***********************************
   // 実行列の構造体宣言
   // ***********************************
