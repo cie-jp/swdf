@@ -35,27 +35,11 @@ int main(void){
   REAL__MATRIX_PRINT(&A    [0][0],5,5,stderr);
   REAL__MATRIX_PRINT(&A_inv[0][0],5,5,stderr);
 
-  for(i = 0;i < 5;i++){
-    for(j = 0;j < 5;j++){
-      tmp = 0.0;
-      for(k = 0;k < 5;k++){
-        tmp += A[i][k] * A_inv[k][j];
-      }
-      B[i][j] = tmp;
-    }
-  }
+  REAL__MATRIX_MUL(&B[0][0],&A[0][0],5,5,&A_inv[0][0],5,5);
 
   REAL__MATRIX_PRINT(&B[0][0],5,5,stderr);
 
-  for(i = 0;i < 5;i++){
-    for(j = 0;j < 5;j++){
-      tmp = 0.0;
-      for(k = 0;k < 5;k++){
-        tmp += A_inv[i][k] * A[k][j];
-      }
-      B[i][j] = tmp;
-    }
-  }
+  REAL__MATRIX_MUL(&B[0][0],&A_inv[0][0],5,5,&A[0][0],5,5);
 
   REAL__MATRIX_PRINT(&B[0][0],5,5,stderr);
 
