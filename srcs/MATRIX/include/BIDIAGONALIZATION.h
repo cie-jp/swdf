@@ -77,13 +77,23 @@ void T__MATRIX_BIDIAGONALIZATION(TYPE A[],
 	for(i = c;i < row;i++){
 	  u[i] = T__MUL(u[i],tmp);
 	}
+        // ============== DEBUG START
+        {
+          REAL norm;
+          norm = REAL__ZERO();
+          for(i = c;i < row;i++){
+            norm = REAL__ADD(norm,T__NORM(u[i]));
+          }
+          REAL__PRINT(norm,stdout);
+        }
+        // ============== DEBUG END
         // ****************************************************************
 	// v = A'uの計算
         // ****************************************************************
 	for(j = c + 1;j < col;j++){
 	  tmp = T__ZERO();
 	  for(i = c;i < row;i++){
-	    tmp = T__FMA(A[j * col + j],u[i],tmp);
+	    tmp = T__FMA(A[i * col + j],u[i],tmp);
 	  }
 	  v[j] = tmp;
 	}
