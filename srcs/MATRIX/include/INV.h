@@ -56,14 +56,14 @@ INT  T__MATRIX_INV(TYPE A[],//(out,in) [n * n]
   // ****************************************************************
   // Uの逆行列の計算
   // ****************************************************************
-  LU_inv[(n - 1) * n + (n - 1)] = T__DIV(T__ONE,A[(n - 1) * n + (n - 1)]);
+  LU_inv[(n - 1) * n + (n - 1)] = T__DIV(T__ONE(),A[(n - 1) * n + (n - 1)]);
   for(i = n - 2;i >= 0;i--){
     dj = A[i * n + i];
-    if(T__EQ(dj,T__ZERO)){
+    if(T__EQ(dj,T__ZERO())){
       ERROR__SHOW("#3");
       return -1;
     }
-    dj = T__DIV(T__ONE,dj);
+    dj = T__DIV(T__ONE(),dj);
     LU_inv[i * n + i] =  dj;
     for(k = i + 1;k < n;k++){
       tmp = T__MUL(T__NEGATIVE(A[i * n + k]),dj);
@@ -77,7 +77,7 @@ INT  T__MATRIX_INV(TYPE A[],//(out,in) [n * n]
   // ****************************************************************
   for(i = 0;i < n;i++){
     for(j = 0;j < i;j++){
-      tmp = T__ZERO;
+      tmp = T__ZERO();
       for(k = i;k < n;k++){
 	tmp = T__FMA(LU_inv[i * n + k],LU_inv[k * n + j],tmp);
       }

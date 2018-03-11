@@ -30,7 +30,7 @@ INT  T__MATRIX_LU_DECOMPOSITION(TYPE A[],//(out,in) [n * n] : 入力正方行列
     // **************************************************************
     for(i = k + 1;i < n;i++){
       tmp = A[k * n + k];
-      if(T__EQ(tmp,T__ZERO)){
+      if(T__EQ(tmp,T__ZERO())){
         ERROR__SHOW("#2");
 	return -1;
       }

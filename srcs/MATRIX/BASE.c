@@ -17,6 +17,18 @@ REAL REAL__ONE     (){
   return  1;
 }
 
+REAL REAL__TWO     (){
+  return  2;
+}
+
+REAL REAL__MAKE    (REAL x){
+  return  x;
+}
+
+REAL REAL__REAL    (REAL x){
+  return x;
+}
+
 REAL REAL__POSITIVE(REAL x){
   return +x;
 }
@@ -27,6 +39,10 @@ REAL REAL__NEGATIVE(REAL x){
 
 REAL REAL__ABS     (REAL x){
   return fabs(x);
+}
+
+REAL REAL__NORM    (REAL x){
+  return  x * x;
 }
 
 INT  REAL__EQ      (REAL x,REAL y){
@@ -57,6 +73,10 @@ REAL REAL__FMA     (REAL x,REAL y,REAL z){
   return  fma(x,y,z);
 }
 
+REAL REAL__SQRT    (REAL x){
+  return  sqrt(x);
+}
+
 INT  REAL__GT      (REAL x,REAL y){
   return  x >  y;
 }
@@ -85,6 +105,18 @@ COMP COMP__ONE     (){
   return  COMPLEX__MAKE_REAL(1.0);
 }
 
+COMP COMP__TWO     (){
+  return  COMPLEX__MAKE_REAL(2.0);
+}
+
+COMP COMP__MAKE    (REAL x){
+  return  COMPLEX__MAKE_REAL(x);
+}
+
+REAL COMP__REAL    (COMP x){
+  return  COMPLEX__REAL(x);
+}
+
 COMP COMP__POSITIVE(COMP x){
   return  x;
 }
@@ -95,6 +127,10 @@ COMP COMP__NEGATIVE(COMP x){
 
 REAL COMP__ABS     (COMP x){
   return  COMPLEX__ABS(x);
+}
+
+REAL COMP__NORM    (COMP x){
+  return  COMPLEX__NORM(x);
 }
 
 INT  COMP__EQ      (COMP x,COMP y){

@@ -65,7 +65,7 @@ INT  T__MATRIX_SOLVE(TYPE x[],//(out) [n]
     }
     x[j] = tmp;
     tmp  = LU[j * n + j];
-    if(T__EQ(tmp,T__ZERO)){
+    if(T__EQ(tmp,T__ZERO())){
       ERROR__SHOW("#3");
       return -1;
     }

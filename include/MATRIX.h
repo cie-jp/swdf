@@ -29,9 +29,13 @@ extern "C" {
 
   REAL REAL__ZERO    ();
   REAL REAL__ONE     ();
+  REAL REAL__TWO     ();
+  REAL REAL__MAKE    (REAL x);
+  REAL REAL__REAL    (REAL x);
   REAL REAL__POSITIVE(REAL x);
   REAL REAL__NEGATIVE(REAL x);
   REAL REAL__ABS     (REAL x);
+  REAL REAL__NORM    (REAL x);
   INT  REAL__EQ      (REAL x,REAL y);
   INT  REAL__NEQ     (REAL x,REAL y);
   REAL REAL__ADD     (REAL x,REAL y);
@@ -41,7 +45,8 @@ extern "C" {
   REAL REAL__FMA     (REAL x,REAL y,REAL z);
 
   void REAL__PRINT   (REAL x,FILE *fp);
-  
+
+  REAL REAL__SQRT    (REAL x);
   INT  REAL__GT      (REAL x,REAL y);
   INT  REAL__GE      (REAL x,REAL y);
   INT  REAL__LT      (REAL x,REAL y);
@@ -49,9 +54,13 @@ extern "C" {
   
   COMP COMP__ZERO    ();
   COMP COMP__ONE     ();
+  COMP COMP__TWO     ();
+  COMP COMP__MAKE    (REAL x);
+  REAL COMP__REAL    (COMP x);
   COMP COMP__POSITIVE(COMP x);
   COMP COMP__NEGATIVE(COMP x);
   REAL COMP__ABS     (COMP x);
+  REAL COMP__NORM    (COMP x);
   INT  COMP__EQ      (COMP x,COMP y);
   INT  COMP__NEQ     (COMP x,COMP y);
   COMP COMP__ADD     (COMP x,COMP y);
@@ -80,6 +89,9 @@ extern "C" {
   void REAL__MATRIX_MUL              (REAL C[],REAL A[],INT Arow,INT Acol,REAL B[],INT Brow,INT Bcol);
   void COMP__MATRIX_MUL              (COMP C[],COMP A[],INT Arow,INT Acol,COMP B[],INT Brow,INT Bcol);
 
+  void REAL__MATRIX_BIDIAGONALIZATION(REAL A[],INT row,INT col);
+  void COMP__MATRIX_BIDIAGONALIZATION(COMP A[],INT row,INT col);
+  
   // ***********************************
   // 実行列の構造体宣言
   // ***********************************

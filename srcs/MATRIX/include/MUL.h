@@ -31,7 +31,7 @@ void T__MATRIX_MUL(TYPE  C[],  //(out) [Arow * Bcol] (Crow = Arow, Ccol = Bcol)
   
   for(i = 0;i < Crow;i++){
     for(j = 0;j < Ccol;j++){
-      tmp = T__ZERO;
+      tmp = T__ZERO();
       for(k = 0;k < Acol;k++){
         tmp = T__FMA(A[i * Acol + k],B[k * Bcol + j],tmp);
       }
