@@ -10,3 +10,8 @@
 #include"FFT.h"
 #include"RANDOM.h"
 #include"SVG/SVGPLOT.h"
+#include"MATRIX.h"
+#include"COMPLEX.h"
+#include"CDF_COMMON.h"
+
+#include"CL31.h"
