@@ -16,6 +16,8 @@
 int main(void){
   REAL   A[5][5];
   REAL   B[5][5];
+  REAL   wu[5];
+  REAL   wv[5];  
   REAL   x[5];
   REAL   y[5];
   RANDOM rnd;
@@ -34,7 +36,7 @@ int main(void){
 
   REAL__MATRIX_PRINT(&A[0][0],5,5,stderr);
 
-  REAL__MATRIX_BIDIAGONALIZATION(&B[0][0],5,5);
+  REAL__MATRIX_BIDIAGONALIZATION(&B[0][0],wu,wv,5,5);
 
   // 1-1. 
   for(i = 0;i < 5;i++){

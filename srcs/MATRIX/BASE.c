@@ -26,7 +26,15 @@ REAL REAL__MAKE    (REAL x){
 }
 
 REAL REAL__REAL    (REAL x){
-  return x;
+  return  x;
+}
+
+REAL REAL__IMAG    (REAL x){
+  return  0.0;
+}
+
+REAL REAL__CONJ    (REAL x){
+  return  x;
 }
 
 REAL REAL__POSITIVE(REAL x){
@@ -117,6 +125,14 @@ REAL COMP__REAL    (COMP x){
   return  COMPLEX__REAL(x);
 }
 
+REAL COMP__IMAG    (COMP x){
+  return  COMPLEX__IMAG(x);
+}
+
+COMP COMP__CONJ    (COMP x){
+  return  COMPLEX__CONJ(x);
+}
+
 COMP COMP__POSITIVE(COMP x){
   return  x;
 }
@@ -145,7 +161,7 @@ COMP COMP__ADD     (COMP x,COMP y){
   return  COMPLEX__ADD(x,y);
 }
 
-COMP COMP__SUM     (COMP x,COMP y){
+COMP COMP__SUB     (COMP x,COMP y){
   return  COMPLEX__SUB(x,y);
 }
 
@@ -159,6 +175,10 @@ COMP COMP__DIV     (COMP x,COMP y){
 
 COMP COMP__FMA     (COMP x,COMP y,COMP z){
   return  COMPLEX__ADD(COMPLEX__MUL(x,y),z);
+}
+
+COMP COMP__SQRT    (COMP x){
+  return  COMPLEX__POW(x,0.5);
 }
 
 void COMP__PRINT   (COMP x,FILE *fp){

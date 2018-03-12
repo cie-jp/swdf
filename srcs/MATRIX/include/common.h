@@ -17,6 +17,8 @@
 #define T__TWO      JOINT(TYPE,__TWO )
 #define T__MAKE     JOINT(TYPE,__MAKE)
 #define T__REAL     JOINT(TYPE,__REAL)
+#define T__IMAG     JOINT(TYPE,__IMAG)
+#define T__CONJ     JOINT(TYPE,__CONJ)
 #define T__POSITIVE JOINT(TYPE,__POSITIVE)
 #define T__NEGATIVE JOINT(TYPE,__NEGATIVE)
 #define T__ABS      JOINT(TYPE,__ABS  )
@@ -28,6 +30,7 @@
 #define T__MUL      JOINT(TYPE,__MUL  )
 #define T__DIV      JOINT(TYPE,__DIV  )
 #define T__FMA      JOINT(TYPE,__FMA  )
+#define T__SQRT     JOINT(TYPE,__SQRT )
 #define T__PRINT    JOINT(TYPE,__PRINT)
 
 #define T__MATRIX_LU_DECOMPOSITION  JOINT(TYPE,__MATRIX_LU_DECOMPOSITION )
