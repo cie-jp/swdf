@@ -169,25 +169,89 @@ void REAL__MATRIX_RQ_TRI(REAL U0[],//(out)[n]     : 3重対角行列RQの対角�
   }
 }
 
+// *******************************************************************
+// 2次実対称行列
+//
+// A = | a0 a1 |
+//     | a1 a2 | 
+// の二つの固有値emax,emin(emax > emin)を返す.  
+// *******************************************************************
+void REAL__MATRIX_EIGENVALUES_2D(REAL *emax,
+                                 REAL *emin,
+                                 REAL  a0,
+                                 REAL  a1,
+                                 REAL  a2){
+  REAL mu;
+  REAL d;
+  
+  mu    = REAL__MUL(REAL__ADD(a0,a2),REAL__TWO());
+  d     = REAL__MUL(REAL__SQRT(REAL__ADD(REAL__NORM(REAL__SUB(a0,a2)),REAL__NORM(REAL__MUL(REAL__TWO(),a1)))),REAL__TWO());
+  *emax = REAL__ADD(mu,d);
+  *emin = REAL__SUB(mu,d);
+}
 
-void REAL__MATRIX_EIGENVALUE_DECOMPOSITION(REAL U [],//(out)[n * n] : 直交行列
-                                           REAL T0[],//(in) [n]     : 実対称3重対角行列の対角成分
-                                           REAL T1[],//(in) [n - 1] : 実対称3重対角行列の非対角成分
-                                           INT  n){  //(in)         : 行列の次元数
+// *******************************************************************
+// 実対称3重対角行列
+//
+//            | T0[0]  T1[0]     0      0  ...         0          0  |
+//            | T1[0]  T0[1]  T1[1]     0  ...         .          .  |
+//            |    0   T1[1]  T0[2]  T1[2] ...         .          .  |
+// T        = |    0      0   T1[2]  T0[3] ...         .          .  |
+//            |    .      .      .      .              0          0  |
+//            |    0      0      0      0  ...  T1[n - 3]         0  | 
+//            |    0      0      0      0  ...  T0[n - 2]  T1[n - 2] | 
+//            |    0      0      0      0  ...  T1[n - 2]  T0[n - 1] |
+//
+// の固有値分解T = U diag(L) U^{T}をWilkinsonシフトQR法により計算する.
+// ここで, Uは直交行列を表し,
+// LはTの固有値からなるベクトルである. 
+// また,
+//            |  L[0]     0      0      0  ...         0          0  |
+//            |    0    L[1]     0      0  ...         .          .  |
+//            |    0      0    L[2]     0  ...         .          .  |
+// diag(L)  = |    0      0      0      0  ...         .          .  |
+//            |    .      .      .      .              0          0  |
+//            |    0      0      0      0  ...         0          0  | 
+//            |    0      0      0      0  ...   L[n - 2]         0  | 
+//            |    0      0      0      0  ...         0    L[n - 1] |
+// である.
+// 
+// 返される固有値は|L[0]| > |L[1]| > |L[2]| > ...の順に並ぶ.
+// また, L[k]に対応する固有ベクトルv[k]は,
+//
+//            | U[     0  * n + k] |
+//            | U[     1  * n + k] |
+//            | U[     2  * n + k] |
+// v[k]     = | U[     3  * n + k] |
+//            |           .        |
+//            | U[(n - 2) * n + k] |
+//            | U[(n - 1) * n + k] |
+//
+// であり, 大きさは1で規格化されており, 固有ベクトルは互いに直交している. 
+//
+// *******************************************************************
+void REAL__MATRIX_EIGENVALUE_DECOMPOSITION_TRI(REAL U [],//(out)[n * n] : 直交行列
+                                               REAL T0[],//(io) [n]     : 実対称3重対角行列の対角成分   (Lが返される)
+                                               REAL T1[],//(io) [n - 1] : 実対称3重対角行列の非対角成分 (破壊される)
+                                               INT  n){  //(in)         : 行列の次元数
   void *mem;
   REAL *C ;//[n - 1]
   REAL *S ;//[n - 1]
   REAL *R0;//[n]
   REAL *R1;//[n - 1]
   REAL *R2;//[n - 2]
+  REAL  emax;
+  REAL  emin;
+  REAL  shift;
   REAL  tmp1,tmp2;
-  INT   i,j;
+  INT   i,j,k;
   
   if((mem = malloc(sizeof(REAL) * (n - 1)
                  + sizeof(REAL) * (n - 1)
                  + sizeof(REAL) *  n
                  + sizeof(REAL) * (n - 1)
                  + sizeof(REAL) * (n - 2))) == NULL){
+    ERROR__SHOW("#1");
     exit(EXIT_FAILURE);
   }
 
@@ -203,17 +267,44 @@ void REAL__MATRIX_EIGENVALUE_DECOMPOSITION(REAL U [],//(out)[n * n] : 直交行�
     }
   }
 
-  REAL__MATRIX_QR_TRI(C,S,R0,R1,NULL,T0,T1,n);
+  for(k = 0;k < 500;k++){
 
-  for(i = 0;i < n;i++){
-    for(j = 0;j < n - 1;j++){
-      tmp1               = REAL__ADD(REAL__MUL(               C[j] ,U[i * n + j]),REAL__MUL(S[j],U[i * n + (j + 1)]));
-      tmp2               = REAL__ADD(REAL__MUL(REAL__NEGATIVE(S[j]),U[i * n + j]),REAL__MUL(C[j],U[i * n + (j + 1)]));
-      U[i * n +  j     ] = tmp1;
-      U[i * n + (j + 1)] = tmp2;
+    REAL__MATRIX_EIGENVALUES_2D(&emax,&emin,T0[n - 2],T1[n - 2],T0[n - 1]);
+    if(REAL__LE(REAL__NORM(REAL__SUB(emax,T0[n - 1])),REAL__NORM(REAL__SUB(emin,T0[n - 1])))){
+      shift = emax;
+    }else{
+      shift = emin;
     }
-  }
 
+    for(i = 0;i < n;i++){
+      T0[i] -= shift;
+    }
+    
+    REAL__MATRIX_QR_TRI(C,S,R0,R1,NULL,T0,T1,n);
+    
+    for(i = 0;i < n;i++){
+      for(j = 0;j < n - 1;j++){
+        tmp1               = REAL__ADD(REAL__MUL(               C[j] ,U[i * n + j]),REAL__MUL(S[j],U[i * n + (j + 1)]));
+        tmp2               = REAL__ADD(REAL__MUL(REAL__NEGATIVE(S[j]),U[i * n + j]),REAL__MUL(C[j],U[i * n + (j + 1)]));
+        U[i * n +  j     ] = tmp1;
+        U[i * n + (j + 1)] = tmp2;
+      }
+    }
+    
+    REAL__MATRIX_RQ_TRI(T0,T1,C,S,R0,R1,n);
+
+    for(i = 0;i < n;i++){
+      T0[i] += shift;
+    }
+
+    printf("===========(%d)\n",k);
+    for(i = 0;i < n - 1;i++){
+      printf("%f %f\n",T0[i],T1[i]);
+    }
+    printf("%f\n",T0[n - 1]);
+
+  }
+  
   free(mem);
 }
 
@@ -336,10 +427,36 @@ int main(void){
   fprintf(stderr,"============ Orthogonal Matrix Q ==========\n");
   REAL__MATRIX_PRINT(&Q[0][0],dim,dim,stderr);
 
-  double U[dim][dim];
+  double U[dim][dim],L[dim][dim],Ut[dim][dim],UL[dim][dim],ULUt[dim][dim],UtLU[dim][dim],LU[dim][dim];
 
-  REAL__MATRIX_EIGENVALUE_DECOMPOSITION(&U[0][0],A0,A1,dim);
+  REAL__MATRIX_EIGENVALUE_DECOMPOSITION_TRI(&U[0][0],A0,A1,dim);
   REAL__MATRIX_PRINT(&U[0][0],dim,dim,stderr);
+
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      Ut[i][j] = U[j][i];
+    }
+  }
+
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      L[i][j] = REAL__ZERO();
+    }
+  }
+  for(i = 0;i < dim    ;i++){
+    L[i][i] = A0[i];
+  }
+
+  REAL__MATRIX_MUL(&UL[0][0],&U[0][0],dim,dim,&L[0][0],dim,dim);
+  REAL__MATRIX_MUL(&LU[0][0],&L[0][0],dim,dim,&U[0][0],dim,dim);
+  REAL__MATRIX_MUL(&ULUt[0][0],&UL[0][0],dim,dim,&Ut[0][0],dim,dim);
+
+  REAL__MATRIX_MUL(&UtLU[0][0],&Ut[0][0],dim,dim,&LU[0][0],dim,dim);
+
+  REAL__MATRIX_PRINT(&ULUt[0][0],dim,dim,stderr);
+  REAL__MATRIX_PRINT(&UtLU[0][0],dim,dim,stderr);
+
+  
   
   return 0;
 }
