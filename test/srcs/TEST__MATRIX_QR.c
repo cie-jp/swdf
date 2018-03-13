@@ -94,16 +94,26 @@ void REAL__MATRIX_QR_TRI(REAL C [],//(out)[n - 1] : 直交行列の情報を表�
 
   for(i = 0;i < n - 2;i++){
     L         = REAL__SQRT(REAL__ADD(REAL__MUL(R0[i],R0[i]),REAL__MUL(T1[i],T1[i])));
-    C[i     ] = REAL__DIV(R0[i],L);
-    S[i     ] = REAL__DIV(T1[i],L);
+    if(REAL__EQ(L,REAL__ZERO())){
+      C[i   ] = REAL__ONE ();
+      S[i   ] = REAL__ZERO();
+    }else{
+      C[i   ] = REAL__DIV(R0[i],L);
+      S[i   ] = REAL__DIV(T1[i],L);
+    }
     R0[i    ] = L;
     R0[i + 1] = REAL__ADD(REAL__MUL(REAL__NEGATIVE(S[i]),R1[i]),REAL__MUL(C[i],T0[i + 1]));
     R1[i    ] = REAL__ADD(REAL__MUL(               C[i] ,R1[i]),REAL__MUL(S[i],T0[i + 1]));
     R1[i + 1] = REAL__MUL(C[i],T1[i + 1]);
   }
     L         = REAL__SQRT(REAL__ADD(REAL__MUL(R0[i],R0[i]),REAL__MUL(T1[i],T1[i])));
-    C[i     ] = REAL__DIV(R0[i],L);
-    S[i     ] = REAL__DIV(T1[i],L);
+    if(REAL__EQ(L,REAL__ZERO())){
+      C[i   ] = REAL__ONE ();
+      S[i   ] = REAL__ZERO();
+    }else{
+      C[i   ] = REAL__DIV(R0[i],L);
+      S[i   ] = REAL__DIV(T1[i],L);
+    }
     R0[i    ] = L;
     R0[i + 1] = REAL__ADD(REAL__MUL(REAL__NEGATIVE(S[i]),R1[i]),REAL__MUL(C[i],T0[i + 1]));
     R1[i    ] = REAL__ADD(REAL__MUL(               C[i] ,R1[i]),REAL__MUL(S[i],T0[i + 1]));  
@@ -160,6 +170,52 @@ void REAL__MATRIX_RQ_TRI(REAL U0[],//(out)[n]     : 3重対角行列RQの対角�
 }
 
 
+void REAL__MATRIX_EIGENVALUE_DECOMPOSITION(REAL U [],//(out)[n * n] : 直交行列
+                                           REAL T0[],//(in) [n]     : 実対称3重対角行列の対角成分
+                                           REAL T1[],//(in) [n - 1] : 実対称3重対角行列の非対角成分
+                                           INT  n){  //(in)         : 行列の次元数
+  void *mem;
+  REAL *C ;//[n - 1]
+  REAL *S ;//[n - 1]
+  REAL *R0;//[n]
+  REAL *R1;//[n - 1]
+  REAL *R2;//[n - 2]
+  REAL  tmp1,tmp2;
+  INT   i,j;
+  
+  if((mem = malloc(sizeof(REAL) * (n - 1)
+                 + sizeof(REAL) * (n - 1)
+                 + sizeof(REAL) *  n
+                 + sizeof(REAL) * (n - 1)
+                 + sizeof(REAL) * (n - 2))) == NULL){
+    exit(EXIT_FAILURE);
+  }
+
+  C  = (REAL*)mem;
+  S  = (REAL*)&C [n - 1];
+  R0 = (REAL*)&S [n - 1];
+  R1 = (REAL*)&R0[n];
+  R2 = (REAL*)&R1[n - 1];
+     
+  for(i = 0;i < n;i++){
+    for(j = 0;j < n;j++){
+      U[i * n + j] = (i == j) ? REAL__ONE() : REAL__ZERO();
+    }
+  }
+
+  REAL__MATRIX_QR_TRI(C,S,R0,R1,NULL,T0,T1,n);
+
+  for(i = 0;i < n;i++){
+    for(j = 0;j < n - 1;j++){
+      tmp1               = REAL__ADD(REAL__MUL(               C[j] ,U[i * n + j]),REAL__MUL(S[j],U[i * n + (j + 1)]));
+      tmp2               = REAL__ADD(REAL__MUL(REAL__NEGATIVE(S[j]),U[i * n + j]),REAL__MUL(C[j],U[i * n + (j + 1)]));
+      U[i * n +  j     ] = tmp1;
+      U[i * n + (j + 1)] = tmp2;
+    }
+  }
+
+  free(mem);
+}
 
 
 
@@ -277,5 +333,13 @@ int main(void){
   }
   printf("%f\n",RQ0[dim - 1]);
 
+  fprintf(stderr,"============ Orthogonal Matrix Q ==========\n");
+  REAL__MATRIX_PRINT(&Q[0][0],dim,dim,stderr);
+
+  double U[dim][dim];
+
+  REAL__MATRIX_EIGENVALUE_DECOMPOSITION(&U[0][0],A0,A1,dim);
+  REAL__MATRIX_PRINT(&U[0][0],dim,dim,stderr);
+  
   return 0;
 }
