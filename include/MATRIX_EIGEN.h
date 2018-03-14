@@ -281,6 +281,33 @@ extern "C" {
                            REAL b1[],//(in) [n - 1] : 2重対角行列の非対角成分
                            INT  n);  //(in)         : 2重対角行列の次元数  
 
+  // **********************************************************
+  // row行col列の実・複素行列Aに対して特異値分解を行う.
+  //
+  // A       = U diag(s) V^{dag} 
+  //
+  // A[i][j] = sum _k s[k]U[i][k]conj(V[j][k]) (成分表示)
+  //
+  // U^{dag} U = I_{dim}, V^{dag} V = I_{dim} 
+  //
+  // dim = min(row,col)
+  //
+  // s[0] > s[1] > ... s[dim - 1] > 0
+  // **********************************************************
+  void REAL__MATRIX_SVD(REAL s[], //(out)[dim]       : 特異値配列
+                        REAL U[], //(out)[row * dim] : 左特異ベクトル群
+                        REAL V[], //(out)[col * dim] : 右特異ベクトル群
+                        REAL A[], //(in) [row * col] : 特異値分解の対象とする行列
+                        INT  row, //(in)             : 行列の行数
+                        INT  col);//(in)             : 行列の列数
+
+  void COMP__MATRIX_SVD(REAL s[], //(out)[dim]       : 特異値配列
+                        COMP U[], //(out)[row * dim] : 左特異ベクトル群
+                        COMP V[], //(out)[col * dim] : 右特異ベクトル群
+                        COMP A[], //(in) [row * col] : 特異値分解の対象とする行列
+                        INT  row, //(in)             : 行列の行数
+                        INT  col);//(in)             : 行列の列数
+  
 #ifdef __cplusplus
 }
 #endif
