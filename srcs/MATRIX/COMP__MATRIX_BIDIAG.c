@@ -7,6 +7,6 @@
  * 
  *****************************************************************/
 
-#define TYPE REAL
+#define TYPE COMP
 
 #include"BIDIAG.h"

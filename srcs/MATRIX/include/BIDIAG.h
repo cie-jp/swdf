@@ -155,7 +155,7 @@ void T__MATRIX_BIDIAG(REAL b0[],//(out) [dim]     2重対角行列の  対角成
       len = REAL__ADD(len,T__NORM(v[j]));
     }
     if(REAL__EQ(len,REAL__ZERO())){
-      b1[c] = T__ZERO();
+      b1[c] = REAL__ZERO();
     }else{
       len = REAL__SQRT(len);
       if(REAL__GE(T__REAL(v[c + 1]),REAL__ZERO())){
