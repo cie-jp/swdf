@@ -13,18 +13,18 @@
 #include"MATRIX.h"
 #include"RANDOM.h"
 
-#define row (8)
-#define col (6) //現在はrow >= colにしか対応していない. 
+#define row (12)
+#define col (8) //現在はrow >= colにしか対応していない. 
 
 #define dim ((row < col) ? row : col)
 
 int main(void){
   COMP   A[row][col];
   COMP   B[row][col];
-  REAL   b0[dim];
-  REAL   b1[dim];
-  COMP   wu[row];
-  COMP   wv[col];
+  REAL   b0[col];
+  REAL   b1[col];
+  COMP   wu[col];
+  COMP   wv[col - 1];
   COMP   u [row];
   COMP   v [col];
   RANDOM rnd;
@@ -55,7 +55,7 @@ int main(void){
   //5. 2重対角化を行う
   COMP__MATRIX_BIDIAG(b0,b1,wu,wv,&B[0][0],row,col);
 
-  for(l = 0;l < 5;l++){
+  for(l = 0;l < col;l++){
     
     //uの初期化
     for(i = 0;i < row;i++){
@@ -64,7 +64,7 @@ int main(void){
     for(i = l;i < row;i++){
       u[i] = B[i][l];
     }
-    //Uの計算
+    //U = I - (1 + wu)uu^{dag}
     for(i = 0;i < row;i++){
       for(j = 0;j < row;j++){
         U[i][j] = (i == j) ? COMP__ONE() : COMP__ZERO();
@@ -87,15 +87,17 @@ int main(void){
     for(j = (l + 1);j < col;j++){
       v[j] = COMP__CONJ(B[l][j]);
     }
-
+    //V = I - (1 + wv)vv^{dag}
     for(i = 0;i < col;i++){
       for(j = 0;j < col;j++){
         V[i][j] = (i == j) ? COMP__ONE() : COMP__ZERO();
       }
     }
-    for(i = 0;i < col;i++){
-      for(j = 0;j < col;j++){
-        V[i][j] = COMP__SUB(V[i][j],COMP__MUL(COMP__ADD(COMP__ONE(),wv[l]),COMP__MUL(v[i],COMP__CONJ(v[j]))));
+    if(l != (col - 1)){
+      for(i = 0;i < col;i++){
+        for(j = 0;j < col;j++){
+          V[i][j] = COMP__SUB(V[i][j],COMP__MUL(COMP__ADD(COMP__ONE(),wv[l]),COMP__MUL(v[i],COMP__CONJ(v[j]))));
+        }
       }
     }
     //Q = RV
@@ -113,6 +115,11 @@ int main(void){
   }
 
   COMP__MATRIX_PRINT(&B[0][0],row,col,stderr);
+
+  for(i = 0;i < dim - 1;i++){
+    printf("%f %f\n",b0[i],b1[i]);
+  }
+  printf("%f\n",b0[dim - 1]);
 
   return 0;
 }
