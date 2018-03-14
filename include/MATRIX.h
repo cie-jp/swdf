@@ -97,7 +97,22 @@ extern "C" {
 
   void REAL__MATRIX_BIDIAGONALIZATION(REAL A[],REAL wu[],REAL wv[],INT row,INT col);
   void COMP__MATRIX_BIDIAGONALIZATION(COMP A[],COMP wu[],COMP wv[],INT row,INT col);
-  
+
+  void REAL__MATRIX_BIDIAG(REAL b0[],
+                           REAL b1[],
+                           REAL wu[],
+                           REAL wv[],
+                           REAL A [],
+                           INT  row,
+                           INT  col);
+  void COMP__MATRIX_BIDIAG(REAL b0[],
+                           REAL b1[],
+                           COMP wu[],
+                           COMP wv[],
+                           COMP A [],
+                           INT  row,
+                           INT  col);
+
   // ***********************************
   // 実行列の構造体宣言
   // ***********************************
