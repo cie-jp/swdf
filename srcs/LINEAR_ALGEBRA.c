@@ -351,7 +351,9 @@ int la_tridiagonalize(double *A,double *P,int n){
   return 0;
 }
 
-int la_eig(double *A,double *P,int n){
+int la_eig(double *A, //入力 行列 [n][n]
+           double *P,
+           int     n){
   int     i,j,k,l,m,p,q,r;
   double  T[5];
   double *B;
@@ -395,13 +397,20 @@ int la_eig(double *A,double *P,int n){
 	return -1;
       }
     }
-    la_tridiagonalize(A,P,n);
+    la_tridiagonalize(A,P,n);//3重対角化
     B = A + n;
     for(i = 1;i < n;i++){
       A[i    ] = A[i * n + i    ];
       B[i - 1] = A[i * n + i - 1];
     }
-    if(P == NULL){
+    //A[0] : 対角成分(0,0)
+    //A[1] : 対角成分(1,1)
+    //A[2] : 対角成分(2,2)
+    //A[3] : 対角成分(3,3)
+    //..
+    //B[0] : 非対角成分(0,1)
+    
+    if(P == NULL){//P 直交行列 
       R = Q + n;
       for(m = n;m >= 2;m--){
 	p = m - 2;
@@ -417,43 +426,47 @@ int la_eig(double *A,double *P,int n){
 	    a = sqrt(c);
 	    c = s + a;
 	    s = s - a;
-	    z = (fabs(c - A[q]) < fabs(s - A[q])) ? c : s;
+	    z = (fabs(c - A[q]) < fabs(s - A[q])) ? c : s;//zはシフト量
 	  }
 	  for(i = 0;i < m;i++){
 	    A[i] -= z;
 	  }
+          //QR = A
 	  Q[0] =  1.0;
 	  t    = B[0];
 	  for(i = 0;i < q;i++){
-	    if((a = sqrt(A[i] * A[i] + B[i] * B[i])) == 0.0){
+	    if((a = sqrt(A[i] * A[i] + B[i] * B[i])) == 0.0){//振幅
 	      t = B[i + 1];
 	      continue;
 	    }
 	    j     =  i + 1;
-	    c     =  A[i] /  a;
-	    s     =  B[i] /  a;
+	    c     =  A[i] /  a;//cos
+	    s     =  B[i] /  a;//sin
 	    A[i]  =  a;
 	    B[i]  =  t * c + A[j] * s;
 	    A[j]  = -t * s + A[j] * c;
 	    Q[i] *=  c;
 	    R[i]  =  s;
 	    Q[j]  =  c;
-	    t     =  c * B[j];
+	    t     =  c * B[j];//一時避難
 	  }
-	  A[0]  =  A[0] * Q[0] + B[0] * R[0];
+
+          //A = RQ
+          A[0]  =  A[0] * Q[0] + B[0] * R[0];
 	  for(i = 1;i < m;i++){
 	    j    = i - 1;
 	    B[j] = A[i] * R[j];
 	    A[i] = A[i] * Q[i] + B[i] * R[i];  
 	  }
+          
 	  for(i = 0;i <  m;i++){
-	    A[i] += z;
+	    A[i] += z;//シフト修正
 	  }
 	  e = fabs(e - B[p]);
 	  if( fabs(d - e)  <=  1e-17  * fabs(A[q])){//1e-17
 	    break;
 	  }
-	  d = e;
+	  d = e;//以前の非対角要素
 	}
       }
     }else{
