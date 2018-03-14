@@ -230,7 +230,8 @@ extern "C" {
   // C_{i,j} <= B_{i,j} \ A_{i,j}
   // ***********************************
   void RMATRIX__SET_LDIVIDE(RMATRIX *C,RMATRIX *B,RMATRIX *A);
-  
+
+  #include"MATRIX_EIGEN.h"
 
 #ifdef __cplusplus
 }
