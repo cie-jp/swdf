@@ -19,7 +19,7 @@
 #define dim ((row < col) ? row : col)
 
 int main(void){
-  COMP   A[row][col];
+  COMP   A[row][col],B[row][col];
   REAL   s[dim];
   COMP   U[row][dim];
   COMP   V[col][dim];
@@ -41,6 +41,17 @@ int main(void){
     }
   }
 
+  /* //エルミート行列の特異値分解検証コード
+  for(i = 0;i < row;i++){
+    for(j = i + 1;j < col;j++){      
+      A[i][j] = COMP__CONJ(A[j][i]);
+    }
+  }
+  for(i = 0;i < row;i++){
+    A[i][i] = COMPLEX__MAKE_RE_IM(RANDOM__NORMAL(&rnd,0.0,1.0),0.0);
+  }
+  */
+  
   COMP__MATRIX_SVD(s,&U[0][0],&V[0][0],&A[0][0],row,col);
   
   for(i = 0;i < dim;i++){
