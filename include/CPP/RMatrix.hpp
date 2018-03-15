@@ -39,24 +39,6 @@ double  RMatrix::norm(double p){
   return pow(tmp,1.0 / p);
 }
 
-RMatrix  RMatrix::diag(){
-  if((W != H) && (W != 1)){
-    cerr << "ERROR : RMatrix.diag()" << endl;
-    exit(EXIT_FAILURE);    
-  }
-  RMatrix A(H,H);
-  if(W == H){
-    for(int j = 0;j < H;j++){
-      A.D[j * A.W + j] = D[j * W + j];
-    }
-  }else{
-    for(int j = 0;j < H;j++){
-      A.D[j * A.W + j] = D[j];
-    }
-  }
-  return A;
-}
-
 RMatrix  RMatrix::pinv(){
   if(W == H){
     return !(*this);
@@ -159,13 +141,6 @@ int RMatrix::eig(RMatrix &D,RMatrix &P){
   D = *this;
   P = RMatrix(H,W);
   return la_eig(D.D,P.D,W);
-}
-
-int RMatrix::svd(RMatrix &U,RMatrix &S,RMatrix &V){
-  S = *this;
-  U = RMatrix(H,H);
-  V = RMatrix(W,W);
-  return la_svd(S.D,U.D,V.D,H,W);
 }
 
 int RMatrix::vpca(RMatrix &X,RMatrix &M,RMatrix &P,RMatrix &L){

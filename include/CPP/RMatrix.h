@@ -107,6 +107,27 @@ class RMatrix{
   friend RMatrix   operator  ~(const RMatrix &);                
   friend RMatrix   operator  !(const RMatrix &);                
 
+  // *************************************************
+  // 単位行列の作成(対角成分 = 1, 非対角成分 = 0)
+  // *************************************************
+  static RMatrix identity(const INT row,const INT col);
+
+  // *************************************************
+  // 標準正規分布に従う乱数を与えた行列の作成
+  // *************************************************
+  static RMatrix random  (const INT row,const INT col);
+
+  // *************************************************
+  // 特異値分解
+  // *************************************************
+  void    svd  (RMatrix &s,RMatrix &U,RMatrix &V);
+
+  // *************************************************
+  // 縦ベクトルの場合 : 縦ベクトル要素を対角成分に持つ対角行列を返す
+  // 正方行列  の場合 : 非対角成分を0にした行列を返す
+  // *************************************************
+  RMatrix diag ();
+
   //trace(sum of diagonal elements)
   double  trace();
 
@@ -115,9 +136,6 @@ class RMatrix{
 
   //vector and matrix norms
   double  norm(double p = 2.0);
-
-  //create or extract a diagonal matrix
-  RMatrix diag();
 
   //pseudo-inverse matrix
   RMatrix pinv();
@@ -136,9 +154,6 @@ class RMatrix{
 
   //eigenvalues and eigenvectors
   int eig(RMatrix &D,RMatrix &P);
-
-  //singular value decomposition
-  int svd(RMatrix &U,RMatrix &S,RMatrix &V);
 
   //principal component analysis
   //this = X * P' + M, L : eigenvalues
@@ -174,5 +189,9 @@ class RMatrix{
 #include"RMatrix__OPERATOR_RESIZE.hpp"
 #include"RMatrix__OPERATOR_TRANSPOSE.hpp"
 #include"RMatrix__OPERATOR_INVERSE.hpp"
+
+#include"RMatrix__STATIC.hpp"
+#include"RMatrix__SVD.hpp"
+#include"RMatrix__DIAG.hpp"
 
 #endif

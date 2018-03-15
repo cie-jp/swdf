@@ -4,20 +4,24 @@
 using namespace std;
 
 int main(void){
-  RMatrix A(3,3);
-  RMatrix B = A;
-  RMatrix C = A;
-  RMatrix D(5,5);
-  
-  for(int i = 0;i < 5;i++){
-    for(int j = 0;j < 5;j++){
-      D[i][j] = rand() / (double)RAND_MAX;
-    }
-  }
+  RMatrix A;
+  RMatrix s,U,V;
 
-  cerr << D << endl;
-  cerr << !D << endl;
-  cerr << D * !D << endl;
+  A = RMatrix::random(8,3);
+
+  A.svd(s,U,V);
+
+  cerr << A                 << endl;
+  cerr << U * s.diag() * ~V << endl;
+
+  cerr << s << endl;
+  cerr << U << endl;
+  cerr << V << endl;
+
+  cerr << ~U * U << endl;
+  cerr << ~V * V << endl;
+
+  cerr << RMatrix::identity(5,3) << endl;
   
   return 0;
 }
