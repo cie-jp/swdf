@@ -102,6 +102,7 @@ void REAL__MATRIX_QR_TRI(REAL c [],//(out)[n - 1] : 直交行列の情報を表�
     r1[i    ] = REAL__ADD(REAL__MUL(               c[i] ,r1[i]),REAL__MUL(s[i],t0[i + 1]));
     r1[i + 1] = REAL__MUL(c[i],t1[i + 1]);
   }
+
     L         = REAL__SQRT(REAL__ADD(REAL__MUL(r0[i],r0[i]),REAL__MUL(t1[i],t1[i])));
     if(REAL__EQ(L,REAL__ZERO())){
       c[i   ] = REAL__ONE ();

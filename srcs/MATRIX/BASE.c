@@ -54,11 +54,23 @@ REAL REAL__NORM    (REAL x){
 }
 
 INT  REAL__EQ      (REAL x,REAL y){
-  return x == y;
+  REAL xa   = REAL__ABS(x);
+  REAL ya   = REAL__ABS(y);
+  REAL d    = REAL__ABS(REAL__SUB(x,y));
+  REAL aeps = DBL_MIN;
+  REAL reps = 1.0e-12;
+
+  if(d <= aeps){
+    return 1;
+  }
+  if(d <= REAL__MUL(reps,fmax(xa,ya))){
+    return 1;
+  }
+  return 0;
 }
 
 INT  REAL__NEQ     (REAL x,REAL y){
-  return x != y;
+  return !REAL__EQ(x,y);
 }
 
 REAL REAL__ADD     (REAL x,REAL y){

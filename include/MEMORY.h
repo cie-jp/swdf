@@ -14,7 +14,8 @@
 extern "C" {
 #endif
 
-#define ERROR__SHOW(comment)              fprintf(stderr,"=== ERROR ===\nfile  name  : %s\nfunc. name  : %s\nline number : %d\ncomment     : %s\n",__FILE__,__func__,__LINE__,comment)
+#define WARNING__SHOW(comment)            fprintf(stderr,"=== WARNING ===\nfile  name  : %s\nfunc. name  : %s\nline number : %d\ncomment     : %s\n",__FILE__,__func__,__LINE__,comment)
+#define   ERROR__SHOW(comment)            fprintf(stderr,"===  ERROR  ===\nfile  name  : %s\nfunc. name  : %s\nline number : %d\ncomment     : %s\n",__FILE__,__func__,__LINE__,comment)
 
 #define MEMORY__NEW(mem,type,num,comment) if((mem = (type*)malloc(sizeof(type) * (num))) == NULL){ERROR__SHOW(comment);exit(EXIT_FAILURE);}
 #define MEMORY__DEL(mem)                  free(mem)
