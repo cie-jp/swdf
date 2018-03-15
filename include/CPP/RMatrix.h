@@ -6,71 +6,106 @@
 #include<cstdlib>
 #include<cstring>
 #include<cmath>
+#include"CLDIA.h"
 
 using namespace std;
 
 class RMatrix{
  protected:
-  double *D;
-  int     W,H;
+  REAL *dat;
+  INT   row;
+  INT   col;
+ private:
+  static void initialize(RMatrix    &A,
+                         const INT   row,
+                         const INT   col);
+  static void finalize  (RMatrix    &A);
+  static void resize    (RMatrix    &A,
+                         const INT   row,
+                         const INT   col);
+  static void zerofill  (RMatrix    &A);
+  static void datacopy  (RMatrix    &A,
+                         const REAL *dat);
  public:
-
-  //create a ( 1  x  1 ) zero matrix
-  RMatrix(int dim = 1);
-
-  //create a (row x col) zero matrix
-  RMatrix(int row, int col);
-
-  //copy constructor
+  // *************************************************
+  // コンストラクタ
+  // *************************************************
+  //row行col列の    行列を作成(0で初期化される)
+  RMatrix(INT row,INT col);
+  //dim行dim列の正方行列を作成(0で初期化される)
+  RMatrix(REAL  x) : RMatrix(1,1) {dat[0] = x;}
+  //  1行  1列の    行列を作成(0で初期化される) 
+  RMatrix()        : RMatrix(1,1) {}
+  // *************************************************
+  // コピーコンストラクタ
+  // *************************************************
   RMatrix(const RMatrix &A);
-
-  //destructor
+  // *************************************************
+  // デストラクタ
+  // *************************************************
  ~RMatrix();
 
-  //get address of a matrix 
-  double *ptr()const;
+  // *************************************************
+  // アクセッサ
+  // *************************************************
+  REAL *get_dat()const{return this->dat;}//データポインタの取得
+  INT   get_row()const{return this->row;}//行数          の取得
+  INT   get_col()const{return this->col;}//列数          の取得
 
-  //get column  of a matrix
-  int     col()const;
-
-  //get row     of a matrix
-  int     row()const;
-
-  //operator overloading
+  // *************************************************
+  // 演算子のオーバーロード
+  // *************************************************
   RMatrix  &operator  =(const RMatrix &);
-  double   *operator [](const int     n)const;
+
+  REAL     *operator [](const INT     n)const;
+
   RMatrix  &operator +=(const RMatrix &);
+  RMatrix  &operator +=(const REAL     );
+
   RMatrix  &operator -=(const RMatrix &);
-  RMatrix  &operator +=(const double   );
-  RMatrix  &operator -=(const double   );
+  RMatrix  &operator -=(const REAL     );
+
   RMatrix  &operator *=(const RMatrix &);
-  RMatrix  &operator *=(const double   );
-  RMatrix  &operator /=(const double   );
+  RMatrix  &operator *=(const REAL     );
+  RMatrix  &operator %=(const RMatrix &);
+
+  RMatrix  &operator /=(const REAL     );
+  RMatrix  &operator /=(const RMatrix &);
+
   RMatrix  &operator &=(const RMatrix &);
+
   RMatrix  &operator |=(const RMatrix &);
+
+  friend ostream  &operator <<(ostream&       ,const RMatrix &);
+
+  friend RMatrix   operator  +(const RMatrix &);
+  friend RMatrix   operator  +(const RMatrix &,const RMatrix &);
+  friend RMatrix   operator  +(const REAL     ,const RMatrix &);
+  friend RMatrix   operator  +(const RMatrix &,const REAL     );
+
+  friend RMatrix   operator  -(const RMatrix &);                
+  friend RMatrix   operator  -(const RMatrix &,const RMatrix &);
+  friend RMatrix   operator  -(const REAL     ,const RMatrix &);
+  friend RMatrix   operator  -(const RMatrix &,const REAL     );
+
+  friend RMatrix   operator  *(const RMatrix &,const RMatrix &);
+  friend RMatrix   operator  *(const REAL     ,const RMatrix &);
+  friend RMatrix   operator  *(const RMatrix &,const REAL     );
+  friend RMatrix   operator  %(const RMatrix &,const RMatrix &);
+
+  friend RMatrix   operator  /(const RMatrix &,const REAL     );
+  friend RMatrix   operator  /(const RMatrix &,const RMatrix &);
+
+  friend RMatrix   operator  &(const RMatrix &,const RMatrix &);
+  friend RMatrix   operator  &(const RMatrix &,const INT      );
+  friend RMatrix   operator  &(const INT      ,const RMatrix &);
+
+  friend RMatrix   operator  |(const RMatrix &,const RMatrix &);
+  friend RMatrix   operator  |(const RMatrix &,const INT      );
+  friend RMatrix   operator  |(const INT      ,const RMatrix &);
+
   friend RMatrix   operator  ~(const RMatrix &);                
   friend RMatrix   operator  !(const RMatrix &);                
-  friend RMatrix   operator  +(const RMatrix &);                
-  friend RMatrix   operator  -(const RMatrix &);                
-  friend RMatrix   operator  +(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  -(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  +(const double   ,const RMatrix &);
-  friend RMatrix   operator  +(const RMatrix &,const double   );
-  friend RMatrix   operator  -(const double   ,const RMatrix &);
-  friend RMatrix   operator  -(const RMatrix &,const double   );
-  friend RMatrix   operator  *(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  *(const double   ,const RMatrix &);
-  friend RMatrix   operator  *(const RMatrix &,const double   );
-  friend RMatrix   operator  %(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  /(const RMatrix &,const double   );
-  friend RMatrix   operator  /(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  &(const RMatrix &,const int      );
-  friend RMatrix   operator  &(const int      ,const RMatrix &);
-  friend RMatrix   operator  &(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  |(const RMatrix &,const int      );
-  friend RMatrix   operator  |(const int      ,const RMatrix &);
-  friend RMatrix   operator  |(const RMatrix &,const RMatrix &);
-  friend ostream  &operator <<(ostream&       ,const RMatrix &);
 
   //trace(sum of diagonal elements)
   double  trace();
@@ -129,6 +164,15 @@ class RMatrix{
   void write_csv(const char *filename,char ch);
 };
 
-#include"RMatrix.hpp"
+#include"RMatrix__PRIVATE.hpp"
+#include"RMatrix__BASE.hpp"
+#include"RMatrix__OPERATOR_MEMBER.hpp"
+#include"RMatrix__OPERATOR_ADD.hpp"
+#include"RMatrix__OPERATOR_SUB.hpp"
+#include"RMatrix__OPERATOR_MUL.hpp"
+#include"RMatrix__OPERATOR_DIV.hpp"
+#include"RMatrix__OPERATOR_RESIZE.hpp"
+#include"RMatrix__OPERATOR_TRANSPOSE.hpp"
+#include"RMatrix__OPERATOR_INVERSE.hpp"
 
 #endif
