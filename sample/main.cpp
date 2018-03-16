@@ -3,6 +3,19 @@
 using namespace std;
 using namespace CLDIA;
 
+void lu_check(){
+  RMatrix A;
+  RMatrix L,U;
+
+  A = RMatrix::random(6,6);
+  lu(L,U,A);
+
+  cerr << A << endl;
+  cerr << L << endl;
+  cerr << U << endl;
+  cerr << L * U << endl;
+}
+
 int main(void){
   RMatrix A(3,3);
 
@@ -12,6 +25,8 @@ int main(void){
 
   cerr <<       A  << endl;
   cerr <<   det(A) << endl;
+  cerr <<   det_lu(A) << endl;
+
   cerr << trace(A) << endl;
 
   RMatrix s,U,V;
@@ -22,5 +37,7 @@ int main(void){
   cerr << s << endl;
   cerr << U << endl;
   cerr << V << endl;
+
+  lu_check();
   return 0;
 }

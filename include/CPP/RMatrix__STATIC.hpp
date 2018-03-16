@@ -79,3 +79,60 @@ RMatrix RMatrix::random  (const INT row,const INT col){
   }
   return A;
 }
+
+
+namespace CLDIA{
+
+  void lu(RMatrix &L,RMatrix &U,RMatrix A){
+    RMatrix LU;
+    INT     i,j;
+    INT     dim;
+    
+    if(!A.is_square()){
+      ERROR__SHOW("#1");
+      exit(EXIT_FAILURE);
+    }
+    dim = A.get_row();
+
+    LU  = A;
+    L   = RMatrix(dim,dim);
+    U   = RMatrix(dim,dim);
+
+    REAL__MATRIX_LU_DECOMPOSITION(&LU[0][0],dim);
+    
+    for(i = 0;i < dim;i++){
+      for(j = 0;j < dim;j++){
+        if(i >  j){
+          L[i][j] = LU[i][j];
+        }
+        if(i == j){
+          L[i][j] = 1.0;
+        }
+      }
+    }
+
+    for(i = 0;i < dim;i++){
+      for(j = 0;j < dim;j++){
+        if(i <= j){
+          U[i][j] = LU[i][j];
+        }
+      }
+    }
+
+  }
+
+  REAL det_lu(RMatrix A){
+    RMatrix L,U;
+    REAL    d;
+    INT     i;
+
+    lu(L,U,A);
+    d = 1.0;
+    for(i = 0;i < U.get_row();i++){
+      d *= U[i][i];
+    }
+    return d;
+  }
+
+
+}
