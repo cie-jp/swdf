@@ -13,5 +13,7 @@ int main(void){
   cerr << diag(diag(A)) << endl;
   cerr << trace(A) << endl;
   cerr << A.trace() << endl;
+  cerr << hilb(5) << endl;
+  cerr << eye(3) << endl;
   return 0;
 }
