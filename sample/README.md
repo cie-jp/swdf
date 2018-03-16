@@ -495,7 +495,7 @@ int main(void){
 </details>
 
 <details>
-<summary>3.18 非対角成分を0にした行列を作成</summary>
+<summary>3.18 対角成分を並べた縦ベクトルを作成</summary>
 
 ```C++
 #include<iostream>
@@ -505,7 +505,7 @@ using namespace std;
 
 int main(void){
 	RMatrix A = RMatrix::random(5,5);
-	cout << A.diag() << endl; //Aの非対角要素を0とした行列を作成し, 表示する. 
+	cout << A.diag() << endl; //Aの対角成分を並べた縦ベクトルを作成し, 表示する. 
 	return 0;
 }
 

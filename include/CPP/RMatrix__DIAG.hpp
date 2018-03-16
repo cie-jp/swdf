@@ -1,20 +1,25 @@
-RMatrix  RMatrix::diag (){
-  RMatrix A(this->row,this->row);
-  INT     i;
-  
-  if((this->row != this->col) && (this->col != 1)){
-    ERROR__SHOW("#1");
-    exit(EXIT_FAILURE);    
-  }
+#define MIN(x,y) (((x) <= (y)) ? (x) : (y))
 
-  if(this->row == this->col){
-    for(i = 0;i < A.row;i++){
-      A.dat[i * A.col + i] = this->dat[i * this->col + i];
+namespace CLDIA{
+  RMatrix diag(RMatrix A){
+    RMatrix C;
+    INT     i;
+    
+    if(A.get_col() == 1){
+      C = RMatrix(A.get_row(),A.get_row());
+      for(i = 0;i < A.get_row();i++){
+        C[i][i] = A[i][0];
+      }
+    }else{
+      C = RMatrix(MIN(A.get_row(),A.get_col()),1);
+      for(i = 0;i < C.get_row();i++){
+        C[i][0] = A[i][i];
+      }
     }
-  }else{
-    for(i = 0;i < A.row;i++){
-      A.dat[i * A.col + i] = this->dat[i];
-    }
+    return C;
   }
-  return A;
+}
+
+RMatrix  RMatrix::diag (){
+  return CLDIA::diag(*this);
 }
