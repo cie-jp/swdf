@@ -15,6 +15,7 @@
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A(4,6);     //4行6列の実行列を作成する. 全ての要素は0で初期化される. 
@@ -34,6 +35,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A;          //1行1列の実行列を作成する. 要素は0で初期化される. 
@@ -52,6 +54,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = 3.0;    //1行1列の実行列を作成する. 要素は3.0で初期化される. 
@@ -70,6 +73,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::identity(4,6); //4行6列の単位行列を作成する. 
@@ -88,6 +92,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);   //4行6列の単位行列を作成する. 
@@ -107,6 +112,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A(4,6);
@@ -126,6 +132,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A(4,6);
@@ -144,6 +151,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A(4,6);
@@ -165,6 +173,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -187,6 +196,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -209,6 +219,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -231,6 +242,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -253,6 +265,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -273,6 +286,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -293,6 +307,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -313,6 +328,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -332,6 +348,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -351,6 +368,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -370,6 +388,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -389,6 +408,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -408,6 +428,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -427,6 +448,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -446,6 +468,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(4,6);
@@ -464,6 +487,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(5,5);
@@ -484,10 +508,12 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix v = RMatrix::random(5,1);
-	cout << v.diag() << endl; //vの要素をもつ対角行列を作成し, 結果を表示する. 
+	cout << v.diag() << endl; // vの要素をもつ対角行列を作成し, 結果を表示する. 
+	cout << diag(v)  << endl; // 上と同じ.
 	return 0;
 }
 
@@ -502,10 +528,32 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(5,5);
-	cout << A.diag() << endl; //Aの対角成分を並べた縦ベクトルを作成し, 表示する. 
+	cout << A.diag() << endl; // Aの対角成分を並べた縦ベクトルを作成し, 表示する. 
+	cout << diag(A)  << endl; // 上と同じ.
+	return 0;
+}
+
+```
+</details>
+
+<details>
+<summary>3.19 行列の対角和</summary>
+
+```C++
+#include<iostream>
+#include"CLDIA.h"
+
+using namespace std;
+using namespace CLDIA;
+
+int main(void){
+	RMatrix A = RMatrix::random(5,5);
+	cout << A.trace() << endl; // Aの対角和を表示する. 
+	cout << trace(A)  << endl; // 上と同じ. 
 	return 0;
 }
 
@@ -521,6 +569,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(5,7);
@@ -528,9 +577,9 @@ int main(void){
 	RMatrix U;//右特異ベクトル群
 	RMatrix V;//左特異ベクトル群
 	cout << A << endl; //Aを表示する. 
-	cout << U * s.diag() * ~V << endl; //特異値分解の定義より, これはAに一致する. 
-	cout << ~U * U << endl;            //特異ベクトルの直交性より, 単位行列となる. 
-	cout << ~V * V << endl;            //特異ベクトルの直交性より, 単位行列となる. 
+	cout << U * diag(s) * ~V << endl; //特異値分解の定義より, これはAに一致する. 
+	cout << ~U * U << endl;           //特異ベクトルの直交性より, 単位行列となる. 
+	cout << ~V * V << endl;           //特異ベクトルの直交性より, 単位行列となる. 
 	return 0;
 }
 
@@ -545,6 +594,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(5,5); 
@@ -566,6 +616,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(8,5); 
@@ -587,6 +638,7 @@ int main(void){
 #include"CLDIA.h"
 
 using namespace std;
+using namespace CLDIA;
 
 int main(void){
 	RMatrix A = RMatrix::random(8,5); 
@@ -596,10 +648,10 @@ int main(void){
 	w[0][0] = 0.001;
 	w[1][0] = 0.001;                  // 始めの3方程式の重みを小さくなるように設定
 	w[2][0] = 0.002;
-	RMatrix x = !(~A * w.diag() * A) * (~A * w.diag() * b); // (Ax - b)^{T} diag(w) (Ax - b)を最小とするxを求める. 
-	cout << x << endl;                                      // xを表示する. 
-	cout << ((A * x) | b) << endl;                          // Ax = bに近い状況になっているかを確認するために表示する. 
-	// おそらく重みが相対的に大きな最後の5式で良い一致が見られるはずである. 
+	RMatrix x = !(~A * diag(w) * A) * (~A * diag(w) * b); // (Ax - b)^{T} diag(w) (Ax - b)を最小とするxを求める. 
+	cout << x << endl;                                    // xを表示する. 
+	cout << ((A * x) | b) << endl;                        // Ax = bに近い状況になっているかを確認するために表示する. 
+	// 重みが相対的に大きな最後の5式で良い一致が見られるはずである. 
 	return 0;
 }
 
