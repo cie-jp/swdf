@@ -54,6 +54,11 @@ class RMatrix{
   INT   get_col()const{return this->col;}//列数          の取得
 
   // *************************************************
+  // 確認
+  // *************************************************
+  INT  is_square(){return this->row == this->col;}
+  
+  // *************************************************
   // 演算子のオーバーロード
   // *************************************************
   RMatrix  &operator  =(const RMatrix &);
@@ -132,7 +137,7 @@ class RMatrix{
   RMatrix diag ();
 
   //trace(sum of diagonal elements)
-  double  trace();
+  REAL    trace();
 
   //matrix determinant
   double  det();
@@ -196,5 +201,6 @@ class RMatrix{
 #include"RMatrix__STATIC.hpp"
 #include"RMatrix__SVD.hpp"
 #include"RMatrix__DIAG.hpp"
+#include"RMatrix__TRACE.hpp"
 
 #endif
