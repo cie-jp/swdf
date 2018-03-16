@@ -27,6 +27,30 @@ namespace CLDIA{
     }
     return H;
   }
+
+  REAL cond(RMatrix A){
+    RMatrix s;
+    RMatrix U;
+    RMatrix V;
+
+    A.svd(s,U,V);
+    return s[0][0] / s[s.get_row() - 1][0];
+  }
+
+  REAL det (RMatrix A){
+    RMatrix s;
+    RMatrix U;
+    RMatrix V;
+    REAL    d;
+    INT     i;
+
+    A.svd(s,U,V);
+    d = 1.0;
+    for(i = 0;i < s.get_row();i++){
+      d *= s[i][0];
+    }
+    return d;
+  }
 }
 
 RMatrix RMatrix::identity(const INT row,const INT col){
