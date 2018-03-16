@@ -1,13 +1,13 @@
 // *************************************************
 // 単項演算子(-)
 // *************************************************
-RMatrix  operator -(const RMatrix &A){
-  RMatrix C = A;
+CMatrix  operator -(const CMatrix &A){
+  CMatrix C = A;
   INT     i,j;
   
   for(i = 0;i < C.row;i++){
     for(j = 0;j < C.col;j++){
-      C.dat[i * C.col + j] = -C.dat[i * C.col + j];
+      C.dat[i * C.col + j] = COMP__NEGATIVE(C.dat[i * C.col + j]);
     }
   }
   return C;
@@ -16,8 +16,8 @@ RMatrix  operator -(const RMatrix &A){
 // *************************************************
 // 減算演算子(行列 - 行列)
 // *************************************************
-RMatrix  operator -(const RMatrix &A,const RMatrix &B){
-  RMatrix C = A;
+CMatrix  operator -(const CMatrix &A,const CMatrix &B){
+  CMatrix C = A;
   INT     i,j;
   
   if(A.row != B.row || A.col != B.col){
@@ -27,37 +27,37 @@ RMatrix  operator -(const RMatrix &A,const RMatrix &B){
   
   for(i = 0;i < C.row;i++){
     for(j = 0;j < C.col;j++){
-      C.dat[i * C.col + j] -= B.dat[i * B.col + j];
+      C.dat[i * C.col + j] = COMP__SUB(C.dat[i * C.col + j],B.dat[i * B.col + j]);
     }
   }
   return C;
 }
 
 // *************************************************
-// 減算演算子(実数 - 行列)
+// 減算演算子(  数 - 行列)
 // *************************************************
-RMatrix  operator -(const REAL     a,const RMatrix &B){
-  RMatrix C = B;
+CMatrix  operator -(const COMP     a,const CMatrix &B){
+  CMatrix C = B;
   INT     i,j;
 
   for(i = 0;i < C.row;i++){
     for(j = 0;j < C.col;j++){
-      C.dat[i * C.col + j] = a - C.dat[i * C.col + j];
+      C.dat[i * C.col + j] = COMP__SUB(a,C.dat[i * C.col + j]);
     }
   }
   return C;
 }
 
 // *************************************************
-// 減算演算子(行列 - 実数)
+// 減算演算子(行列 -   数)
 // *************************************************
-RMatrix  operator -(const RMatrix &A,const REAL     b){
-  RMatrix C = A;
+CMatrix  operator -(const CMatrix &A,const COMP     b){
+  CMatrix C = A;
   INT     i,j;
 
   for(i = 0;i < C.row;i++){
     for(j = 0;j < C.col;j++){
-      C.dat[i * C.col + j] = C.dat[i * C.col + j] - b;
+      C.dat[i * C.col + j] = COMP__SUB(C.dat[i * C.col + j],b);
     }
   }
   return C;

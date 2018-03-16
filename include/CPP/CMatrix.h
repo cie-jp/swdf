@@ -6,7 +6,6 @@
 #include<cstdlib>
 #include<cstring>
 #include<cmath>
-#include"CLDIA.h"
 
 using namespace std;
 
@@ -120,7 +119,7 @@ class CMatrix{
   // *************************************************
   // 特異値分解
   // *************************************************
-  void    svd  (CMatrix &s,CMatrix &U,CMatrix &V);
+  void    svd  (RMatrix &s,CMatrix &U,CMatrix &V);
 
   // *************************************************
   // 縦ベクトルの場合 : 縦ベクトル要素を対角成分に持つ対角行列を返す
@@ -183,19 +182,33 @@ class CMatrix{
 #include"CMatrix__BASE.hpp"
 #include"CMatrix__OPERATOR_MEMBER.hpp"
 #include"CMatrix__OPERATOR_ADD.hpp"
-/*
 #include"CMatrix__OPERATOR_SUB.hpp"
 #include"CMatrix__OPERATOR_MUL.hpp"
 #include"CMatrix__OPERATOR_DIV.hpp"
 #include"CMatrix__OPERATOR_RESIZE.hpp"
+#include"CMatrix__OPERATOR_ADJOINT.hpp"
+/*
 #include"CMatrix__OPERATOR_TRANSPOSE.hpp"
-#include"CMatrix__OPERATOR_INVERSE.hpp"
 */
+#include"CMatrix__OPERATOR_INVERSE.hpp"
 
 #include"CMatrix__STATIC.hpp"
-/*
+
 #include"CMatrix__SVD.hpp"
+/*
 #include"CMatrix__DIAG.hpp"
 */
+
+RMatrix::operator CMatrix()const{
+  CMatrix C(this->row,this->col);
+  INT     i,j;
+
+  for(i = 0;i < this->row;i++){
+    for(j = 0;j < this->col;j++){
+      C[i][j] = COMP__MAKE(this->dat[i * this->col + j]);
+    }    
+  }  
+  return C;
+}
 
 #endif

@@ -22,12 +22,12 @@ CMatrix  &CMatrix::operator +=(const CMatrix &A){
 }
 
 // *************************************************
-// 加算演算子(実数)
+// 加算演算子(  数)
 // *************************************************
 CMatrix  &CMatrix::operator +=(const COMP     k){
   return *this = *this + k;
 }
-/*
+
 // *************************************************
 // 減算演算子(行列)
 // *************************************************
@@ -36,7 +36,7 @@ CMatrix  &CMatrix::operator -=(const CMatrix &A){
 }
 
 // *************************************************
-// 減算演算子(実数)
+// 減算演算子(  数)
 // *************************************************
 CMatrix  &CMatrix::operator -=(const COMP     k){
   return *this = *this - k;
@@ -50,7 +50,7 @@ CMatrix  &CMatrix::operator *=(const CMatrix &A){
 }
 
 // *************************************************
-// 乗算演算子(実数)
+// 乗算演算子(  数)
 // *************************************************
 CMatrix  &CMatrix::operator *=(const COMP     b){
   return *this = *this * b;
@@ -64,7 +64,7 @@ CMatrix  &CMatrix::operator %=(const CMatrix &A){
 }
 
 // *************************************************
-// 除算演算子(実数)
+// 除算演算子(  数)
 // *************************************************
 CMatrix  &CMatrix::operator /=(const COMP     b){
   return *this = *this / b;
@@ -90,7 +90,7 @@ CMatrix  &CMatrix::operator &=(const CMatrix &A){
 CMatrix  &CMatrix::operator |=(const CMatrix &A){
   return *this = *this | A;
 }
-*/
+
 // *************************************************
 // 出力
 // *************************************************

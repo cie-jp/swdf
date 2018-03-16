@@ -6,9 +6,10 @@
 #include<cstdlib>
 #include<cstring>
 #include<cmath>
-#include"CLDIA.h"
 
 using namespace std;
+
+class CMatrix;
 
 class RMatrix{
  protected:
@@ -76,6 +77,8 @@ class RMatrix{
 
   RMatrix  &operator |=(const RMatrix &);
 
+  operator CMatrix()const;
+  
   friend ostream  &operator <<(ostream&       ,const RMatrix &);
 
   friend RMatrix   operator  +(const RMatrix &);

@@ -26,7 +26,7 @@ CMatrix  operator +(const CMatrix &A,const CMatrix &B){
 }
 
 // *************************************************
-// 加算演算子(実数 + 行列)
+// 加算演算子(  数 + 行列)
 // *************************************************
 CMatrix  operator +(const COMP     a,const CMatrix &B){
   CMatrix C = B;
@@ -41,7 +41,7 @@ CMatrix  operator +(const COMP     a,const CMatrix &B){
 }
 
 // *************************************************
-// 加算演算子(行列 + 実数)
+// 加算演算子(行列 +   数)
 // *************************************************
 CMatrix  operator +(const CMatrix &A,const COMP     b){
   CMatrix C = A;

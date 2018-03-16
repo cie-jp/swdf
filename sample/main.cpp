@@ -1,6 +1,4 @@
 #include"CLDIA.h"
-#include"CPP/RMatrix.h"
-#include"CPP/CMatrix.h"
 
 using namespace std;
 
@@ -29,5 +27,23 @@ int main(void){
   W = B + B;
   cerr << B << endl;
   cerr << W << endl;
+
+  cerr << W - B << endl;
+  cerr << COMPLEX__MAKE_RE_IM(5.0,3.0) * W / B / COMPLEX__MAKE_RE_IM(5.0,3.0) << endl;
+  cerr << (W & W) << endl;
+
+  cerr << ~(W & W) << endl;
+
+  CMatrix Q = CMatrix::random(4,9);
+  CMatrix UU,VV;
+
+  Q.svd(s,UU,VV);
+  cerr << Q << endl;
+  cerr << ~UU * UU << endl;
+  cerr << ~VV * VV << endl;
+
+  cerr << UU * s.diag() * ~VV << endl;
+  cerr << s << endl;
+  cerr << ~s << endl;
   return 0;
 }
