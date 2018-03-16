@@ -15,3 +15,10 @@
 #include"CDF_COMMON.h"
 
 #include"CL31.h"
+
+#ifdef __cplusplus
+
+#include"CPP/RMatrix.h"
+#include"CPP/CMatrix.h"
+
+#endif
