@@ -203,4 +203,22 @@ class RMatrix{
 #include"RMatrix__DIAG.hpp"
 #include"RMatrix__TRACE.hpp"
 
+namespace CLDIA{
+  void hist(const RMatrix &A,
+            const REAL     min,
+            const REAL     max,
+            const INT      div,
+            const CHAR *filename){
+    SVGPLOT__HISTOGRAM(&A[0][0],A.get_row(),
+                       min,max,
+                       div,
+                       "x label",
+                       "y label",
+                       "title",
+                       filename);
+  }
+
+  RMatrix linspace(const REAL x1,const REAL x2);
+}
+
 #endif

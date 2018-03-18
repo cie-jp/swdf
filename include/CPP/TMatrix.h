@@ -477,4 +477,53 @@ void show(const TMatrix<REAL> &A,const TMatrix<INT> &M){
   }  
 }
 
+
+template<typename TYPE> class TVector : public TMatrix<TYPE>{
+ public:
+  //create a ( 1 )-dimensional zero vector
+  TVector()                   : TMatrix<TYPE>(1,1){}
+  
+  //create a (dim)-dimensional zero vector
+  TVector(int dim)            : TMatrix<TYPE>(dim,1){}
+
+  //copy constructor
+  TVector(const TMatrix<TYPE> &A);
+  
+  //get dimension of a vector
+  int dim()const{return this->row;}
+  
+  //operator overloading
+  TYPE          &operator [](const int n)const{return this->dat[n];}
+  TVector<TYPE> &operator  =(const TMatrix<TYPE> &);
+};
+
+template<typename TYPE> 
+TVector<TYPE>::TVector(const TMatrix<TYPE> &A){
+  if(A.col() != 1){
+    cerr << "Error : TVector.TVector(TMatrix)" << endl;
+    exit(EXIT_FAILURE);
+  }
+  this->col =       1;
+  this->row = A.row();
+  this->dat = new TYPE[this->row];
+  memcpy(this->dat,A.get_dat(),this->row * sizeof(TYPE));
+}
+
+template<typename TYPE> 
+TVector<TYPE> &TVector<TYPE>::operator  =(const TMatrix<TYPE> &A){
+  if(A.get_col() != 1){
+    cerr << "Error : TVector.=(TMatrix)" << endl;
+    exit(EXIT_FAILURE);
+  }
+  if(this->row != A.get_row()){ 
+    delete [] this->D;
+    this->col =       1;
+    this->row = A.row();
+    this->dat = new TYPE[this->row];
+  }
+  memcpy(this->dat,A.get_dat(),this->row * sizeof(TYPE));
+  return *this;
+}
+
+
 #endif

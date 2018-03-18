@@ -35,6 +35,20 @@ void tmatrix_check(){
   cerr <<  C << endl;
   show(C);
   show(C,C < 3.0);
+
+  RMatrix Q = RMatrix::random(100000,1);
+  hist(Q,-5,5,70,"hoge.svg");
+  TVector<REAL> c(5);
+  TVector<REAL> d;
+
+  c[2] = 1.0;
+  c[3] = 2.0;
+  cerr << c << endl;
+  cerr << d << endl;
+
+  show(c,c > 1.0);
+
+  //hist(c,-5,5,70,"piyo.svg");
 }
 
 int main(void){
