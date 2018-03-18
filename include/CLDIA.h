@@ -18,6 +18,7 @@
 
 #ifdef __cplusplus
 
+#include"CPP/TMatrix.h"
 #include"CPP/RMatrix.h"
 #include"CPP/CMatrix.h"
 
