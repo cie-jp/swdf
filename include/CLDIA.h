@@ -7,6 +7,8 @@
  * 
  *****************************************************************/
 
+#include"DTIME.h"
+
 #include"FFT.h"
 #include"RANDOM.h"
 #include"SVG/SVGPLOT.h"
