@@ -6,6 +6,7 @@
 #include<cstdlib>
 #include<cstring>
 #include<cmath>
+#include"DATATYPE.h"
 
 using namespace std;
 
@@ -240,22 +241,22 @@ TMatrix<INT>  operator > (const TMatrix<TYPE> &A,const TYPE     b){
 
 template<typename TYPE>
 TMatrix<INT>  operator > (const TYPE           a,const TMatrix<TYPE> &B){
-  return B <= a;
-}
-
-template<typename TYPE>
-TMatrix<INT>  operator >=(const TYPE           a,const TMatrix<TYPE> &B){
   return B <  a;
 }
 
 template<typename TYPE>
+TMatrix<INT>  operator >=(const TYPE           a,const TMatrix<TYPE> &B){
+  return B <= a;
+}
+
+template<typename TYPE>
 TMatrix<INT>  operator < (const TYPE           a,const TMatrix<TYPE> &B){
-  return B >= a;
+  return B >  a;
 }
 
 template<typename TYPE>
 TMatrix<INT>  operator <=(const TYPE           a,const TMatrix<TYPE> &B){
-  return B >  a;
+  return B >= a;
 }
 
 template<typename TYPE>
@@ -525,5 +526,73 @@ TVector<TYPE> &TVector<TYPE>::operator  =(const TMatrix<TYPE> &A){
   return *this;
 }
 
+class DMatrix : public TMatrix<T2000>{
+ public:
+  using TMatrix<T2000>::TMatrix;
+};
+
+
+void show(const TMatrix<T2000> &A){
+  CHAR str[256];
+  INT  i,j;
+  
+  cerr << "=============(" << A.get_row() << "," << A.get_col() << ")=============" << endl;  
+  for(i = 0;i < A.get_row();i++){
+    cerr << "| "; 
+    for(j = 0;j < A.get_col();j++){
+      T2000__PRINT(A[i][j],stderr);
+      cerr << " ";
+    }
+    cerr << "|" << endl;
+  }  
+}
+
+void show(const TMatrix<T2000> &A,const TMatrix<INT> &M){
+  CHAR str[256];
+  INT  i,j;
+  
+  cerr << "=============(" << A.get_row() << "," << A.get_col() << ")=============" << endl;  
+  for(i = 0;i < A.get_row();i++){
+    cerr << "| "; 
+    for(j = 0;j < A.get_col();j++){
+      if(M[i][j] == 1){
+        cerr << "\x1b[36m";
+      }
+      T2000__PRINT(A[i][j],stderr);
+      cerr << " ";
+      if(M[i][j] == 1){
+        cerr << "\x1b[39m";
+      }
+    }
+    cerr << "|" << endl;
+  }  
+}
+
+DMatrix linspace(const CHAR *epoch_s,
+                 const CHAR *epoch_e,
+                 INT8        diff){
+  DMatrix t;
+  T2000   ts;
+  T2000   te;
+  INT4    num;
+  INT4    i;
+
+  ts  =  T2000__MAKE_FROM_TEXT(epoch_s);
+  te  =  T2000__MAKE_FROM_TEXT(epoch_e);
+  num = (te - ts) / diff;
+  t   =  DMatrix(num,1);
+  for(i = 0;i < num;i++){
+    t[i][0] = ts + i * diff;
+  }
+  return t;
+}
+
+#define T2000__NSEC (               1LL)
+#define T2000__USEC (1000 * T2000__NSEC)
+#define T2000__MSEC (1000 * T2000__USEC)
+#define T2000__SEC  (1000 * T2000__MSEC)
+#define T2000__MIN  (  60 * T2000__SEC )
+#define T2000__HOUR (  60 * T2000__MIN )
+#define T2000__DAY  (  24 * T2000__HOUR)
 
 #endif

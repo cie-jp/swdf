@@ -29,6 +29,7 @@ extern "C" {
     INT2  nsec;
   }DTIME;
 
+  void  T2000__PRINT    (T2000 epoch,FILE *fp);
   void  DTIME__PRINT    (DTIME epoch,FILE *fp);
   T2000 T2000__MAKE_FROM_DTIME(DTIME epoch);
   DTIME DTIME__MAKE_FROM_T2000(T2000 t2000);

@@ -15,6 +15,10 @@
 #include"cdf.h"
 #include"DTIME.h"
 
+void  T2000__PRINT    (T2000 epoch,FILE *fp){
+  DTIME__PRINT(DTIME__MAKE_FROM_T2000(epoch),fp);
+}
+
 void  DTIME__PRINT    (DTIME epoch,FILE *fp){
   fprintf(fp,"%04d-%02d-%02d %02d:%02d:%02d.%03d%03d%03d",
           epoch.YYYY,
