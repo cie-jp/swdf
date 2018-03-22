@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+  #include<stdio.h>
+  
   // ***********************************
   // データ型宣言
   // ***********************************
@@ -83,7 +85,14 @@ extern "C" {
     EPOCH       _epoch;
     EPOCH16     _epoch16;
     TIME_TT2000 _time_tt2000;    
+  }DATA_CONTENT;
+
+  typedef struct{
+    INT1         type;
+    DATA_CONTENT data;
   }DATA;
+
+  void DATA__WRITE(DATA *dat,FILE *fp);
 
   // ***********************************
   // マクロ定義
