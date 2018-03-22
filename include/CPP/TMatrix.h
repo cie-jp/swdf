@@ -595,4 +595,89 @@ DMatrix linspace(const CHAR *epoch_s,
 #define T2000__HOUR (  60 * T2000__MIN )
 #define T2000__DAY  (  24 * T2000__HOUR)
 
+//時刻の取得関数
+void DMatrix__fetch(DMatrix    &t,
+                    const char *varName,  //z変数名
+                    const char *filename){//CDFファイル名  
+  CDFid     id;
+  CDFstatus status;
+  long      varNum;
+  long      numRecs;
+  long      numDims;
+  long      dimSizes[CDF_MAX_DIMS];
+  long      numValues;
+  int       i;
+  
+  //CDFファイルを開く
+  status    = CDFopenCDF(filename,&id);
+  //CDFのz変数名からz変数のIDを取得
+  varNum    = CDFgetVarNum(id,(char*)varName);
+  //CDFファイルに書かれたレコードの最大番号を取得
+  status    = CDFgetzVarMaxWrittenRecNum(id,varNum,&numRecs);
+  //z変数の次元を取得
+  status    = CDFgetzVarNumDims(id,varNum,&numDims);
+  //z変数の各次元の要素数を取得
+  status    = CDFgetzVarDimSizes(id,varNum,dimSizes);
+  //z変数の1レコード文の要素数を計算
+  numValues = 1;
+  for(i = 0;i < numDims;i++){
+    numValues *= dimSizes[i];
+  }
+
+  //情報の表示  
+  printf("numDims = %ld | numRecs = %ld\n",numDims,numRecs);
+  printf("numValues = %d, numRecs = %d\n",(int)numValues,(int)numRecs);
+  for(i = 0;i < numDims;i++){
+    printf("%d %ld\n",i,dimSizes[i]);
+  }
+
+  //行列の初期化
+  t = DMatrix((numRecs + 1) * numValues,1);
+  
+  status = CDFgetzVarAllRecordsByVarID(id,varNum,t.get_dat());
+  
+  CDFcloseCDF(id);
+}
+
+
+void RMatrix__fetch(TMatrix<REAL8> &A,
+                    const char *varName,  //z変数名
+                    const char *filename){//CDFファイル名  
+  CDFid     id;
+  CDFstatus status;
+  long      varNum;
+  long      numRecs;
+  long      numDims;
+  long      dimSizes[CDF_MAX_DIMS];
+  long      numValues;
+  int       i;
+
+  //CDFファイルを開く
+  status    = CDFopenCDF(filename,&id);
+  //CDFのz変数名からz変数のIDを取得
+  varNum    = CDFgetVarNum(id,(char*)varName);
+  //CDFファイルに書かれたレコードの最大番号を取得
+  status    = CDFgetzVarMaxWrittenRecNum(id,varNum,&numRecs);
+  //z変数の次元を取得
+  status    = CDFgetzVarNumDims(id,varNum,&numDims);
+  //z変数の各次元の要素数を取得
+  status    = CDFgetzVarDimSizes(id,varNum,dimSizes);
+  //z変数の1レコード文の要素数を計算
+  numValues = 1;
+  for(i = 0;i < numDims;i++){
+    numValues *= dimSizes[i];
+  }
+
+  //情報の表示
+  printf("numDims = %ld | numRecs = %ld\n",numDims,numRecs);
+  printf("numValues = %d, numRecs = %d\n",(int)numValues,(int)numRecs);
+  for(i = 0;i < numDims;i++){
+    printf("%d %ld\n",i,dimSizes[i]);
+  }
+  A = TMatrix<REAL8>(numRecs + 1,numValues);
+  status = CDFgetzVarAllRecordsByVarID(id,varNum,A.get_dat());
+
+  CDFcloseCDF(id);
+}
+
 #endif
