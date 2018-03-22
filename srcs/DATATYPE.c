@@ -50,7 +50,7 @@ void DATA__WRITE_EPOCH16_    (EPOCH16     dat,FILE *fp){
   long nsec;
   long psec;
 
-  EPOCH16breakdown(dat,
+  EPOCH16breakdown(&dat,
                    &YYYY,
                    &MM,
                    &DD,
@@ -169,6 +169,33 @@ void DATA__WRITE(DATA *dat,FILE *fp){
   case DATATYPE_EPOCH16    :DATA__WRITE_EPOCH16_    (dat->data._epoch16    ,fp);break;
   case DATATYPE_TIME_TT2000:DATA__WRITE_TIME_TT2000_(dat->data._time_tt2000,fp);break;
   }
+}
+
+void DATA__COPY(DATA *dst,
+                INT1  type,
+                void *data_ptr){
+  dst->type = type;
+  switch(type){
+  case DATATYPE_NULL       :return;
+  case DATATYPE_CHAR       :dst->data._char        = *(CHAR       *)data_ptr;return;
+  case DATATYPE_UCHAR      :dst->data._uchar       = *(UCHAR      *)data_ptr;return;
+  case DATATYPE_BYTE       :dst->data._byte        = *(BYTE       *)data_ptr;return;
+  case DATATYPE_INT1       :dst->data._int1        = *(INT1       *)data_ptr;return;
+  case DATATYPE_INT2       :dst->data._int2        = *(INT2       *)data_ptr;return;
+  case DATATYPE_INT4       :dst->data._int4        = *(INT4       *)data_ptr;return;
+  case DATATYPE_INT8       :dst->data._int8        = *(INT8       *)data_ptr;return;
+  case DATATYPE_UINT1      :dst->data._uint1       = *(UINT1      *)data_ptr;return;
+  case DATATYPE_UINT2      :dst->data._uint2       = *(UINT2      *)data_ptr;return;
+  case DATATYPE_UINT4      :dst->data._uint4       = *(UINT4      *)data_ptr;return;
+  case DATATYPE_FLOAT      :dst->data._float       = *(FLOAT      *)data_ptr;return;
+  case DATATYPE_DOUBLE     :dst->data._double      = *(DOUBLE     *)data_ptr;return;
+  case DATATYPE_REAL4      :dst->data._real4       = *(REAL4      *)data_ptr;return;
+  case DATATYPE_REAL8      :dst->data._real8       = *(REAL8      *)data_ptr;return;
+  case DATATYPE_EPOCH      :dst->data._epoch       = *(EPOCH      *)data_ptr;return;
+  case DATATYPE_EPOCH16    :dst->data._epoch16     = *(EPOCH16    *)data_ptr;return;
+  case DATATYPE_TIME_TT2000:dst->data._time_tt2000 = *(TIME_TT2000*)data_ptr;return;
+  default                  :return;
+  }  
 }
 
 INT1 DATA__GET_DATATYPE(long dataType){

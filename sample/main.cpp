@@ -4,12 +4,13 @@ using namespace std;
 using namespace CLDIA;
 
 int main(){
-  DMatrix epoch;
-  TMatrix<REAL> bscat;
+  TMatrix<DATA> epoch;
+  TMatrix<DATA> bscat;
   
-  DMatrix__fetch(epoch,"epoch"    ,"~/Desktop/ceilo_l1_20170825_v00.cdf");
-  RMatrix__fetch(bscat,"back_scat","~/Desktop/ceilo_l1_20170825_v00.cdf");
-  show(epoch);
-  show(bscat);
+  Matrix__fetch(epoch,"epoch"    ,"~/Desktop/ceilo_l1_20170825_v00.cdf");
+  Matrix__fetch(bscat,"back_scat","~/Desktop/ceilo_l1_20170825_v00.cdf");
+
+
+  show(epoch | (bscat | 0));
   return 0;
 }

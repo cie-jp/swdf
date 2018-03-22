@@ -442,6 +442,23 @@ ostream &operator <<(ostream     &os,const TMatrix<REAL> &A){
   return os;
 }
 
+ostream &operator <<(ostream     &os,const TMatrix<DATA> &A){
+  CHAR str[256];
+  INT  i,j;
+  
+  os << "=============(" << A.row << "," << A.col << ")=============" << endl;  
+  for(i = 0;i < A.get_row();i++){
+    os << "| "; 
+    for(j = 0;j < A.get_col();j++){
+      DATA__WRITE(&A[i][j],stderr);
+      os << " ";
+    }
+    os << "|" << endl;
+  }
+  
+  return os;
+}
+
 void show(const TMatrix<REAL> &A){
   CHAR str[256];
   INT  i,j;
@@ -541,6 +558,21 @@ void show(const TMatrix<T2000> &A){
     cerr << "| "; 
     for(j = 0;j < A.get_col();j++){
       T2000__PRINT(A[i][j],stderr);
+      cerr << " ";
+    }
+    cerr << "|" << endl;
+  }  
+}
+
+void show(const TMatrix<DATA> &A){
+  CHAR str[256];
+  INT  i,j;
+  
+  cerr << "=============(" << A.get_row() << "," << A.get_col() << ")=============" << endl;  
+  for(i = 0;i < A.get_row();i++){
+    cerr << "| "; 
+    for(j = 0;j < A.get_col();j++){
+      DATA__WRITE(&A[i][j],stderr);
       cerr << " ";
     }
     cerr << "|" << endl;
@@ -677,6 +709,59 @@ void RMatrix__fetch(TMatrix<REAL8> &A,
   A = TMatrix<REAL8>(numRecs + 1,numValues);
   status = CDFgetzVarAllRecordsByVarID(id,varNum,A.get_dat());
 
+  CDFcloseCDF(id);
+}
+
+void Matrix__fetch(TMatrix<DATA> &A,
+                    const char    *varName,  //z変数名
+                    const char    *filename){//CDFファイル名  
+  CDFid     id;
+  CDFstatus status;
+  long      varNum;
+  long      numRecs;
+  long      numDims;
+  long      dimSizes[CDF_MAX_DIMS];
+  long      numValues;
+  long      dataType;
+  long      dataSize;
+  BYTE     *buffer;
+  int       i,j;
+
+  //CDFファイルを開く
+  status    = CDFopenCDF(filename,&id);
+  //CDFのz変数名からz変数のIDを取得
+  varNum    = CDFgetVarNum(id,(char*)varName);
+  //CDFファイルに書かれたレコードの最大番号を取得
+  status    = CDFgetzVarMaxWrittenRecNum(id,varNum,&numRecs);
+  //z変数の次元を取得
+  status    = CDFgetzVarNumDims(id,varNum,&numDims);
+  //z変数の各次元の要素数を取得
+  status    = CDFgetzVarDimSizes(id,varNum,dimSizes);
+  //z変数の1レコード文の要素数を計算
+  numValues = 1;
+  for(i = 0;i < numDims;i++){
+    numValues *= dimSizes[i];
+  }
+  status = CDFgetzVarDataType(id,varNum,&dataType);
+  CDFgetDataTypeSize(dataType,&dataSize);
+  //情報の表示
+  printf("numDims = %ld | numRecs = %ld\n",numDims,numRecs);
+  printf("numValues = %d, numRecs = %d\n",(int)numValues,(int)numRecs);
+  for(i = 0;i < numDims;i++){
+    printf("%d %ld\n",i,dimSizes[i]);
+  }
+  if((buffer = (BYTE*)malloc(dataSize * (numRecs + 1) * numValues)) == NULL){
+    exit(EXIT_FAILURE);
+  }
+  A = TMatrix<DATA>(numRecs + 1,numValues);
+  status = CDFgetzVarAllRecordsByVarID(id,varNum,buffer);
+  for(i = 0;i <= numRecs;i++){
+    for(j = 0;j < numValues;j++){
+      DATA__COPY(&A[i][j],DATA__GET_DATATYPE(dataType),buffer + (i * numValues + j) * dataSize);
+    }
+  }
+  free(buffer);
+  
   CDFcloseCDF(id);
 }
 

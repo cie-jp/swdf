@@ -36,7 +36,10 @@ extern "C" {
   typedef float              REAL4      ; //    4-byte, floating point.
   typedef double             REAL8      ; //    8-byte, floating point.
   typedef double             EPOCH      ; //    8-byte, floating point.
-  typedef double             EPOCH16[2] ; //two 8-byte, floating point.
+  typedef struct{
+    double x;
+    double y;
+  }EPOCH16;                               //two 8-byte, floating point.
   typedef long long int      TIME_TT2000; //    8-byte,   signed integer.
   typedef TIME_TT2000        T2000      ;
 
@@ -107,6 +110,14 @@ extern "C" {
 #ifndef ILLEGAL_TT2000_VALUE
 #define ILLEGAL_TT2000_VALUE    (-9223372036854775805LL)
 #endif
+
+  INT1 DATA__GET_DATATYPE(long dataType);
+  REAL8 DATA__GET(DATA *dat);
+  void DATA__COPY(DATA *dst,
+                  INT1  type,
+                  void *data_ptr);
+
+
   
 #ifdef __cplusplus
 }
