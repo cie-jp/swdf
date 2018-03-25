@@ -20,6 +20,15 @@ void cdfplot(const CHAR *zvarname,
   char          variable_name[CDF_VAR_NAME_LEN256 + 1];
   char          depend_0_name[CDF_VAR_NAME_LEN256 + 1];
   char          depend_1_name[CDF_VAR_NAME_LEN256 + 1];
+  char          variable_catdesc[1024];
+  char          depend_0_catdesc[1024];
+  char          depend_1_catdesc[1024];
+  char          variable_units[1024];
+  char          depend_0_units[1024];
+  char          depend_1_units[1024];
+  STRING        variable_label;
+  STRING        depend_0_label;
+  STRING        depend_1_label;
   // *******************************************************************************
   {
     CDFid       id;
@@ -57,6 +66,37 @@ void cdfplot(const CHAR *zvarname,
     if(status != CDF_OK){
       CDF__Status_Handler(status);
     }
+
+    CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,variable_name,"CATDESC");
+    strcpy(variable_catdesc,(char*)meta.buffer);
+    CDFMETADATA__FINALIZE(&meta);
+
+    CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,depend_0_name,"CATDESC");
+    strcpy(depend_0_catdesc,(char*)meta.buffer);
+    CDFMETADATA__FINALIZE(&meta);
+
+    CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,depend_1_name,"CATDESC");
+    strcpy(depend_1_catdesc,(char*)meta.buffer);
+    CDFMETADATA__FINALIZE(&meta);
+
+    CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,variable_name,"UNITS");
+    strcpy(variable_units,(char*)meta.buffer);
+    CDFMETADATA__FINALIZE(&meta);
+
+    /*
+    CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,depend_0_name,"UNITS");
+    strcpy(depend_0_units,(char*)meta.buffer);
+    CDFMETADATA__FINALIZE(&meta);
+    */
+    strcpy(depend_0_units,".");
+
+    CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,depend_1_name,"UNITS");
+    strcpy(depend_1_units,(char*)meta.buffer);
+    CDFMETADATA__FINALIZE(&meta);
+
+    variable_label = STRING(variable_catdesc) + " [" + STRING(variable_units) + "] ";
+    depend_0_label = STRING(depend_0_catdesc) + " [" + STRING(depend_0_units) + "] ";
+    depend_1_label = STRING(depend_1_catdesc) + " [" + STRING(depend_1_units) + "] ";
     
     CDF__Close(&id);
 
@@ -127,17 +167,17 @@ void cdfplot(const CHAR *zvarname,
 
   //x軸ラベルの設定
   SVGPLOT__XLABEL(&plt,
-		  depend_0_name,//x軸(下)
+		  &depend_0_label[0],//x軸(下)
 		  NULL);        //x軸(上)
 
   //y軸ラベルの設定  
   SVGPLOT__YLABEL(&plt,
-		  depend_1_name,//y軸(左)
+		  &depend_1_label[0],//y軸(左)
 		  NULL);        //y軸(右)
   
   //z軸ラベルの設定  
   SVGPLOT__ZLABEL(&plt,
-		  variable_name);//z軸
+		  &variable_label[0]);//z軸
 
   SVGPLOT__TITLE (&plt,"CDFPLOT");
   
