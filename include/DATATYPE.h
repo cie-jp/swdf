@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
   #include<stdio.h>
+  #include"cdf.h"
   
   // ***********************************
   // データ型宣言
@@ -118,6 +119,55 @@ extern "C" {
                   void *data_ptr);
 
 
+  // ***********************************
+  // CDFメタデータ
+  // ***********************************
+  typedef struct{
+    char  attrName [CDF_ATTR_NAME_LEN256 + 1];
+    char  entryType;//g/r/z  
+    long  dataType;
+    long  numElems;
+    void *buffer;
+  }CDFMETADATA;
+  
+  const char *CDF__DATATYPETEXT(long dataType); 
+  size_t CDF__SIZEOF(long dataType);
+
+  void CDF__DATA_SHOW_CHAR_       (CHAR        dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_UCHAR_      (UCHAR       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_BYTE_       (BYTE        dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_INT1_       (INT1        dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_INT2_       (INT2        dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_INT4_       (INT4        dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_INT8_       (INT8        dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_UINT1_      (UINT1       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_UINT2_      (UINT2       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_UINT4_      (UINT4       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_FLOAT_      (FLOAT       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_DOUBLE_     (DOUBLE      dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_REAL4_      (REAL4       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_REAL8_      (REAL8       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_EPOCH_      (EPOCH       dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_EPOCH16_    (EPOCH16     dat[],long numElems,FILE *fp);
+  void CDF__DATA_SHOW_TIME_TT2000_(TIME_TT2000 dat[],long numElems,FILE *fp);
+
+  void CDFMETADATA__SHOW      (CDFMETADATA *meta,
+                               FILE        *fp);
+
+  void CDFMETADATA__INITIALIZE(CDFMETADATA *meta,
+                               CDFid        id,
+                               long         attrNum,
+                               long         entryNum);
+
+  void CDFMETADATA__FINALIZE  (CDFMETADATA *meta);
+
+  void CDF__SHOW_GATTRIBUTES(CDFid id,FILE *fp);
+  void CDF__SHOW_RATTRIBUTES(CDFid id,FILE *fp);
+  void CDF__SHOW_ZATTRIBUTES(CDFid id,FILE *fp);
+  void CDFMETADATA__INITIALIZE_ZVAR_ATTR(CDFMETADATA *meta,
+                                         CDFid        id,
+                                         const CHAR  *zVarName,
+                                         const CHAR  *attrName);
   
 #ifdef __cplusplus
 }
