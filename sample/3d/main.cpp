@@ -14,7 +14,7 @@ int main(int argc,char *argv[]){
   SVG__RECT(&plt.svg,plt.Xmin,plt.Ymin,plt.Xmax,plt.Ymax,plt.borderstyle);
 
   aacontour(&plt);
-  //DRAW_BORDER(&plt);
+  DRAW_BORDER(&plt);
   SVGPLOT__FINALIZE(&plt);
     
   return 0;

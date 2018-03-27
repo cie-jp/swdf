@@ -280,7 +280,7 @@ VECTOR_3D VECTOR_3D__VtoS(VECTOR_3D pv,     //(in) 位置ベクトル(ビュー�
   VECTOR_3D ps;
   REAL      r;
 
-  r  = fmin(width,height);
+  r  = fmax(width,height);
 
   ps = VECTOR_3D__INIT(pv.x / 2.0 * r + x0 + (width  / 2.0),
                        pv.y / 2.0 * r + y0 + (height / 2.0),
@@ -298,7 +298,7 @@ REGION_3D REGION_3D__VtoS(REGION_3D rv,     //(in) プロット領域(ビュー�
   REAL      r;
   INT       n;
 
-  r  = fmin(width,height);
+  r  = fmax(width,height);
 
   for(n = 0;n < 8;n++){
     rs.P[n] = VECTOR_3D__INIT(rv.P[n].x / 2.0 * r + x0 + (width  / 2.0),
@@ -389,12 +389,12 @@ REGION_3D REGION_3D__WtoS(REAL obj_xmin,
 }
 
 void DRAW_BORDER(SVGPLOT *plt){
-  // プロット領域(数学    座標系)の設定
-  REAL xmin     =  0.0;
-  REAL xmax     =  1.0;
-  REAL ymin     =  0.0;
-  REAL ymax     =  1.0;
-  REAL zmin     =  0.0;
+    // プロット領域(数学    座標系)の設定
+  REAL xmin     = -2.0;
+  REAL xmax     =  2.0;
+  REAL ymin     = -2.0;
+  REAL ymax     =  2.0;
+  REAL zmin     = -1.0;
   REAL zmax     =  1.0;
   // プロット領域(ワールド座標系)の設定
   REAL obj_xmin = -1.0;
@@ -405,7 +405,7 @@ void DRAW_BORDER(SVGPLOT *plt){
   REAL obj_zmax = +1.0;
   // カメラ位置の設定
   REAL r        = 20.0;
-  REAL theta    = 30.0 / 180.0 * M_PI;
+  REAL theta    = 70.0 / 180.0 * M_PI;
   REAL phi      = 30.0 / 180.0 * M_PI;
   // スクリーンの設定
   REAL x0       = plt->Xmin;
@@ -533,8 +533,8 @@ void DRAW_BORDER(SVGPLOT *plt){
 
 }
 
-#define XNUM (150)
-#define YNUM (150)
+#define XNUM (50)
+#define YNUM (50)
 
 
 INT       VECTOR_2D__HITTEST_POINT_TRIANGLE(VECTOR_2D p,VECTOR_2D a,VECTOR_2D b,VECTOR_2D c);
@@ -657,85 +657,6 @@ void FILL(REAL cx[],INT cx_num,REAL cy[],INT cy_num,REAL contour[],REAL zbuf[],
   }
 }
 
-void TRANSFORM_3D_2(REAL *dst_x,
-                    REAL *dst_y,
-                    REAL *dst_z,
-                    REAL  src_x,
-                    REAL  src_y,
-                    REAL  src_z){
-  //カメラ位置(ワールド座標系)
-  REAL r        = 20.0;  
-  REAL theta    = 40.0 / 180.0 * M_PI;
-  REAL phi      = 30.0 / 180.0 * M_PI;
-  REAL xc       = r * sin(theta) * cos(phi);
-  REAL yc       = r * sin(theta) * sin(phi);
-  REAL zc       = r * cos(theta);
-
-  //カメラ基底(ワールド座標系) : ey (カメラの上を向く) ez (視線方向)
-  //カメラ座標系からワールド座標系への変換
-  RMatrix Twc(4,4);
-  //ワールド座標系からカメラ座標系への変換
-  RMatrix Tcw(4,4);
-  RMatrix world (4,1);
-  RMatrix camera(4,1);
-  REAL    camera_x;
-  REAL    camera_y;
-  REAL    camera_z;
-  REAL    projection_xmin;
-  REAL    projection_xmax;
-  REAL    projection_ymin;
-  REAL    projection_ymax;
-  REAL    projection_x;
-  REAL    projection_y;
-  REAL    screen_xsize;
-  REAL    screen_ysize;
-  REAL    screen_x0;
-  REAL    screen_y0;
-  REAL    screen_x;
-  REAL    screen_y;
-  
-  Twc[0][0] =  sin(phi); Twc[0][1] = -cos(theta) * cos(phi); Twc[0][2] = -sin(theta) * cos(phi); Twc[0][3] =  xc;
-  Twc[1][0] = -cos(phi); Twc[1][1] = -cos(theta) * sin(phi); Twc[1][2] = -sin(theta) * sin(phi); Twc[1][3] =  yc;
-  Twc[2][0] =       0.0; Twc[2][1] =  sin(theta)           ; Twc[2][2] = -cos(theta)           ; Twc[2][3] =  zc;
-  Twc[3][0] =       0.0; Twc[3][1] =                    0.0; Twc[3][2] =                      r; Twc[3][3] = 1.0;
-
-  Tcw       = ~Twc;
-
-  world[0][0] = src_x;
-  world[1][0] = src_y;
-  world[2][0] = src_z;
-  world[3][0] = 1.0;
-
-  camera = Tcw * world;
-  
-  //カメラ座標系
-  camera_x = camera[0][0];
-  camera_y = camera[1][0];
-  camera_z = camera[2][0];
-
-  //射影空間
-  projection_xmin = -sqrt(3.0);
-  projection_xmax = +sqrt(3.0);
-  projection_ymin = -sqrt(3.0);
-  projection_ymax = +sqrt(3.0);
-
-  projection_x = -1.0 + 2.0 * (camera_x - projection_xmin) / (projection_xmax - projection_xmin);
-  projection_y = -1.0 + 2.0 * (camera_y - projection_ymin) / (projection_ymax - projection_ymin);
-  
-  //スクリーン座標系[-1,1]^2
-  screen_xsize = 2.0;
-  screen_ysize = 2.0; 
-  screen_x0    = 0.0;
-  screen_y0    = 0.0;
-
-  screen_x = -projection_x / (projection_xmax - projection_xmin);
-  screen_y =  projection_y / (projection_ymax - projection_ymin);
-  
-  *dst_x = screen_xsize * screen_x + screen_x0;
-  *dst_y = screen_ysize * screen_y + screen_y0;
-  *dst_z = camera_z;
-}
-
 void aacontour(SVGPLOT *plt){
   // プロット領域(数学    座標系)の設定
   REAL xmin     = -2.0;
@@ -806,7 +727,7 @@ void aacontour(SVGPLOT *plt){
       zbuf   [n * cy_num + m] = 1.0e+8;
     }
   }
-  
+
   for(int m = 0;m < YNUM - 1;m++){
     for(int n = 0;n < XNUM - 1;n++){
       p1 = VECTOR_3D__INIT(x[n    ],y[m    ],z[n    ][m    ]);
@@ -845,7 +766,7 @@ void aacontour(SVGPLOT *plt){
            z[n + 1][m],z[n][m + 1],z[n + 1][m + 1]);
     }
   }
-  
+
   zmin = fmin(STATS__MIN(contour,cx_num * cy_num,0),
               STATS__MIN(contour,cx_num * cy_num,0));
   zmax = fmax(STATS__MAX(contour,cx_num * cy_num,0),
@@ -854,8 +775,46 @@ void aacontour(SVGPLOT *plt){
   SVGPLOT_PALETTE__Create10(&plt->pal);
   SVGPLOT__SET_RANGE_Z_003(plt,0.0,1.0);  
    
-  SVGPLOT__XYZ_CONTOUR(plt,cx,cx_num,cy,cy_num,contour,-1.0,-1.0,0);
+  //SVGPLOT__XYZ_CONTOUR(plt,cx,cx_num,cy,cy_num,contour,-1.0,-1.0,0);
 
+  SVG_STYLE linestyle;
+
+  SVG_STYLE__SET_001(linestyle,"1.0","#000000","1.0",NULL,NULL,NULL,NULL,"none");
+
+  for(int m = 0;m < YNUM - 1;m++){
+    for(int n = 0;n < XNUM - 1;n++){
+      p1 = VECTOR_3D__INIT(x[n    ],y[m    ],z[n    ][m    ]);
+      p2 = VECTOR_3D__INIT(x[n + 1],y[m    ],z[n + 1][m    ]);
+      p3 = VECTOR_3D__INIT(x[n    ],y[m + 1],z[n    ][m + 1]);
+      p1 = VECTOR_3D__MtoS(p1,xmin,xmax,ymin,ymax,zmin,zmax,obj_xmin,obj_xmax,obj_ymin,obj_ymax,obj_zmin,obj_zmax,r,theta,phi,x0,y0,width,height);
+      p2 = VECTOR_3D__MtoS(p2,xmin,xmax,ymin,ymax,zmin,zmax,obj_xmin,obj_xmax,obj_ymin,obj_ymax,obj_zmin,obj_zmax,r,theta,phi,x0,y0,width,height);
+      p3 = VECTOR_3D__MtoS(p3,xmin,xmax,ymin,ymax,zmin,zmax,obj_xmin,obj_xmax,obj_ymin,obj_ymax,obj_zmin,obj_zmax,r,theta,phi,x0,y0,width,height);
+      SVG__LINE(&plt->svg,
+                p1.x,p1.y,
+                p2.x,p2.y,
+                linestyle);
+      SVG__LINE(&plt->svg,
+                p1.x,p1.y,
+                p3.x,p3.y,
+                linestyle);  
+      p1 = VECTOR_3D__INIT(x[n + 1],y[m    ],z[n + 1][m    ]);
+      p2 = VECTOR_3D__INIT(x[n    ],y[m + 1],z[n    ][m + 1]);
+      p3 = VECTOR_3D__INIT(x[n + 1],y[m + 1],z[n + 1][m + 1]);
+      p1 = VECTOR_3D__MtoS(p1,xmin,xmax,ymin,ymax,zmin,zmax,obj_xmin,obj_xmax,obj_ymin,obj_ymax,obj_zmin,obj_zmax,r,theta,phi,x0,y0,width,height);
+      p2 = VECTOR_3D__MtoS(p2,xmin,xmax,ymin,ymax,zmin,zmax,obj_xmin,obj_xmax,obj_ymin,obj_ymax,obj_zmin,obj_zmax,r,theta,phi,x0,y0,width,height);
+      p3 = VECTOR_3D__MtoS(p3,xmin,xmax,ymin,ymax,zmin,zmax,obj_xmin,obj_xmax,obj_ymin,obj_ymax,obj_zmin,obj_zmax,r,theta,phi,x0,y0,width,height);
+      SVG__LINE(&plt->svg,
+                p1.x,p1.y,
+                p3.x,p3.y,
+                linestyle);
+      SVG__LINE(&plt->svg,
+                p2.x,p2.y,
+                p3.x,p3.y,
+                linestyle);  
+    }
+  }
+
+  
   free(cx);
   free(cy);
   free(contour);
