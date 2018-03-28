@@ -1,15 +1,11 @@
-#ifndef _STRING_H_INCLUDE_
-#define _STRING_H_INCLUDE_
+#ifndef _STRINGS_H_INCLUDE_
+#define _STRINGS_H_INCLUDE_
 
-#include<iostream>
-#include<cstdio>
-#include<cstdlib>
-#include<cstring>
-#include<cmath>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<math.h>
 #include"DATATYPE.h"
-
-using namespace std;
-
 
 class STRING{
 protected:

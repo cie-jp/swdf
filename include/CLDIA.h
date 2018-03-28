@@ -20,7 +20,7 @@
 
 #ifdef __cplusplus
 
-#include"CPP/STRING.h"
+#include"CPP/STRINGS.h"
 
 #include"CPP/TMatrix.h"
 #include"CPP/RMatrix.h"
