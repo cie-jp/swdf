@@ -9,55 +9,35 @@
 
 using namespace std;
 
-class CMatrix{
- protected:
-  COMP *dat;
-  INT   row;
-  INT   col;
- private:
-  static void initialize(CMatrix    &A,
-                         const INT   row,
-                         const INT   col);
-  static void finalize  (CMatrix    &A);
-  static void resize    (CMatrix    &A,
-                         const INT   row,
-                         const INT   col);
-  static void zerofill  (CMatrix    &A);
-  static void datacopy  (CMatrix    &A,
-                         const COMP *dat);
+class CMatrix : public TMatrix<COMP>{
  public:
   // *************************************************
   // コンストラクタ
   // *************************************************
   //row行col列の    行列を作成(0で初期化される)
-  CMatrix(INT row,INT col);
+  CMatrix(INT row,INT col)  : TMatrix<COMP>(row,col) {}
   //dim行dim列の正方行列を作成(0で初期化される)
-  CMatrix(COMP  x) : CMatrix(1,1) {dat[0] = x;}
+  CMatrix(COMP  x)          : TMatrix<COMP>(x)       {}
   //  1行  1列の    行列を作成(0で初期化される) 
-  CMatrix()        : CMatrix(1,1) {}
+  CMatrix()                 : TMatrix<COMP>()        {}
+
+  CMatrix(const TMatrix<COMP> &A){
+    TMatrix<COMP>::initialize(*this,A.get_row(),A.get_col());
+    TMatrix<COMP>::datacopy  (*this,A.get_dat());
+  }
+
   // *************************************************
   // コピーコンストラクタ
   // *************************************************
-  CMatrix(const CMatrix &A);
+  CMatrix(const CMatrix &A) : TMatrix<COMP>(A)       {}
   // *************************************************
   // デストラクタ
   // *************************************************
- ~CMatrix();
-
-  // *************************************************
-  // アクセッサ
-  // *************************************************
-  COMP *get_dat()const{return this->dat;}//データポインタの取得
-  INT   get_row()const{return this->row;}//行数          の取得
-  INT   get_col()const{return this->col;}//列数          の取得
+ ~CMatrix(){}
 
   // *************************************************
   // 演算子のオーバーロード
   // *************************************************
-  CMatrix  &operator  =(const CMatrix &);
-
-  COMP     *operator [](const INT     n)const;
-
   CMatrix  &operator +=(const CMatrix &);
   CMatrix  &operator +=(const COMP     );
 
@@ -70,10 +50,6 @@ class CMatrix{
 
   CMatrix  &operator /=(const COMP     );
   CMatrix  &operator /=(const CMatrix &);
-
-  CMatrix  &operator &=(const CMatrix &);
-
-  CMatrix  &operator |=(const CMatrix &);
 
   friend ostream  &operator <<(ostream&       ,const CMatrix &);
 
@@ -94,14 +70,6 @@ class CMatrix{
 
   friend CMatrix   operator  /(const CMatrix &,const COMP     );
   friend CMatrix   operator  /(const CMatrix &,const CMatrix &);
-
-  friend CMatrix   operator  &(const CMatrix &,const CMatrix &);
-  friend CMatrix   operator  &(const CMatrix &,const INT      );
-  friend CMatrix   operator  &(const INT      ,const CMatrix &);
-
-  friend CMatrix   operator  |(const CMatrix &,const CMatrix &);
-  friend CMatrix   operator  |(const CMatrix &,const INT      );
-  friend CMatrix   operator  |(const INT      ,const CMatrix &);
 
   friend CMatrix   operator  ~(const CMatrix &);                
   friend CMatrix   operator  !(const CMatrix &);                
@@ -178,14 +146,11 @@ class CMatrix{
   void write_csv(const char *filename,char ch);
 };
 
-#include"CMatrix__PRIVATE.hpp"
-#include"CMatrix__BASE.hpp"
 #include"CMatrix__OPERATOR_MEMBER.hpp"
 #include"CMatrix__OPERATOR_ADD.hpp"
 #include"CMatrix__OPERATOR_SUB.hpp"
 #include"CMatrix__OPERATOR_MUL.hpp"
 #include"CMatrix__OPERATOR_DIV.hpp"
-#include"CMatrix__OPERATOR_RESIZE.hpp"
 #include"CMatrix__OPERATOR_ADJOINT.hpp"
 /*
 #include"CMatrix__OPERATOR_TRANSPOSE.hpp"

@@ -1,20 +1,4 @@
 // *************************************************
-// 代入演算子
-// *************************************************
-RMatrix  &RMatrix::operator  =(const RMatrix &A){
-  RMatrix::resize    (*this,A.row,A.col);
-  RMatrix::datacopy  (*this,A.dat);
-  return *this;
-}
-
-// *************************************************
-// 配列演算子
-// *************************************************
-REAL     *RMatrix::operator [](const INT n)const{
-  return &this->dat[n * this->col];
-}
-
-// *************************************************
 // 加算演算子(行列)
 // *************************************************
 RMatrix  &RMatrix::operator +=(const RMatrix &A){
@@ -75,20 +59,6 @@ RMatrix  &RMatrix::operator /=(const REAL     b){
 // *************************************************
 RMatrix  &RMatrix::operator /=(const RMatrix &A){
   return *this = *this / A;
-}
-
-// *************************************************
-// 縦結合演算子
-// *************************************************
-RMatrix  &RMatrix::operator &=(const RMatrix &A){
-  return *this = *this & A;
-}
-
-// *************************************************
-// 横結合演算子
-// *************************************************
-RMatrix  &RMatrix::operator |=(const RMatrix &A){
-  return *this = *this | A;
 }
 
 // *************************************************

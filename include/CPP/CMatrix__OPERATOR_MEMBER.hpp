@@ -1,20 +1,4 @@
 // *************************************************
-// 代入演算子
-// *************************************************
-CMatrix  &CMatrix::operator  =(const CMatrix &A){
-  CMatrix::resize    (*this,A.row,A.col);
-  CMatrix::datacopy  (*this,A.dat);
-  return *this;
-}
-
-// *************************************************
-// 配列演算子
-// *************************************************
-COMP     *CMatrix::operator [](const INT n)const{
-  return &this->dat[n * this->col];
-}
-
-// *************************************************
 // 加算演算子(行列)
 // *************************************************
 CMatrix  &CMatrix::operator +=(const CMatrix &A){
@@ -75,20 +59,6 @@ CMatrix  &CMatrix::operator /=(const COMP     b){
 // *************************************************
 CMatrix  &CMatrix::operator /=(const CMatrix &A){
   return *this = *this / A;
-}
-
-// *************************************************
-// 縦結合演算子
-// *************************************************
-CMatrix  &CMatrix::operator &=(const CMatrix &A){
-  return *this = *this & A;
-}
-
-// *************************************************
-// 横結合演算子
-// *************************************************
-CMatrix  &CMatrix::operator |=(const CMatrix &A){
-  return *this = *this | A;
 }
 
 // *************************************************

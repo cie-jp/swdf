@@ -11,60 +11,35 @@ using namespace std;
 
 class CMatrix;
 
-class RMatrix{
- protected:
-  REAL *dat;
-  INT   row;
-  INT   col;
- private:
-  static void initialize(RMatrix    &A,
-                         const INT   row,
-                         const INT   col);
-  static void finalize  (RMatrix    &A);
-  static void resize    (RMatrix    &A,
-                         const INT   row,
-                         const INT   col);
-  static void zerofill  (RMatrix    &A);
-  static void datacopy  (RMatrix    &A,
-                         const REAL *dat);
+class RMatrix : public TMatrix<REAL>{
  public:
   // *************************************************
   // コンストラクタ
   // *************************************************
   //row行col列の    行列を作成(0で初期化される)
-  RMatrix(INT row,INT col);
+  RMatrix(INT row,INT col)  : TMatrix<REAL>(row,col) {}
   //dim行dim列の正方行列を作成(0で初期化される)
-  RMatrix(REAL  x) : RMatrix(1,1) {dat[0] = x;}
+  RMatrix(REAL  x)          : TMatrix<REAL>(x)       {}
   //  1行  1列の    行列を作成(0で初期化される) 
-  RMatrix()        : RMatrix(1,1) {}
+  RMatrix()                 : TMatrix<REAL>()        {}
+
+  RMatrix(const TMatrix<REAL> &A){
+    TMatrix<REAL>::initialize(*this,A.get_row(),A.get_col());
+    TMatrix<REAL>::datacopy  (*this,A.get_dat());
+  }
+
   // *************************************************
   // コピーコンストラクタ
   // *************************************************
-  RMatrix(const RMatrix &A);
+  RMatrix(const RMatrix &A) : TMatrix<REAL>(A)       {}
   // *************************************************
   // デストラクタ
   // *************************************************
- ~RMatrix();
-
-  // *************************************************
-  // アクセッサ
-  // *************************************************
-  REAL *get_dat()const{return this->dat;}//データポインタの取得
-  INT   get_row()const{return this->row;}//行数          の取得
-  INT   get_col()const{return this->col;}//列数          の取得
-
-  // *************************************************
-  // 確認
-  // *************************************************
-  INT  is_square(){return this->row == this->col;}
+ ~RMatrix(){}
   
   // *************************************************
   // 演算子のオーバーロード
   // *************************************************
-  RMatrix  &operator  =(const RMatrix &);
-
-  REAL     *operator [](const INT     n)const;
-
   RMatrix  &operator +=(const RMatrix &);
   RMatrix  &operator +=(const REAL     );
 
@@ -77,10 +52,6 @@ class RMatrix{
 
   RMatrix  &operator /=(const REAL     );
   RMatrix  &operator /=(const RMatrix &);
-
-  RMatrix  &operator &=(const RMatrix &);
-
-  RMatrix  &operator |=(const RMatrix &);
 
   operator CMatrix()const;
   
@@ -103,14 +74,6 @@ class RMatrix{
 
   friend RMatrix   operator  /(const RMatrix &,const REAL     );
   friend RMatrix   operator  /(const RMatrix &,const RMatrix &);
-
-  friend RMatrix   operator  &(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  &(const RMatrix &,const INT      );
-  friend RMatrix   operator  &(const INT      ,const RMatrix &);
-
-  friend RMatrix   operator  |(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  |(const RMatrix &,const INT      );
-  friend RMatrix   operator  |(const INT      ,const RMatrix &);
 
   friend RMatrix   operator  ~(const RMatrix &);                
   friend RMatrix   operator  !(const RMatrix &);                
@@ -187,14 +150,11 @@ class RMatrix{
   void write_csv(const char *filename,char ch);
 };
 
-#include"RMatrix__PRIVATE.hpp"
-#include"RMatrix__BASE.hpp"
 #include"RMatrix__OPERATOR_MEMBER.hpp"
 #include"RMatrix__OPERATOR_ADD.hpp"
 #include"RMatrix__OPERATOR_SUB.hpp"
 #include"RMatrix__OPERATOR_MUL.hpp"
 #include"RMatrix__OPERATOR_DIV.hpp"
-#include"RMatrix__OPERATOR_RESIZE.hpp"
 #include"RMatrix__OPERATOR_TRANSPOSE.hpp"
 #include"RMatrix__OPERATOR_INVERSE.hpp"
 
