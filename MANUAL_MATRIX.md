@@ -1,3 +1,7 @@
+## `CLDIA::TMatrix<TYPE>`
+## `CLDIA::RMatrix : public TMatrix<REAL>`
+## `CLDIA::CMatrix : public TMatrix<COMP>`
+
 ## CLDIAを用いた行列演算(C++用)
 
 1. 実行列・複素行列の計算が可能. 

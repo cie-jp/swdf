@@ -28,6 +28,15 @@ int main(int argc,char *argv[]){
   a.show();
   cerr << endl;
   cerr << STRING((REAL8)STRING("%d",30)) << endl;
+  a = 'q';
+  cerr << a << endl;
+
+  STRING str = "hoge";
+  
+  str[2] = 'G';
+  
+  cout << str << endl;
+  cout << strlen(&str[0]) << endl;
   return 0;
 }
 
