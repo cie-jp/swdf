@@ -7,17 +7,21 @@ using namespace CLDIA;
 #include"ERG_mgf.h"
 #include"ERG_ofa.h"
 
-void PLOT_ERG_PWE_OFA_L1_prime(){
-  SVGPlot   plt;
+void PLOT_ERG_PWE_OFA_L1_prime(SVGPlot &plt){
   CDFData   cdf("E_spectra_132","~/Desktop/erg_pwe_ofa_l1_prime_e_spec_65khz_132pts_20180323_v06.cdf");
 
   plt.set_scaletype("y","log");
   plt.set_scaletype("z","log");
   plt.cdfplot(cdf,1);
-  plt.output(cdf);
+  plt.output2();
+  //plt.aux(cdf.depend_0_label,cdf.depend_1_label,"CDFPLOT");
+}
 
+void PLOT_ERG_MGF(SVGPlot &plt){
   ERG_mgf   erg_mgf("2017-03-28","2017-03-29","l2","01");
   RMatrix   gse0,gse1,gse2,mag,fce,fce_half;
+
+  plt.set_range();
 
   gse0 = erg_mgf.mag_gse | 0;
   gse1 = erg_mgf.mag_gse | 1;
@@ -26,8 +30,9 @@ void PLOT_ERG_PWE_OFA_L1_prime(){
   fce  = get_fce(mag);
   fce_half = get_fce_half(mag);
   plt.add(erg_mgf.epoch,fce,"fce");
-  plt.add(erg_mgf.epoch,fce_half,"fce_half");
-  plt.plot("Time","MAG","MGF磁場");
+  plt.add(erg_mgf.epoch,fce_half,"fce_{half}");
+  plt.plot();
+  //plt.aux("Time","MAG","MGF磁場");
 }
 
 void foo(){
@@ -42,25 +47,48 @@ void foo(){
   plt.set_scaletype("z","log");
   plt.tplot(E_spectra,erg_ofa.epoch,erg_ofa.freq,1);
   plt.output();
-  plt.plot("Time","MAG","OFA");
+  plt.plot();
+  plt.aux("Time","MAG","OFA");
 }
 
-int main(int argc,char *argv[]){
-  /*
-  ERG_orbit erg_orbit("2017-03-28","2017-04-03","l2","01");
+void PLOT_ERG_ORB(SVGPlot &plt){
+  ERG_orbit erg_orbit("2017-03-28","2017-03-29","l2","01");
   RMatrix   gsm0,gsm1,gsm2;
-  SVGPlot   plt;
+
+  plt.set_range();
   
   gsm0 = erg_orbit.pos_gsm | 0;
   gsm1 = erg_orbit.pos_gsm | 1;
   gsm2 = erg_orbit.pos_gsm | 2;
 
+  plt.set_scaletype("y","linear");
+
   plt.add(erg_orbit.epoch,gsm0,"GSM0");
   plt.add(erg_orbit.epoch,gsm1,"GSM1");
   plt.add(erg_orbit.epoch,gsm2,"GSM2");
-  plt.plot("Time","Orbit","ERG衛星確定軌道");
-  */
-  //PLOT_ERG_PWE_OFA_L1_prime();
-  foo();
+  plt.plot();
+  //plt.aux("Time","Orbit","ERG衛星確定軌道");
+  //cerr << gsm0 << endl;
+}
+
+void multiplot(){
+  STRING  filename = "output.svg";
+  SVGPlot plt(filename);
+  INT plot_num = 3;
+
+  for(int i = 0;i < plot_num;i++){
+    plt.next(i,plot_num);
+    plt.draw_border();
+  }
+  plt.next(0,plot_num);
+  PLOT_ERG_PWE_OFA_L1_prime(plt);
+  plt.next(1,plot_num);
+  PLOT_ERG_MGF(plt);
+  plt.next(2,plot_num);
+  PLOT_ERG_ORB(plt);
+}
+
+int main(int argc,char *argv[]){
+  multiplot();
   return 0;
 }
