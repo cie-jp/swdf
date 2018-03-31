@@ -32,6 +32,7 @@ typedef TVector<REAL>        RVector;
 typedef TVector<COMP>        CVector;
 typedef TVector<TIME_TT2000> EVector;
 
+#include"CPP/CDFData.h"
 #include"CPP/ERG_orbit.h"
 
 #endif

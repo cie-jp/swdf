@@ -1,5 +1,11 @@
+#ifndef _CDFDATA_H_INCLUDE_
+#define _CDFDATA_H_INCLUDE_
+
+using namespace std;
+using namespace CLDIA;
+
 class CDFData{
- public:
+  public:
   TMatrix<DATA> variable;
   TMatrix<DATA> depend_0;
   TMatrix<DATA> depend_1;
@@ -22,7 +28,6 @@ class CDFData{
 
     status = CDFgetzVarName(cdf_id,var_id,varname);
     if(status != CDF_OK){
-      cerr << "asd" << endl;
       CDF__Status_Handler(status);
     }
     return varname;
@@ -33,10 +38,9 @@ class CDFData{
     STRING      varname;
     STRING      catdesc;
 
-    varname = get_name(cdf_id,var_id);
+varname = get_name(cdf_id,var_id);
     CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,cdf_id,&varname[0],"CATDESC");
-    catdesc = STRING(meta.numElems + 1,' ');
-    memcpy(&catdesc[0],meta.buffer,meta.numElems);
+catdesc = STRING(meta.numElems,(const CHAR*)meta.buffer);
     CDFMETADATA__FINALIZE(&meta);
     return catdesc;
   }
@@ -48,8 +52,7 @@ class CDFData{
 
     varname = get_name(cdf_id,var_id);
     CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,cdf_id,&varname[0],"UNITS");
-    units = STRING(meta.numElems + 1,' ');
-    memcpy(&units[0],meta.buffer,meta.numElems);
+units = STRING(meta.numElems,(const CHAR*)meta.buffer);
     CDFMETADATA__FINALIZE(&meta);
     return units;
   }
@@ -76,24 +79,18 @@ class CDFData{
     }
     
     CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,&zvarname[0],"DEPEND_0");
-    depend_0_name = STRING(meta.numElems + 1,' ');
-    memcpy(&depend_0_name[0],(char*)meta.buffer,meta.numElems);
-    depend_0_id = CDFgetVarNum(id,&depend_0_name[0]);
+depend_0_name = STRING(meta.numElems,(const CHAR*)meta.buffer);
+depend_0_id = CDFgetVarNum(id,&depend_0_name[0]);
     CDFMETADATA__FINALIZE(&meta);
     
     CDFMETADATA__INITIALIZE_ZVAR_ATTR(&meta,id,&zvarname[0],"DEPEND_1");
-    depend_1_name = STRING(meta.numElems + 1,' ');
-    memcpy(&depend_1_name[0],(char*)meta.buffer,meta.numElems);
+    depend_1_name = STRING(meta.numElems,(const CHAR*)meta.buffer);
     depend_1_id = CDFgetVarNum(id,&depend_1_name[0]);
     CDFMETADATA__FINALIZE(&meta);    
-
-    cerr << "HOGE" << endl;
     
     variable_name = get_name(id,variable_id);
     depend_0_name = get_name(id,depend_0_id);
     depend_1_name = get_name(id,depend_1_id);
-
-    cerr << "PIYO" << endl;
 
     variable_catdesc = get_catdesc(id,variable_id);
     depend_0_catdesc = get_catdesc(id,depend_0_id);
@@ -116,3 +113,5 @@ class CDFData{
     Matrix__fetch(depend_1,&depend_1_name[0],&filename[0]);    
   }
 };
+
+#endif

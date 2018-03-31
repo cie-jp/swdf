@@ -17,75 +17,80 @@ void PLOT_ERG_PWE_OFA_L1_prime(SVGPlot &plt){
   //plt.aux(cdf.depend_0_label,cdf.depend_1_label,"CDFPLOT");
 }
 
-void PLOT_ERG_MGF(SVGPlot &plt){
-  ERG_mgf   erg_mgf("2017-03-28","2017-03-29","l2","01");
-  RMatrix   gse0,gse1,gse2,mag,fce,fce_half;
-
-  plt.set_range();
-
-  gse0 = erg_mgf.mag_gse | 0;
-  gse1 = erg_mgf.mag_gse | 1;
-  gse2 = erg_mgf.mag_gse | 2;
-  mag  = gse0 % gse0 + gse1 % gse1 + gse2 % gse2;
-  fce  = get_fce(mag);
-  fce_half = get_fce_half(mag);
-  plt.add(erg_mgf.epoch,fce,"fce");
-  plt.add(erg_mgf.epoch,fce_half,"fce_{half}");
-  plt.plot();
-  //plt.aux("Time","MAG","MGF磁場");
-}
-
-void foo(){
-  ERG_ofa   erg_ofa("2017-03-28","2017-03-29","l2","01");
-  RMatrix   E_spectra;
-  SVGPlot   plt;
-
-  E_spectra = erg_ofa.E_spectra;
-  
-  plt.timespan("2017-03-28","2017-03-29");
-  plt.set_scaletype("y","log");
-  plt.set_scaletype("z","log");
-  plt.tplot(E_spectra,erg_ofa.epoch,erg_ofa.freq,1);
-  plt.output();
-  plt.plot();
-  plt.aux("Time","MAG","OFA");
-}
-
-void PLOT_ERG_ORB(SVGPlot &plt){
-  ERG_orbit erg_orbit("2017-03-28","2017-03-29","l2","01");
-  RMatrix   gsm0,gsm1,gsm2;
-
-  plt.set_range();
-  
-  gsm0 = erg_orbit.pos_gsm | 0;
-  gsm1 = erg_orbit.pos_gsm | 1;
-  gsm2 = erg_orbit.pos_gsm | 2;
-
-  plt.set_scaletype("y","linear");
-
-  plt.add(erg_orbit.epoch,gsm0,"GSM0");
-  plt.add(erg_orbit.epoch,gsm1,"GSM1");
-  plt.add(erg_orbit.epoch,gsm2,"GSM2");
-  plt.plot();
-  //plt.aux("Time","Orbit","ERG衛星確定軌道");
-  //cerr << gsm0 << endl;
-}
-
 void multiplot(){
   STRING  filename = "output.svg";
   SVGPlot plt(filename);
   INT plot_num = 3;
+  STRING ts = "2017-03-28";
+  STRING te = "2017-03-30";
 
-  for(int i = 0;i < plot_num;i++){
-    plt.next(i,plot_num);
-    plt.draw_border();
-  }
-  plt.next(0,plot_num);
-  PLOT_ERG_PWE_OFA_L1_prime(plt);
-  plt.next(1,plot_num);
-  PLOT_ERG_MGF(plt);
-  plt.next(2,plot_num);
-  PLOT_ERG_ORB(plt);
+  plt.timespan(ts,te);
+
+  plt.set_title("ERG衛星データ");
+  
+  // =================================================
+  // OFA
+  // =================================================
+  ERG_ofa erg_ofa(ts,te,"l2","01");
+
+  plt.set_scaletype("y","log");
+  plt.set_scaletype("z","log");
+  plt.set_yrange(0.032,20.0);
+  plt.set_zrange(1.0e-6,1.0e-2);
+  plt.set_plot_region(0,3);
+  plt.tplot(erg_ofa.E_spectra,
+            erg_ofa.epoch,
+            erg_ofa.freq,
+            1);
+  plt.set_label("y","OFA");
+  plt.set_label("z","Spectra");
+
+  // =================================================
+  // MGF
+  // =================================================
+  ERG_mgf erg_mgf(ts,te,"l2","01");
+  RMatrix gse0,gse1,gse2,mag,fce,fce_half;
+
+  gse0 = erg_mgf.mag_gse | 0;
+  gse1 = erg_mgf.mag_gse | 1;
+  gse2 = erg_mgf.mag_gse | 2;
+  mag  = sqrt(gse0 % gse0 + gse1 % gse1 + gse2 % gse2);
+  fce  = get_fce(mag);
+  fce_half = get_fce_half(mag);
+  //fce /= 1000.0;
+  //fce_half /= 1000.0;
+  plt.add(erg_mgf.epoch,fce     ,"fce");
+  plt.add(erg_mgf.epoch,fce_half,"fce_{half}");
+  //plt.set_scaletype("y","linear");
+  plt.set_plot_region(0,3);
+  plt.plot();
+  plt.set_label("y","MGF");
+
+  // =================================================
+  // ORBIT
+  // =================================================
+  ERG_orbit erg_orbit(ts,te,"l2","01");
+  RVector   gsm0,gsm1,gsm2;
+
+  gsm0 = erg_orbit.pos_gsm | 0;
+  gsm1 = erg_orbit.pos_gsm | 1;
+  gsm2 = erg_orbit.pos_gsm | 2;
+
+  plt.set_autorange();
+  plt.set_scaletype("y","linear");
+  
+  plt.add(erg_orbit.epoch,gsm0,"GSM0");
+  plt.add(erg_orbit.epoch,gsm1,"GSM1");
+  plt.add(erg_orbit.epoch,gsm2,"GSM2");
+  plt.set_plot_region(2,3);
+  plt.plot();
+  plt.set_label("y","Orbit");
+
+  // =================================================
+  // 時間軸ラベルの表示
+  // =================================================
+  plt.draw_time();
+  plt.set_label("x","Time");
 }
 
 int main(int argc,char *argv[]){

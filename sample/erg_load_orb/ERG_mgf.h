@@ -12,6 +12,20 @@ void setval(TMatrix<REAL8> &A,TMatrix<INT> M,REAL8 val){
   }
 }
 
+TMatrix<REAL8> sqrt(const TMatrix<REAL8> &A){
+  INT            row = A.get_row();
+  INT            col = A.get_col();
+  TMatrix<REAL8> C(row,col);
+  INT            i,j;
+  
+  for(i = 0;i < row;i++){
+    for(j = 0;j < col;j++){
+      C[i][j] = sqrt(A[i][j]);
+    }
+  }
+  return C;
+}
+
 TMatrix<REAL8> get_fce(TMatrix<REAL8> &mag){
   TMatrix<REAL8> fce(mag.get_row(),mag.get_col());
   INT            i,j;
