@@ -77,6 +77,15 @@ template<typename TYPE> class TMatrix{
   // 確認
   // *************************************************
   INT  is_square(){return this->row == this->col;}
+  operator TYPE                ()const{
+    if((this->row != 1) || (this->col != 1)){
+      ERROR__SHOW("#1");
+      exit(EXIT_FAILURE);
+    }
+    return this->dat[0];
+  }
+  operator TMatrix<REAL>       ()const;
+  operator TMatrix<TIME_TT2000>()const;
   
   // *************************************************
   // 演算子のオーバーロード
@@ -763,6 +772,32 @@ void Matrix__fetch(TMatrix<DATA> &A,
   free(buffer);
   
   CDFcloseCDF(id);
+}
+
+template<>
+TMatrix<DATA>::operator TMatrix<REAL>       ()const{
+  TMatrix<REAL> C(this->row,this->col);
+  INT           i,j;
+  
+  for(i = 0;i < this->row;i++){
+    for(j = 0;j < this->col;j++){
+      C[i][j] = DATA__GET(&this->dat[i * this->col + j]);
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<DATA>::operator TMatrix<TIME_TT2000>()const{
+  TMatrix<TIME_TT2000> C(this->row,this->col);
+  INT                  i,j;
+  
+  for(i = 0;i < this->row;i++){
+    for(j = 0;j < this->col;j++){
+      C[i][j] = this->dat[i * this->col + j].data._time_tt2000;
+    }
+  }
+  return C;
 }
 
 #endif

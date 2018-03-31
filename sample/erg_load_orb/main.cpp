@@ -3,44 +3,64 @@
 using namespace std;
 using namespace CLDIA;
 
-int main(int argc,char *argv[]){
-  //system("curl -L -o test2.cdf http://ergsc.isee.nagoya-u.ac.jp/data/ergsc/satellite/erg/orb/def/2017/erg_orb_l2_20170116_v01.cdf");
-  //fprintf(stderr,"FINISH!\n");
-  STRING a = "hoge";
-  REAL8 b;
-  INT4 c;
-  a = "piyo";
-  a = STRING("%04d",30) + "hoge";
-  a += STRING("asd");
-  a  = STRING("asdfhhogehoege %d %s\n",130,"hoge");
-  //a  = "asd%c\n";
-  a  = 30.0;
-  b = a;
-  a.show();
-  c = a;
-  cerr << b << endl;
-  cerr << c << endl;
-  a = "2017-03-01 12:30:21.001";
-  TIME_TT2000 e;
-  e = a;
-  a.show();
-  a = e;
-  a.show();
-  cerr << endl;
-  cerr << STRING((REAL8)STRING("%d",30)) << endl;
-  a = 'q';
-  cerr << a << endl;
+#include"SVGPlot.h"
+#include"ERG_mgf.h"
+#include"ERG_ofa.h"
 
-  STRING str = "hoge";
-  
-  str[2] = 'G';
-  
-  cout << str << endl;
-  cout << strlen(&str[0]) << endl;
-  return 0;
+void PLOT_ERG_PWE_OFA_L1_prime(){
+  SVGPlot   plt;
+  CDFData   cdf("E_spectra_132","~/Desktop/erg_pwe_ofa_l1_prime_e_spec_65khz_132pts_20180323_v06.cdf");
+
+  plt.set_scaletype("y","log");
+  plt.set_scaletype("z","log");
+  plt.cdfplot(cdf,1);
+  plt.output(cdf);
+
+  ERG_mgf   erg_mgf("2017-03-28","2017-03-29","l2","01");
+  RMatrix   gse0,gse1,gse2,mag,fce,fce_half;
+
+  gse0 = erg_mgf.mag_gse | 0;
+  gse1 = erg_mgf.mag_gse | 1;
+  gse2 = erg_mgf.mag_gse | 2;
+  mag  = gse0 % gse0 + gse1 % gse1 + gse2 % gse2;
+  fce  = get_fce(mag);
+  fce_half = get_fce_half(mag);
+  plt.add(erg_mgf.epoch,fce,"fce");
+  plt.add(erg_mgf.epoch,fce_half,"fce_half");
+  plt.plot("Time","MAG","MGF磁場");
 }
 
-//curl -L -o test2.cdf http://ergsc.isee.nagoya-u.ac.jp/data/ergsc/satellite/erg/orb/def/2017/erg_orb_l2_20170116_v[01-99].cdf
-//curl -I http://ergsc.isee.nagoya-u.ac.jp/data/ergsc/satellite/erg/orb/def/2017/erg_orb_l2_20170116_v[01-99].cdf
+void foo(){
+  ERG_ofa   erg_ofa("2017-03-28","2017-03-29","l2","01");
+  RMatrix   E_spectra;
+  SVGPlot   plt;
 
-//curl -L http://ergsc.isee.nagoya-u.ac.jp/data/ergsc/satellite/erg/orb/def/2017/
+  E_spectra = erg_ofa.E_spectra;
+  
+  plt.timespan("2017-03-28","2017-03-29");
+  plt.set_scaletype("y","log");
+  plt.set_scaletype("z","log");
+  plt.tplot(E_spectra,erg_ofa.epoch,erg_ofa.freq,1);
+  plt.output();
+  plt.plot("Time","MAG","OFA");
+}
+
+int main(int argc,char *argv[]){
+  /*
+  ERG_orbit erg_orbit("2017-03-28","2017-04-03","l2","01");
+  RMatrix   gsm0,gsm1,gsm2;
+  SVGPlot   plt;
+  
+  gsm0 = erg_orbit.pos_gsm | 0;
+  gsm1 = erg_orbit.pos_gsm | 1;
+  gsm2 = erg_orbit.pos_gsm | 2;
+
+  plt.add(erg_orbit.epoch,gsm0,"GSM0");
+  plt.add(erg_orbit.epoch,gsm1,"GSM1");
+  plt.add(erg_orbit.epoch,gsm2,"GSM2");
+  plt.plot("Time","Orbit","ERG衛星確定軌道");
+  */
+  //PLOT_ERG_PWE_OFA_L1_prime();
+  foo();
+  return 0;
+}

@@ -26,4 +26,6 @@
 #include"CPP/RMatrix.h"
 #include"CPP/CMatrix.h"
 
+#include"CPP/ERG_orbit.h"
+
 #endif

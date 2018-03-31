@@ -3,6 +3,8 @@
 using namespace std;
 using namespace CLDIA;
 
+
+
 int main(int argc,char *argv[]){
   string a = "hoge";
   STRING b;
@@ -12,12 +14,13 @@ int main(int argc,char *argv[]){
 
   STRING A = "aaaa";
   STRING B = "bbb";
-  STRING C = B;
+  STRING C;// = A;
 
-
+  C = A + B;
   cout << endl;
-  (A + B + "ccccc").show();
+  (A + C + "ccccc").show();
   cout << endl;
-    
+  //cerr << strlen(A) << endl;
+  cerr << STRING(6,"hogerahogera") << endl;
   return 0;
 }

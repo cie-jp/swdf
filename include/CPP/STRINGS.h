@@ -94,10 +94,14 @@ namespace CLDIA{
     // コンストラクタ
     // *************************************************
     STRING(){
-      STRING::initialize(*this,      1, ' ');
+      STRING::initialize(*this,      1,' ');
     }
-    STRING(const INT4    num,const CHAR ch){
-      STRING::initialize(*this,    num, ch );
+    STRING(const INT4    num,const CHAR  ch ){
+      STRING::initialize(*this,num + 1, ch);
+    }
+    STRING(const INT4    num,const CHAR *dat){
+      STRING::initialize(*this,num + 1,' ');
+      memcpy(this->dat,dat,num);      
     }
     STRING(const CHAR   *fmt,...){
       va_list args;
@@ -115,7 +119,7 @@ namespace CLDIA{
       DTIME epoch;
       
       epoch = DTIME__MAKE_FROM_T2000(val);
-      STRING::initialize(*this,     30, ' ');
+      STRING::initialize(*this,    30, ' ');
       sprintf(this->dat,
               "%04d-%02d-%02d %02d:%02d:%02d.%03d%03d%03d",
               epoch.YYYY,
@@ -131,7 +135,7 @@ namespace CLDIA{
     // *************************************************
     // コピーコンストラクタ
     // *************************************************
-    STRING(const STRING &str){
+    STRING(const STRING  &str){
       STRING::initialize(*this,str.dat);
     }
     // *************************************************
@@ -154,6 +158,13 @@ namespace CLDIA{
     // *************************************************
     // 演算子のオーバーロード
     // *************************************************
+    bool operator==(const STRING &str){return strcmp(this->dat,str.dat) == 0;}
+    bool operator!=(const STRING &str){return strcmp(this->dat,str.dat) != 0;}
+    bool operator>=(const STRING &str){return strcmp(this->dat,str.dat) >= 0;}
+    bool operator<=(const STRING &str){return strcmp(this->dat,str.dat) <= 0;}
+    bool operator> (const STRING &str){return strcmp(this->dat,str.dat) >  0;}
+    bool operator< (const STRING &str){return strcmp(this->dat,str.dat) <  0;}
+    
     friend ostream  &operator <<(ostream &os,const STRING &str){
       os << str.dat;
       return os;
@@ -163,12 +174,19 @@ namespace CLDIA{
     operator        INT4()const{return ( INT4)atof(this->dat  );}
     operator       REAL8()const{return (REAL8)atof(this->dat  );}
     operator TIME_TT2000()const{return T2000__MAKE_FROM_TEXT(this->dat);}
-    STRING  &operator  =(const STRING &str){
+    STRING  &operator  =(const STRING  &str){
       STRING::finalize  (*this);
       STRING::initialize(*this,str.dat);
       return *this;
     }
-    STRING  &operator  =(const CHAR   *dat){
+    STRING  &operator  =(      STRING &&str){
+      this->dat =  str.dat;
+      this->nul =     '\0';
+      str.dat   = &str.nul;
+      str.nul   =     '\0';
+      return *this;
+    }
+    STRING  &operator  =(const CHAR    *dat){
       *this = STRING(dat);
       return *this;
     }
@@ -205,9 +223,15 @@ namespace CLDIA{
     friend STRING operator +(const CHAR   *dat1,const STRING &str2){
       return STRING(dat1) +        str2 ;
     }
-
 };
 
 }
+
+namespace CLDIA{
+  size_t strlen(const STRING &str){
+    return std::strlen((const CHAR*)&str[0]);
+  }
+}
+
 
 #endif
