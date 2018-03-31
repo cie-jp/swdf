@@ -23,8 +23,11 @@
 #include"CPP/STRINGS.h"
 
 #include"CPP/TMatrix.h"
-#include"CPP/RMatrix.h"
-#include"CPP/CMatrix.h"
+
+typedef TMatrix<REAL> RMatrix;
+typedef TMatrix<COMP> CMatrix;
+typedef TVector<REAL> RVector;
+typedef TVector<COMP> CVector;
 
 #include"CPP/ERG_orbit.h"
 

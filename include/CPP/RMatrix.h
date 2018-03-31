@@ -36,71 +36,8 @@ class RMatrix : public TMatrix<REAL>{
   // デストラクタ
   // *************************************************
  ~RMatrix(){}
-  
-  // *************************************************
-  // 演算子のオーバーロード
-  // *************************************************
-  RMatrix  &operator +=(const RMatrix &);
-  RMatrix  &operator +=(const REAL     );
-
-  RMatrix  &operator -=(const RMatrix &);
-  RMatrix  &operator -=(const REAL     );
-
-  RMatrix  &operator *=(const RMatrix &);
-  RMatrix  &operator *=(const REAL     );
-  RMatrix  &operator %=(const RMatrix &);
-
-  RMatrix  &operator /=(const REAL     );
-  RMatrix  &operator /=(const RMatrix &);
 
   operator CMatrix()const;
-  
-  friend ostream  &operator <<(ostream&       ,const RMatrix &);
-
-  friend RMatrix   operator  +(const RMatrix &);
-  friend RMatrix   operator  +(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  +(const REAL     ,const RMatrix &);
-  friend RMatrix   operator  +(const RMatrix &,const REAL     );
-
-  friend RMatrix   operator  -(const RMatrix &);                
-  friend RMatrix   operator  -(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  -(const REAL     ,const RMatrix &);
-  friend RMatrix   operator  -(const RMatrix &,const REAL     );
-
-  friend RMatrix   operator  *(const RMatrix &,const RMatrix &);
-  friend RMatrix   operator  *(const REAL     ,const RMatrix &);
-  friend RMatrix   operator  *(const RMatrix &,const REAL     );
-  friend RMatrix   operator  %(const RMatrix &,const RMatrix &);
-
-  friend RMatrix   operator  /(const RMatrix &,const REAL     );
-  friend RMatrix   operator  /(const RMatrix &,const RMatrix &);
-
-  friend RMatrix   operator  ~(const RMatrix &);                
-  friend RMatrix   operator  !(const RMatrix &);                
-
-  // *************************************************
-  // 単位行列の作成(対角成分 = 1, 非対角成分 = 0)
-  // *************************************************
-  static RMatrix identity(const INT row,const INT col);
-
-  // *************************************************
-  // 標準正規分布に従う乱数を与えた行列の作成
-  // *************************************************
-  static RMatrix random  (const INT row,const INT col);
-
-  // *************************************************
-  // 特異値分解
-  // *************************************************
-  void    svd  (RMatrix &s,RMatrix &U,RMatrix &V);
-
-  // *************************************************
-  // 縦ベクトルの場合 : 縦ベクトル要素を対角成分に持つ対角行列を返す
-  // 正方行列  の場合 : 非対角成分を0にした行列を返す
-  // *************************************************
-  RMatrix diag ();
-
-  //trace(sum of diagonal elements)
-  REAL    trace();
 
   //matrix determinant
   double  det();
@@ -150,35 +87,6 @@ class RMatrix : public TMatrix<REAL>{
   void write_csv(const char *filename,char ch);
 };
 
-#include"RMatrix__OPERATOR_MEMBER.hpp"
-#include"RMatrix__OPERATOR_ADD.hpp"
-#include"RMatrix__OPERATOR_SUB.hpp"
-#include"RMatrix__OPERATOR_MUL.hpp"
-#include"RMatrix__OPERATOR_DIV.hpp"
-#include"RMatrix__OPERATOR_TRANSPOSE.hpp"
-#include"RMatrix__OPERATOR_INVERSE.hpp"
-
 #include"RMatrix__STATIC.hpp"
-#include"RMatrix__SVD.hpp"
-#include"RMatrix__DIAG.hpp"
-#include"RMatrix__TRACE.hpp"
-
-namespace CLDIA{
-  void hist(const RMatrix &A,
-            const REAL     min,
-            const REAL     max,
-            const INT      div,
-            const CHAR *filename){
-    SVGPLOT__HISTOGRAM(&A[0][0],A.get_row(),
-                       min,max,
-                       div,
-                       "x label",
-                       "y label",
-                       "title",
-                       filename);
-  }
-
-  RMatrix linspace(const REAL x1,const REAL x2);
-}
 
 #endif

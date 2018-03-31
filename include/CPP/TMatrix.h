@@ -1,6 +1,8 @@
 #ifndef _TMATRIX_H_INCLUDE_
 #define _TMATRIX_H_INCLUDE_
 
+#define MACRO_MIN(x,y) (((x) <= (y)) ? (x) : (y))
+
 #include<iostream>
 #include<cstdio>
 #include<cstdlib>
@@ -11,13 +13,13 @@
 using namespace std;
 
 template<typename TYPE> class TMatrix;
+template<typename TYPE> ostream       &operator <<(ostream&             ,const TMatrix<TYPE> &);
 template<typename TYPE> TMatrix<TYPE>  operator  &(const TMatrix<TYPE> &,const int            );
 template<typename TYPE> TMatrix<TYPE>  operator  &(const int            ,const TMatrix<TYPE> &);
 template<typename TYPE> TMatrix<TYPE>  operator  &(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
 template<typename TYPE> TMatrix<TYPE>  operator  |(const TMatrix<TYPE> &,const int            );
 template<typename TYPE> TMatrix<TYPE>  operator  |(const int            ,const TMatrix<TYPE> &);
 template<typename TYPE> TMatrix<TYPE>  operator  |(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
-template<typename TYPE> ostream       &operator <<(ostream&             ,const TMatrix<TYPE> &);
 
 template<typename TYPE> TMatrix<INT>   operator > (const TMatrix<TYPE> &,const TYPE           );
 template<typename TYPE> TMatrix<INT>   operator > (const TYPE           ,const TMatrix<TYPE> &);
@@ -30,6 +32,66 @@ template<typename TYPE> TMatrix<INT>   operator < (const TYPE           ,const T
 
 template<typename TYPE> TMatrix<INT>   operator <=(const TMatrix<TYPE> &,const TYPE           );
 template<typename TYPE> TMatrix<INT>   operator <=(const TYPE           ,const TMatrix<TYPE> &);
+
+template<typename TYPE> TMatrix<TYPE>  operator  +(const TMatrix<TYPE> &);                
+template<typename TYPE> TMatrix<TYPE>  operator  +(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+template<typename TYPE> TMatrix<TYPE>  operator  +(const TYPE           ,const TMatrix<TYPE> &);
+template<typename TYPE> TMatrix<TYPE>  operator  +(const TMatrix<TYPE> &,const TYPE           );
+
+template<typename TYPE> TMatrix<TYPE>  operator  -(const TMatrix<TYPE> &);                
+template<typename TYPE> TMatrix<TYPE>  operator  -(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+template<typename TYPE> TMatrix<TYPE>  operator  -(const TYPE           ,const TMatrix<TYPE> &);
+template<typename TYPE> TMatrix<TYPE>  operator  -(const TMatrix<TYPE> &,const TYPE           );
+
+template<typename TYPE> TMatrix<TYPE>  operator  *(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+template<typename TYPE> TMatrix<TYPE>  operator  *(const TYPE           ,const TMatrix<TYPE> &);
+template<typename TYPE> TMatrix<TYPE>  operator  *(const TMatrix<TYPE> &,const TYPE           );
+
+template<typename TYPE> TMatrix<TYPE>  operator  %(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+
+template<typename TYPE> TMatrix<TYPE>  operator  /(const TMatrix<TYPE> &,const TYPE           );
+template<typename TYPE> TMatrix<TYPE>  operator  /(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+
+template<typename TYPE> TMatrix<TYPE>  operator  ~(const TMatrix<TYPE> &);                
+template<typename TYPE> TMatrix<TYPE>  operator  !(const TMatrix<TYPE> &);                
+
+namespace CLDIA{
+  // *************************************************
+  // 縦ベクトルの場合 : 縦ベクトル要素を対角成分に持つ対角行列を返す
+  // 正方行列  の場合 : 非対角成分を0にした行列を返す
+  // *************************************************
+  // row行col列の単位行列(対角成分に1, 非対角成分に0をもつ行列)を返す.
+  void eye (TMatrix<REAL> &E,
+           const INT      row,
+           const INT      col);
+  // dim次の単位行列を返す.
+  void eye (TMatrix<REAL> &E,
+           const INT      dim);
+  // dim次のヒルベルト行列を返す. 
+  void hilb(TMatrix<REAL> &H,
+            const INT     dim);
+  
+  template<typename TYPE> TMatrix<TYPE> diag (const TMatrix<TYPE> &A  );
+
+  template<typename TYPE> TYPE          trace(const TMatrix<TYPE> &A  );
+
+  template<typename TYPE> TYPE          cond (const TMatrix<TYPE> &A  );
+
+  template<typename TYPE> TYPE          det  (const TMatrix<TYPE> &A  );
+  template<typename TYPE> TYPE          det_lu(const TMatrix<TYPE> &A  );
+
+  void          svd  (      TMatrix<REAL> &s,
+                            TMatrix<REAL> &U,
+                            TMatrix<REAL> &V,
+                      const TMatrix<REAL> &A);
+  void          svd  (      TMatrix<COMP> &s,
+                            TMatrix<COMP> &U,
+                            TMatrix<COMP> &V,
+                      const TMatrix<COMP> &A);
+  void          lu   (      TMatrix<REAL> &L,
+                            TMatrix<REAL> &U,
+                      const TMatrix<REAL> &A);
+}
 
 template<typename TYPE> class TMatrix{
  protected:
@@ -76,7 +138,7 @@ template<typename TYPE> class TMatrix{
   // *************************************************
   // 確認
   // *************************************************
-  INT  is_square(){return this->row == this->col;}
+  INT  is_square()const{return this->row == this->col;}
   operator TYPE                ()const{
     if((this->row != 1) || (this->col != 1)){
       ERROR__SHOW("#1");
@@ -85,6 +147,7 @@ template<typename TYPE> class TMatrix{
     return this->dat[0];
   }
   operator TMatrix<REAL>       ()const;
+  operator TMatrix<COMP>       ()const;
   operator TMatrix<TIME_TT2000>()const;
   
   // *************************************************
@@ -95,7 +158,7 @@ template<typename TYPE> class TMatrix{
   TMatrix<TYPE>  &operator &=(const TMatrix<TYPE> &);
   TMatrix<TYPE>  &operator |=(const TMatrix<TYPE> &);
 
-  friend ostream  &operator <<(ostream&       ,const TMatrix<TYPE> &);
+  friend ostream        &operator << <>(ostream&             ,const TMatrix<TYPE> &);
   
   friend TMatrix<TYPE>   operator  & <>(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
   friend TMatrix<TYPE>   operator  & <>(const TMatrix<TYPE> &,const INT            );
@@ -116,7 +179,62 @@ template<typename TYPE> class TMatrix{
 
   friend TMatrix<INT>    operator <= <>(const TMatrix<TYPE> &,const TYPE           );
   friend TMatrix<INT>    operator <= <>(const TYPE           ,const TMatrix<TYPE> &);
+  
+  TMatrix<TYPE> &operator +=(const TMatrix<TYPE> &);
+  TMatrix<TYPE> &operator +=(const TYPE           );
 
+  TMatrix<TYPE> &operator -=(const TMatrix<TYPE> &);
+  TMatrix<TYPE> &operator -=(const TYPE           );
+
+  TMatrix<TYPE> &operator *=(const TMatrix<TYPE> &);
+  TMatrix<TYPE> &operator *=(const TYPE           );
+
+  TMatrix<TYPE> &operator %=(const TMatrix<TYPE> &);
+
+  TMatrix<TYPE> &operator /=(const TYPE           );
+  TMatrix<TYPE> &operator /=(const TMatrix<TYPE> &);
+
+  friend TMatrix<TYPE>   operator  + <>(const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  + <>(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  + <>(const TYPE           ,const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  + <>(const TMatrix<TYPE> &,const TYPE           );
+
+  friend TMatrix<TYPE>   operator  - <>(const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  - <>(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  - <>(const TYPE           ,const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  - <>(const TMatrix<TYPE> &,const TYPE           );
+
+  friend TMatrix<TYPE>   operator  * <>(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  * <>(const TYPE           ,const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  * <>(const TMatrix<TYPE> &,const TYPE           );
+
+  friend TMatrix<TYPE>   operator  % <>(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+
+  friend TMatrix<TYPE>   operator  / <>(const TMatrix<TYPE> &,const TYPE           );
+  friend TMatrix<TYPE>   operator  / <>(const TMatrix<TYPE> &,const TMatrix<TYPE> &);
+
+  friend TMatrix<TYPE>   operator  ~ <>(const TMatrix<TYPE> &);
+  friend TMatrix<TYPE>   operator  ! <>(const TMatrix<TYPE> &);
+
+  // *************************************************
+  // 単位行列の作成(対角成分 = 1, 非対角成分 = 0)
+  // *************************************************
+  static TMatrix<TYPE> identity(const INT row,const INT col);
+
+  // *************************************************
+  // 標準正規分布に従う乱数を与えた行列の作成
+  // *************************************************
+  static TMatrix<TYPE> random  (const INT row,const INT col);
+  
+  // *************************************************
+  // 特異値分解
+  // *************************************************
+  void svd(TMatrix<TYPE> &s,TMatrix<TYPE> &U,TMatrix<TYPE> &V);
+
+  TMatrix<TYPE> diag (){return CLDIA::diag (*this);}
+  TYPE          trace(){return CLDIA::trace(*this);}
+
+  //operator CMatrix()const;
 };
 
 // *************************************************
@@ -310,6 +428,7 @@ TMatrix<INT>  operator <=(const TMatrix<TYPE> &A,const TYPE     b){
 // *************************************************
 // 出力
 // *************************************************
+template<>
 ostream &operator <<(ostream &os,const TMatrix<INT> &A){
   CHAR str[256];
   INT  i,j;
@@ -434,15 +553,16 @@ class IMatrix : public TMatrix<INT>{
 // *************************************************
 // 出力
 // *************************************************
+template<>
 ostream &operator <<(ostream     &os,const TMatrix<REAL> &A){
   CHAR str[256];
   INT  i,j;
   
   os << "=============(" << A.row << "," << A.col << ")=============" << endl;  
-  for(i = 0;i < A.get_row();i++){
+  for(i = 0;i < A.row;i++){
     os << "| "; 
-    for(j = 0;j < A.get_col();j++){
-      sprintf(str,(A[i][j] >= 0.0) ? "+%10.5lf " : "-%10.5lf ",fabs(A[i][j]));
+    for(j = 0;j < A.col;j++){
+      sprintf(str,"%+10.5f ",fabs(A.dat[i * A.col + j]));
       os << str;
     }
     os << "|" << endl;
@@ -451,6 +571,25 @@ ostream &operator <<(ostream     &os,const TMatrix<REAL> &A){
   return os;
 }
 
+template<>
+ostream &operator <<(ostream     &os,const TMatrix<COMP> &A){
+  CHAR str[256];
+  INT  i,j;
+
+  os << "=============(" << A.row << "," << A.col << ")=============" << endl;  
+  for(i = 0;i < A.row;i++){
+    os << "| "; 
+    for(j = 0;j < A.col;j++){
+      sprintf(str,"(%+10.5lf,%+10.5lf) ",COMPLEX__REAL(A.dat[i * A.col + j]),COMPLEX__IMAG(A.dat[i * A.col + j]));
+      os << str;
+    }
+    os << "|" << endl;
+  }
+  
+  return os;
+}
+
+template<>
 ostream &operator <<(ostream     &os,const TMatrix<DATA> &A){
   CHAR str[256];
   INT  i,j;
@@ -775,6 +914,19 @@ void Matrix__fetch(TMatrix<DATA> &A,
 }
 
 template<>
+TMatrix<REAL>::operator TMatrix<COMP>       ()const{
+  TMatrix<COMP> C(this->row,this->col);
+  INT           i,j;
+  
+  for(i = 0;i < this->row;i++){
+    for(j = 0;j < this->col;j++){
+      C[i][j] = COMPLEX__MAKE_REAL(this->dat[i * this->col + j]);
+    }
+  }
+  return C;
+}
+
+template<>
 TMatrix<DATA>::operator TMatrix<REAL>       ()const{
   TMatrix<REAL> C(this->row,this->col);
   INT           i,j;
@@ -798,6 +950,846 @@ TMatrix<DATA>::operator TMatrix<TIME_TT2000>()const{
     }
   }
   return C;
+}
+
+
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator +=(const TMatrix<TYPE> &B){return *this = *this + B;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator +=(const TYPE           b){return *this = *this + b;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator -=(const TMatrix<TYPE> &B){return *this = *this - B;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator -=(const TYPE           b){return *this = *this - b;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator *=(const TMatrix<TYPE> &B){return *this = *this * B;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator *=(const TYPE           b){return *this = *this * b;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator %=(const TMatrix<TYPE> &B){return *this = *this % B;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator /=(const TYPE           b){return *this = *this / b;}
+template<typename TYPE> TMatrix<TYPE> &TMatrix<TYPE>::operator /=(const TMatrix<TYPE> &B){return *this = *this / B;}
+
+// *************************************************
+// 符号演算子(+)
+// *************************************************
+template<>
+TMatrix<REAL>  operator +(const TMatrix<REAL> &A){
+  return A;
+}
+
+template<>
+TMatrix<COMP>  operator +(const TMatrix<COMP> &A){
+  return A;
+}
+
+// *************************************************
+// 加算演算子(行列 + 行列)
+// *************************************************
+template<>
+TMatrix<REAL>  operator +(const TMatrix<REAL> &A,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+  
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] += B.dat[i * B.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator +(const TMatrix<COMP> &A,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+  
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j]  = COMP__ADD(C.dat[i * C.col + j],B.dat[i * B.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 加算演算子(  数 + 行列)
+// *************************************************
+template<>
+TMatrix<REAL>  operator +(const REAL           a,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = B;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = a + C.dat[i * C.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator +(const COMP           a,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = B;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__ADD(a,C.dat[i * C.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 加算演算子(行列 +   数)
+// *************************************************
+template<>
+TMatrix<REAL>  operator +(const TMatrix<REAL> &A,const REAL           b){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = C.dat[i * C.col + j] + b;
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator +(const TMatrix<COMP> &A,const COMP           b){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__ADD(C.dat[i * C.col + j],b);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 符号演算子(-)
+// *************************************************
+template<>
+TMatrix<REAL>  operator -(const TMatrix<REAL> &A){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = -C.dat[i * C.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator -(const TMatrix<COMP> &A){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__NEGATIVE(C.dat[i * C.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 減算演算子(行列 - 行列)
+// *************************************************
+template<>
+TMatrix<REAL>  operator -(const TMatrix<REAL> &A,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+  
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] -= B.dat[i * B.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator -(const TMatrix<COMP> &A,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+  
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__SUB(C.dat[i * C.col + j],B.dat[i * B.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 減算演算子(  数 - 行列)
+// *************************************************
+template<>
+TMatrix<REAL>  operator -(const REAL           a,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = B;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = a - C.dat[i * C.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator -(const COMP           a,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = B;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__SUB(a,C.dat[i * C.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 減算演算子(行列 -   数)
+// *************************************************
+template<>
+TMatrix<REAL>  operator -(const TMatrix<REAL> &A,const REAL           b){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = C.dat[i * C.col + j] - b;
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator -(const TMatrix<COMP> &A,const COMP           b){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__SUB(C.dat[i * C.col + j],b);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 乗算演算子(行列 * 行列)
+// *************************************************
+template<>
+TMatrix<REAL>  operator *(const TMatrix<REAL> &A,const TMatrix<REAL> &B){
+  TMatrix<REAL> C(A.row,B.col);
+  REAL          tmp;
+  INT           i,j,k;
+  
+  if(A.col != B.row){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      tmp = 0.0;
+      for(k = 0;k < A.col;k++){
+        tmp += A.dat[i * A.col + k] * B.dat[k * B.col + j];
+      }
+      C.dat[i * C.col + j] = tmp;
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator *(const TMatrix<COMP> &A,const TMatrix<COMP> &B){
+  TMatrix<COMP> C(A.row,B.col);
+  COMP          tmp;
+  INT           i,j,k;
+  
+  if(A.col != B.row){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      tmp = COMP__ZERO();
+      for(k = 0;k < A.col;k++){
+        tmp = COMP__FMA(A.dat[i * A.col + k],B.dat[k * B.col + j],tmp);
+      }
+      C.dat[i * C.col + j] = tmp;
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 乗算演算子(  数 * 行列)
+// *************************************************
+template<>
+TMatrix<REAL>  operator *(const REAL           a,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = B;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = a * C.dat[i * C.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator *(const COMP           a,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = B;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__MUL(a,C.dat[i * C.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 乗算演算子(行列 *   数)
+// *************************************************
+template<>
+TMatrix<REAL>  operator *(const TMatrix<REAL> &A,const REAL           b){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = C.dat[i * C.col + j] * b;
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator *(const TMatrix<COMP> &A,const COMP           b){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__MUL(C.dat[i * C.col + j],b);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 乗算演算子(行列 % 行列) (要素ごとの乗算)
+// *************************************************
+template<>
+TMatrix<REAL>  operator %(const TMatrix<REAL> &A,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] *= B.dat[i * B.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator %(const TMatrix<COMP> &A,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j]  = COMP__MUL(C.dat[i * C.col + j],B.dat[i * B.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 除算演算子(行列 /   数)
+// *************************************************
+template<>
+TMatrix<REAL>  operator /(const TMatrix<REAL> &A,const REAL           b){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = C.dat[i * C.col + j] / b;
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator /(const TMatrix<COMP> &A,const COMP           b){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__DIV(C.dat[i * C.col + j],b);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 除算演算子(行列 / 行列) (要素ごとの乗算)
+// *************************************************
+template<>
+TMatrix<REAL>  operator /(const TMatrix<REAL> &A,const TMatrix<REAL> &B){
+  TMatrix<REAL> C = A;
+  INT           i,j;
+
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] /= B.dat[i * B.col + j];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator /(const TMatrix<COMP> &A,const TMatrix<COMP> &B){
+  TMatrix<COMP> C = A;
+  INT           i,j;
+
+  if(A.row != B.row || A.col != B.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__DIV(C.dat[i * C.col + j],B.dat[i * B.col + j]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 随伴演算子(~)
+// *************************************************
+template<>
+TMatrix<REAL>  operator ~(const TMatrix<REAL> &A){
+  TMatrix<REAL> C(A.col,A.row);
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = A.dat[j * A.col + i];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator ~(const TMatrix<COMP> &A){
+  TMatrix<COMP> C(A.col,A.row);
+  INT           i,j;
+
+  for(i = 0;i < C.row;i++){
+    for(j = 0;j < C.col;j++){
+      C.dat[i * C.col + j] = COMP__CONJ(A.dat[j * A.col + i]);
+    }
+  }
+  return C;
+}
+
+// *************************************************
+// 逆元演算子(!)
+// *************************************************
+template<>
+TMatrix<REAL>  operator !(const TMatrix<REAL> &A){
+  TMatrix<REAL> C = A;
+
+  if(A.row != A.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  if(REAL__MATRIX_INV(C.dat,C.row) == -1){
+    ERROR__SHOW("#2");
+    exit(EXIT_FAILURE);
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP>  operator !(const TMatrix<COMP> &A){
+  TMatrix<COMP> C = A;
+
+  if(A.row != A.col){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  
+  if(COMP__MATRIX_INV(C.dat,C.row) == -1){
+    ERROR__SHOW("#2");
+    exit(EXIT_FAILURE);
+  }
+  return C;
+}
+
+template<>
+TMatrix<REAL> TMatrix<REAL>::identity(const INT row,const INT col){
+  TMatrix<REAL> A(row,col);
+  INT           dim;
+  INT           i;
+
+  dim = (row <= col) ? row : col;
+  for(i = 0;i < dim;i++){
+    A.dat[i * A.col + i] = 1.0;
+  }
+  return A;
+}
+
+template<>
+TMatrix<COMP> TMatrix<COMP>::identity(const INT row,const INT col){
+  TMatrix<COMP> A(row,col);
+  INT           dim;
+  INT           i;
+
+  dim = (row <= col) ? row : col;
+  for(i = 0;i < dim;i++){
+    A.dat[i * A.col + i] = COMP__ONE();
+  }
+  return A;
+}
+
+template<>
+TMatrix<REAL> TMatrix<REAL>::random  (const INT row,const INT col){
+  TMatrix<REAL> A(row,col);
+  RANDOM        rnd;
+  INT           i,j;
+
+  RANDOM__INITIALIZE(&rnd);
+  
+  for(i = 0;i < A.row;i++){
+    for(j = 0;j < A.col;j++){
+      A.dat[i * A.col + j] = RANDOM__NORMAL(&rnd,0.0,1.0);
+    }
+  }
+  return A;
+}
+
+template<>
+TMatrix<COMP> TMatrix<COMP>::random  (const INT row,const INT col){
+  TMatrix<COMP> A(row,col);
+  RANDOM        rnd;
+  INT           i,j;
+
+  RANDOM__INITIALIZE(&rnd);
+  
+  for(i = 0;i < A.row;i++){
+    for(j = 0;j < A.col;j++){
+      A.dat[i * A.col + j] = COMPLEX__MAKE_RE_IM(RANDOM__NORMAL(&rnd,0.0,1.0),RANDOM__NORMAL(&rnd,0.0,1.0)); 
+    }
+  }
+  return A;
+}
+
+template<>
+void TMatrix<REAL>::svd(TMatrix<REAL> &s,TMatrix<REAL> &U,TMatrix<REAL> &V){
+  CLDIA::svd(s,U,V,*this);
+}
+
+template<>
+void TMatrix<COMP>::svd(TMatrix<COMP> &s,TMatrix<COMP> &U,TMatrix<COMP> &V){
+  CLDIA::svd(s,U,V,*this);
+}
+
+void CLDIA::eye (TMatrix<REAL> &E,
+                 const INT      row,
+                 const INT      col){
+  INT dim;
+  INT i;
+
+  E   = TMatrix<REAL>(row,col);  
+  dim = MACRO_MIN(row,col);
+  for(i = 0;i < dim;i++){
+    E[i][i] = 1.0;
+  }
+}
+
+void CLDIA::eye (TMatrix<REAL> &E,
+                 const INT      dim){
+  CLDIA::eye(E,dim,dim);
+}
+
+void CLDIA::hilb(TMatrix<REAL> &H,
+                 const INT     dim){
+  INT i,j;
+
+  H = TMatrix<REAL>(dim,dim);  
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      H[i][j] = 1.0 / (i + j + 1.0);
+    }
+  }
+}
+
+template<>
+TMatrix<REAL> CLDIA::diag (const TMatrix<REAL> &A  ){
+  TMatrix<REAL> C;
+  INT           row = A.get_row();
+  INT           col = A.get_col();
+  INT           dim;
+  INT           i;
+  
+  if(col == 1){
+    C = TMatrix<REAL>(row,row);
+    for(i = 0;i < row;i++){
+      C[i][i] = A[i][0];
+    }
+  }else{
+    dim = MACRO_MIN(row,col);
+    C   = TMatrix<REAL>(dim,1);
+    for(i = 0;i < dim;i++){
+      C[i][0] = A[i][i];
+    }
+  }
+  return C;
+}
+
+template<>
+TMatrix<COMP> CLDIA::diag (const TMatrix<COMP> &A  ){
+  TMatrix<COMP> C;
+  INT           row = A.get_row();
+  INT           col = A.get_col();
+  INT           dim;
+  INT           i;
+  
+  if(col == 1){
+    C = TMatrix<COMP>(row,row);
+    for(i = 0;i < row;i++){
+      C[i][i] = A[i][0];
+    }
+  }else{
+    dim = MACRO_MIN(row,col);
+    C   = TMatrix<COMP>(dim,1);
+    for(i = 0;i < dim;i++){
+      C[i][0] = A[i][i];
+    }
+  }
+  return C;
+}
+
+template<>
+REAL          CLDIA::trace(const TMatrix<REAL> &A  ){
+  REAL tr;
+  INT  dim = A.get_row();
+  INT  i;
+
+  if(!A.is_square()){
+    ERROR__SHOW("Matrix must be square.");
+    exit(EXIT_FAILURE);
+  }
+  tr = 0.0;
+  for(i = 0;i < dim;i++){
+    tr += A[i][i];
+  }
+  return tr;
+}
+
+template<>
+COMP          CLDIA::trace(const TMatrix<COMP> &A  ){
+  COMP tr;
+  INT  dim = A.get_row();
+  INT  i;
+
+  if(!A.is_square()){
+    ERROR__SHOW("Matrix must be square.");
+    exit(EXIT_FAILURE);
+  }
+  tr = COMP__ZERO();
+  for(i = 0;i < dim;i++){
+    tr = COMP__ADD(tr,A[i][i]);
+  }
+  return tr;
+}
+
+template<>
+REAL          CLDIA::cond (const TMatrix<REAL> &A  ){
+  TMatrix<REAL> s;
+  TMatrix<REAL> U;
+  TMatrix<REAL> V;
+  
+  CLDIA::svd(s,U,V,A);
+  return s[0][0] / s[s.get_row() - 1][0];
+}
+
+template<>
+REAL          CLDIA::det  (const TMatrix<REAL> &A  ){
+  TMatrix<REAL> s;
+  TMatrix<REAL> U;
+  TMatrix<REAL> V;
+  REAL          d;
+  INT           i;
+  
+  CLDIA::svd(s,U,V,A);
+  d = 1.0;
+  for(i = 0;i < s.get_row();i++){
+    d *= s[i][0];
+  }
+  return d;
+}
+
+template<>
+REAL          CLDIA::det_lu(const TMatrix<REAL> &A  ){
+  TMatrix<REAL> L,U;
+  REAL          d;
+  INT           i;
+  
+  CLDIA::lu(L,U,A);
+  d = 1.0;
+  for(i = 0;i < U.get_row();i++){
+    d *= U[i][i];
+  }
+  return d;
+}
+
+void CLDIA::svd  (      TMatrix<REAL> &s,
+                        TMatrix<REAL> &U,
+                        TMatrix<REAL> &V,
+                  const TMatrix<REAL> &A){
+  INT row = A.get_row();
+  INT col = A.get_col();
+  
+  if(row >= col){
+    s = TMatrix<REAL>(col,1);
+    U = TMatrix<REAL>(row,col);
+    V = TMatrix<REAL>(col,col);
+  }else{
+    s = TMatrix<REAL>(row,1);
+    U = TMatrix<REAL>(row,row);
+    V = TMatrix<REAL>(col,row);
+  }
+  REAL__MATRIX_SVD(s.get_dat(),U.get_dat(),V.get_dat(),A.get_dat(),row,col);
+}
+
+void CLDIA::svd  (      TMatrix<COMP> &s,
+                        TMatrix<COMP> &U,
+                        TMatrix<COMP> &V,
+                  const TMatrix<COMP> &A){
+  TMatrix<REAL> q;
+  INT           row = A.get_row();
+  INT           col = A.get_col();
+  
+  if(row >= col){
+    q = TMatrix<REAL>(col,1);
+    U = TMatrix<COMP>(row,col);
+    V = TMatrix<COMP>(col,col);
+  }else{
+    q = TMatrix<REAL>(row,1);
+    U = TMatrix<COMP>(row,row);
+    V = TMatrix<COMP>(col,row);
+  }
+  COMP__MATRIX_SVD(q.get_dat(),U.get_dat(),V.get_dat(),A.get_dat(),row,col);
+  s = q;
+}
+
+void CLDIA::lu   (      TMatrix<REAL> &L,
+                        TMatrix<REAL> &U,
+                  const TMatrix<REAL> &A){
+  TMatrix<REAL> LU;
+  INT           i,j;
+  INT           dim;
+    
+  if(!A.is_square()){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  dim = A.get_row();
+
+  LU  = A;
+  L   = TMatrix<REAL>(dim,dim);
+  U   = TMatrix<REAL>(dim,dim);
+  
+  REAL__MATRIX_LU_DECOMPOSITION(&LU[0][0],dim);
+    
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      if(i >  j){
+        L[i][j] = LU[i][j];
+      }
+      if(i == j){
+        L[i][j] = 1.0;
+      }
+    }
+  }
+  
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      if(i <= j){
+        U[i][j] = LU[i][j];
+      }
+    }
+  }
+}
+
+namespace CLDIA{
+  void hist(const TMatrix<REAL> &A,
+            const REAL           min,
+            const REAL           max,
+            const INT            div,
+            const CHAR          *filename){
+    SVGPLOT__HISTOGRAM(&A[0][0],A.get_row(),
+                       min,max,
+                       div,
+                       "x label",
+                       "y label",
+                       "title",
+                       filename);
+  }
+
+  TMatrix<REAL> linspace(const REAL x1,const REAL x2);
 }
 
 #endif

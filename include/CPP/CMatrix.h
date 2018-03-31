@@ -36,60 +36,6 @@ class CMatrix : public TMatrix<COMP>{
  ~CMatrix(){}
 
   // *************************************************
-  // 演算子のオーバーロード
-  // *************************************************
-  CMatrix  &operator +=(const CMatrix &);
-  CMatrix  &operator +=(const COMP     );
-
-  CMatrix  &operator -=(const CMatrix &);
-  CMatrix  &operator -=(const COMP     );
-
-  CMatrix  &operator *=(const CMatrix &);
-  CMatrix  &operator *=(const COMP     );
-  CMatrix  &operator %=(const CMatrix &);
-
-  CMatrix  &operator /=(const COMP     );
-  CMatrix  &operator /=(const CMatrix &);
-
-  friend ostream  &operator <<(ostream&       ,const CMatrix &);
-
-  friend CMatrix   operator  +(const CMatrix &);
-  friend CMatrix   operator  +(const CMatrix &,const CMatrix &);
-  friend CMatrix   operator  +(const COMP     ,const CMatrix &);
-  friend CMatrix   operator  +(const CMatrix &,const COMP     );
-
-  friend CMatrix   operator  -(const CMatrix &);                
-  friend CMatrix   operator  -(const CMatrix &,const CMatrix &);
-  friend CMatrix   operator  -(const COMP     ,const CMatrix &);
-  friend CMatrix   operator  -(const CMatrix &,const COMP     );
-
-  friend CMatrix   operator  *(const CMatrix &,const CMatrix &);
-  friend CMatrix   operator  *(const COMP     ,const CMatrix &);
-  friend CMatrix   operator  *(const CMatrix &,const COMP     );
-  friend CMatrix   operator  %(const CMatrix &,const CMatrix &);
-
-  friend CMatrix   operator  /(const CMatrix &,const COMP     );
-  friend CMatrix   operator  /(const CMatrix &,const CMatrix &);
-
-  friend CMatrix   operator  ~(const CMatrix &);                
-  friend CMatrix   operator  !(const CMatrix &);                
-
-  // *************************************************
-  // 単位行列の作成(対角成分 = 1, 非対角成分 = 0)
-  // *************************************************
-  static CMatrix identity(const INT row,const INT col);
-
-  // *************************************************
-  // 標準正規分布に従う乱数を与えた行列の作成
-  // *************************************************
-  static CMatrix random  (const INT row,const INT col);
-
-  // *************************************************
-  // 特異値分解
-  // *************************************************
-  void    svd  (RMatrix &s,CMatrix &U,CMatrix &V);
-
-  // *************************************************
   // 縦ベクトルの場合 : 縦ベクトル要素を対角成分に持つ対角行列を返す
   // 正方行列  の場合 : 非対角成分を0にした行列を返す
   // *************************************************
@@ -146,20 +92,6 @@ class CMatrix : public TMatrix<COMP>{
   void write_csv(const char *filename,char ch);
 };
 
-#include"CMatrix__OPERATOR_MEMBER.hpp"
-#include"CMatrix__OPERATOR_ADD.hpp"
-#include"CMatrix__OPERATOR_SUB.hpp"
-#include"CMatrix__OPERATOR_MUL.hpp"
-#include"CMatrix__OPERATOR_DIV.hpp"
-#include"CMatrix__OPERATOR_ADJOINT.hpp"
-/*
-#include"CMatrix__OPERATOR_TRANSPOSE.hpp"
-*/
-#include"CMatrix__OPERATOR_INVERSE.hpp"
-
-#include"CMatrix__STATIC.hpp"
-
-#include"CMatrix__SVD.hpp"
 /*
 #include"CMatrix__DIAG.hpp"
 */
