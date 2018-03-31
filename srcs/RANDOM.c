@@ -10,6 +10,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
+#include<time.h>
 #include"RANDOM.h"
 
 void  RANDOM__INITIALIZE_SEED (RANDOM *rnd,unsigned long seed){
@@ -21,7 +22,16 @@ void  RANDOM__INITIALIZE_SEED (RANDOM *rnd,unsigned long seed){
 }
 
 void  RANDOM__INITIALIZE      (RANDOM *rnd){
-  RANDOM__INITIALIZE_SEED(rnd,0x00000000UL);
+  static unsigned long seed   = 0x00000000UL;
+  static int           isinit = 0;
+
+  if(!isinit){
+    seed = time(NULL);
+    isinit = 1;
+  }else{
+    seed++;
+  }
+  RANDOM__INITIALIZE_SEED(rnd,seed);
 }
 
 REAL8 RANDOM__UNIFORM         (RANDOM *rnd,

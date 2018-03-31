@@ -1,6 +1,5 @@
 #include"CDFData.h"
 
-
 class PlotElement{
  public:
   STRING xlabel1;

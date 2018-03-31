@@ -647,7 +647,7 @@ void show(const TMatrix<REAL> &A,const TMatrix<INT> &M){
 template<typename TYPE> class TVector : public TMatrix<TYPE>{
  public:
   //create a ( 1 )-dimensional zero vector
-  TVector()                   : TMatrix<TYPE>(1,1){}
+  TVector()                   : TMatrix<TYPE>(  1,1){}
   
   //create a (dim)-dimensional zero vector
   TVector(int dim)            : TMatrix<TYPE>(dim,1){}
@@ -656,7 +656,11 @@ template<typename TYPE> class TVector : public TMatrix<TYPE>{
   TVector(const TMatrix<TYPE> &A);
   
   //get dimension of a vector
-  int dim()const{return this->row;}
+  INT get_dim()const{return this->row;}
+
+  static TVector<TYPE> random(const INT dim){
+    return TMatrix<TYPE>::random(dim,1);
+  }
   
   //operator overloading
   TYPE          &operator [](const int n)const{return this->dat[n];}
@@ -664,30 +668,23 @@ template<typename TYPE> class TVector : public TMatrix<TYPE>{
 };
 
 template<typename TYPE> 
-TVector<TYPE>::TVector(const TMatrix<TYPE> &A){
-  if(A.col() != 1){
-    cerr << "Error : TVector.TVector(TMatrix)" << endl;
+TVector<TYPE>::TVector(const TMatrix<TYPE> &A){  
+  if(A.get_col() != 1){
+    ERROR__SHOW("#1");
     exit(EXIT_FAILURE);
   }
-  this->col =       1;
-  this->row = A.row();
-  this->dat = new TYPE[this->row];
-  memcpy(this->dat,A.get_dat(),this->row * sizeof(TYPE));
+  TMatrix<TYPE>::initialize(*this,A.get_row(),A.get_col());
+  TMatrix<TYPE>::datacopy  (*this,A.get_dat());
 }
 
 template<typename TYPE> 
 TVector<TYPE> &TVector<TYPE>::operator  =(const TMatrix<TYPE> &A){
   if(A.get_col() != 1){
-    cerr << "Error : TVector.=(TMatrix)" << endl;
+    ERROR__SHOW("#1");
     exit(EXIT_FAILURE);
   }
-  if(this->row != A.get_row()){ 
-    delete [] this->D;
-    this->col =       1;
-    this->row = A.row();
-    this->dat = new TYPE[this->row];
-  }
-  memcpy(this->dat,A.get_dat(),this->row * sizeof(TYPE));
+  TMatrix<TYPE>::initialize(*this,A.get_row(),A.get_col());
+  TMatrix<TYPE>::datacopy  (*this,A.get_dat());
   return *this;
 }
 
