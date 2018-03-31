@@ -2,6 +2,7 @@
 #define _TMATRIX_H_INCLUDE_
 
 #define MACRO_MIN(x,y) (((x) <= (y)) ? (x) : (y))
+#define MACRO_MAX(x,y) (((x) >= (y)) ? (x) : (y))
 
 #include<iostream>
 #include<cstdio>
@@ -96,6 +97,7 @@ namespace CLDIA{
 template<typename TYPE> class TMatrix{
  protected:
   TYPE *dat;
+  TYPE  scl;
   INT   row;
   INT   col;
  protected:
@@ -108,7 +110,12 @@ template<typename TYPE> class TMatrix{
                          const INT      col);
   static void zerofill  (TMatrix<TYPE> &A);
   static void datacopy  (TMatrix<TYPE> &A,
-                         const TYPE    *dat);  
+                         const TYPE    *dat);
+  static void release   (TMatrix<TYPE> &A){
+    A.dat = &A.scl;    
+    A.row =      1;
+    A.col =      1;
+  }
  public:
   // *************************************************
   // コンストラクタ
@@ -122,7 +129,8 @@ template<typename TYPE> class TMatrix{
   // *************************************************
   // コピーコンストラクタ
   // *************************************************
-  TMatrix(const TMatrix<TYPE> &A);
+  TMatrix(const TMatrix<TYPE>  &A);
+  TMatrix(      TMatrix<TYPE> &&A);
   // *************************************************
   // デストラクタ
   // *************************************************
@@ -153,10 +161,11 @@ template<typename TYPE> class TMatrix{
   // *************************************************
   // 演算子のオーバーロード
   // *************************************************
-  TMatrix<TYPE>  &operator  =(const TMatrix<TYPE> &);
-  TYPE           *operator [](const INT     n)const ;
-  TMatrix<TYPE>  &operator &=(const TMatrix<TYPE> &);
-  TMatrix<TYPE>  &operator |=(const TMatrix<TYPE> &);
+  TMatrix<TYPE>  &operator  =(const TMatrix<TYPE>  &);
+  TMatrix<TYPE>  &operator  =(      TMatrix<TYPE> &&);
+  TYPE           *operator [](const INT     n)const  ;
+  TMatrix<TYPE>  &operator &=(const TMatrix<TYPE>  &);
+  TMatrix<TYPE>  &operator |=(const TMatrix<TYPE>  &);
 
   friend ostream        &operator << <>(ostream&             ,const TMatrix<TYPE> &);
   
@@ -245,13 +254,18 @@ template<typename TYPE>
 void TMatrix<TYPE>::initialize(TMatrix<TYPE> &A,
                                const INT      row,
                                const INT      col){
-  if(col <= 0 || row <= 0){
-    ERROR__SHOW("#1");
+  if((row <= 0) || (col <= 0)){
+    ERROR__SHOW("(row <= 0) || (col <= 0)");
     exit(EXIT_FAILURE);
   }
-  if((A.dat = (TYPE*)malloc(sizeof(TYPE) * row * col)) == NULL){
-    ERROR__SHOW("#2");
-    exit(EXIT_FAILURE);    
+  if((row == 1) && (col == 1)){
+    A.dat = &A.scl;
+  }else{
+    A.dat = (TYPE*)malloc(sizeof(TYPE) * row * col);
+    if(A.dat == NULL){
+      ERROR__SHOW("Memory allocation failed.");
+      exit(EXIT_FAILURE);    
+    }
   }
   A.row = row;
   A.col = col;
@@ -259,6 +273,9 @@ void TMatrix<TYPE>::initialize(TMatrix<TYPE> &A,
 
 template<typename TYPE> 
 void TMatrix<TYPE>::finalize  (TMatrix<TYPE> &A){
+  if((A.row == 1) && (A.col == 1)){
+    return;
+  }
   free(A.dat);
 }
 
@@ -266,8 +283,8 @@ template<typename TYPE>
 void TMatrix<TYPE>::resize    (TMatrix<TYPE> &A,
                                const INT      row,
                                const INT      col){
-  if(col <= 0 || row <= 0){
-    ERROR__SHOW("#1");
+  if((row <= 0) || (col <= 0)){
+    ERROR__SHOW("(row <= 0) || (col <= 0)");
     exit(EXIT_FAILURE);
   }
   if((A.row * A.col) != (row * col)){
@@ -306,9 +323,17 @@ TMatrix<TYPE>::TMatrix(INT row,INT col){
 // コピーコンストラクタ
 // *************************************************
 template<typename TYPE> 
-TMatrix<TYPE>::TMatrix(const TMatrix<TYPE> &A){
+TMatrix<TYPE>::TMatrix(const TMatrix<TYPE>  &A){
   TMatrix<TYPE>::initialize(*this,A.row,A.col);
   TMatrix<TYPE>::datacopy  (*this,A.dat);
+}
+
+template<typename TYPE> 
+TMatrix<TYPE>::TMatrix(      TMatrix<TYPE> &&A){
+  this->dat = A.dat;
+  this->row = A.row;
+  this->col = A.col;
+  TMatrix<TYPE>::release   (A);
 }
 
 // *************************************************
@@ -323,9 +348,19 @@ TMatrix<TYPE>::~TMatrix(){
 // 代入演算子
 // *************************************************
 template<typename TYPE> 
-TMatrix<TYPE> &TMatrix<TYPE>::operator  =(const TMatrix<TYPE> &A){
+TMatrix<TYPE> &TMatrix<TYPE>::operator  =(const TMatrix<TYPE>  &A){
   TMatrix<TYPE>::resize  (*this,A.row,A.col);
   TMatrix<TYPE>::datacopy(*this,A.dat);
+  return *this;
+}
+
+template<typename TYPE> 
+TMatrix<TYPE> &TMatrix<TYPE>::operator  =(      TMatrix<TYPE> &&A){
+  TMatrix<TYPE>::finalize  (*this);
+  this->dat = A.dat;
+  this->row = A.row;
+  this->col = A.col;
+  TMatrix<TYPE>::release   (A);
   return *this;
 }
 
@@ -590,6 +625,23 @@ ostream &operator <<(ostream     &os,const TMatrix<COMP> &A){
 }
 
 template<>
+ostream &operator <<(ostream     &os,const TMatrix<TIME_TT2000> &A){
+  CHAR str[256];
+  INT  i,j;
+  
+  os << "=============(" << A.get_row() << "," << A.get_col() << ")=============" << endl;  
+  for(i = 0;i < A.get_row();i++){
+    os << "| "; 
+    for(j = 0;j < A.get_col();j++){
+      T2000__PRINT(A[i][j],stderr);
+      os << " ";
+    }
+    os << "|" << endl;
+  }  
+  return os;
+}
+
+template<>
 ostream &operator <<(ostream     &os,const TMatrix<DATA> &A){
   CHAR str[256];
   INT  i,j;
@@ -643,56 +695,7 @@ void show(const TMatrix<REAL> &A,const TMatrix<INT> &M){
   }  
 }
 
-
-template<typename TYPE> class TVector : public TMatrix<TYPE>{
- public:
-  //create a ( 1 )-dimensional zero vector
-  TVector()                   : TMatrix<TYPE>(  1,1){}
-  
-  //create a (dim)-dimensional zero vector
-  TVector(int dim)            : TMatrix<TYPE>(dim,1){}
-
-  //copy constructor
-  TVector(const TMatrix<TYPE> &A);
-  
-  //get dimension of a vector
-  INT get_dim()const{return this->row;}
-
-  static TVector<TYPE> random(const INT dim){
-    return TMatrix<TYPE>::random(dim,1);
-  }
-  
-  //operator overloading
-  TYPE          &operator [](const int n)const{return this->dat[n];}
-  TVector<TYPE> &operator  =(const TMatrix<TYPE> &);
-};
-
-template<typename TYPE> 
-TVector<TYPE>::TVector(const TMatrix<TYPE> &A){  
-  if(A.get_col() != 1){
-    ERROR__SHOW("#1");
-    exit(EXIT_FAILURE);
-  }
-  TMatrix<TYPE>::initialize(*this,A.get_row(),A.get_col());
-  TMatrix<TYPE>::datacopy  (*this,A.get_dat());
-}
-
-template<typename TYPE> 
-TVector<TYPE> &TVector<TYPE>::operator  =(const TMatrix<TYPE> &A){
-  if(A.get_col() != 1){
-    ERROR__SHOW("#1");
-    exit(EXIT_FAILURE);
-  }
-  TMatrix<TYPE>::initialize(*this,A.get_row(),A.get_col());
-  TMatrix<TYPE>::datacopy  (*this,A.get_dat());
-  return *this;
-}
-
-class DMatrix : public TMatrix<T2000>{
- public:
-  using TMatrix<T2000>::TMatrix;
-};
-
+#include"TVector.h"
 
 void show(const TMatrix<T2000> &A){
   CHAR str[256];
@@ -745,35 +748,8 @@ void show(const TMatrix<T2000> &A,const TMatrix<INT> &M){
   }  
 }
 
-DMatrix linspace(const CHAR *epoch_s,
-                 const CHAR *epoch_e,
-                 INT8        diff){
-  DMatrix t;
-  T2000   ts;
-  T2000   te;
-  INT4    num;
-  INT4    i;
-
-  ts  =  T2000__MAKE_FROM_TEXT(epoch_s);
-  te  =  T2000__MAKE_FROM_TEXT(epoch_e);
-  num = (te - ts) / diff;
-  t   =  DMatrix(num,1);
-  for(i = 0;i < num;i++){
-    t[i][0] = ts + i * diff;
-  }
-  return t;
-}
-
-#define T2000__NSEC (               1LL)
-#define T2000__USEC (1000 * T2000__NSEC)
-#define T2000__MSEC (1000 * T2000__USEC)
-#define T2000__SEC  (1000 * T2000__MSEC)
-#define T2000__MIN  (  60 * T2000__SEC )
-#define T2000__HOUR (  60 * T2000__MIN )
-#define T2000__DAY  (  24 * T2000__HOUR)
-
 //時刻の取得関数
-void DMatrix__fetch(DMatrix    &t,
+void DMatrix__fetch(TMatrix<TIME_TT2000>    &t,
                     const char *varName,  //z変数名
                     const char *filename){//CDFファイル名  
   CDFid     id;
@@ -809,7 +785,7 @@ void DMatrix__fetch(DMatrix    &t,
   }
 
   //行列の初期化
-  t = DMatrix((numRecs + 1) * numValues,1);
+  t = TMatrix<TIME_TT2000>((numRecs + 1) * numValues,1);
   
   status = CDFgetzVarAllRecordsByVarID(id,varNum,t.get_dat());
   
@@ -1786,7 +1762,45 @@ namespace CLDIA{
                        filename);
   }
 
-  TMatrix<REAL> linspace(const REAL x1,const REAL x2);
+  TVector<REAL> linspace(const REAL x1,
+                         const REAL x2,
+                         const INT  num = 100){
+    TVector<REAL> v(num);
+    INT           i;
+    
+    for(i = 0;i < num;i++){
+      v[i] = x1 + (x2 - x1) / (REAL)(num - 1) * i;
+    }
+    return v;
+  }
+
+  TVector<TIME_TT2000> linspace(const CHAR *epoch_s,
+                                const CHAR *epoch_e,
+                                INT8        diff){
+    TVector<TIME_TT2000> t;
+    TIME_TT2000          ts;
+    TIME_TT2000          te;
+    INT4                 num;
+    INT4                 i;
+    
+    ts  = T2000__MAKE_FROM_TEXT(epoch_s);
+    te  = T2000__MAKE_FROM_TEXT(epoch_e);
+    num = (te - ts) / diff;
+    t   = TVector<TIME_TT2000>(num);
+    for(i = 0;i < num;i++){
+      t[i] = ts + i * diff;
+    }
+    return t;
+  }
+
+#define TIME_TT2000__NSEC (                     1LL)
+#define TIME_TT2000__USEC (1000 * TIME_TT2000__NSEC)
+#define TIME_TT2000__MSEC (1000 * TIME_TT2000__USEC)
+#define TIME_TT2000__SEC  (1000 * TIME_TT2000__MSEC)
+#define TIME_TT2000__MIN  (  60 * TIME_TT2000__SEC )
+#define TIME_TT2000__HOUR (  60 * TIME_TT2000__MIN )
+#define TIME_TT2000__DAY  (  24 * TIME_TT2000__HOUR)
+  
 }
 
 #endif

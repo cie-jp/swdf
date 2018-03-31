@@ -24,10 +24,13 @@
 
 #include"CPP/TMatrix.h"
 
-typedef TMatrix<REAL> RMatrix;
-typedef TMatrix<COMP> CMatrix;
-typedef TVector<REAL> RVector;
-typedef TVector<COMP> CVector;
+typedef TMatrix<REAL>        RMatrix;
+typedef TMatrix<COMP>        CMatrix;
+typedef TMatrix<TIME_TT2000> EMatrix;
+
+typedef TVector<REAL>        RVector;
+typedef TVector<COMP>        CVector;
+typedef TVector<TIME_TT2000> EVector;
 
 #include"CPP/ERG_orbit.h"
 
