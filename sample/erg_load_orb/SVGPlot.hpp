@@ -5,6 +5,13 @@ SVGPlot:: SVGPlot(const STRING &filename){
                           height_cm,
                           dpi);
   SVGPLOT_PALETTE__Create10(&plt.pal);
+  xmin = 0LL;
+  xmax = 0LL;
+  ymin = 0.0;
+  ymax = 0.0;
+  zmin = 0.0;
+  zmax = 0.0;
+  num  =   0;
 }
 
 SVGPlot::~SVGPlot(){
@@ -56,6 +63,8 @@ void SVGPlot::set_plot_region(const INT plot_id,const INT plot_num,const INT mod
 }
 
 void SVGPlot::timespan(const STRING &ts,const STRING &te){
+  xmin = T2000__MAKE_FROM_TEXT(&ts[0]);
+  xmax = T2000__MAKE_FROM_TEXT(&te[0]);
   SVGPLOT__SET_RANGE_T_003(&plt,
                            T2000__MAKE_FROM_TEXT(&ts[0]),
                            T2000__MAKE_FROM_TEXT(&te[0]));

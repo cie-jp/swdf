@@ -15,6 +15,18 @@ class PlotElement{
 };
 
 class SVGPlot{
+ private:
+  //tplot用のスタック
+  EVector     x[50];
+  RVector     y[50];
+  RMatrix     z[50];
+  INT         yscaletype[50];
+  INT         zscaletype[50];
+  INT         dim[50];
+  TIME_TT2000 xmin,xmax;
+  REAL8       ymin,ymax;
+  REAL8       zmin,zmax;
+  INT         num;
 private:
   SVGPLOT plt;
   //規定値
@@ -32,9 +44,13 @@ private:
     SVGPLOT__SET_RANGE_Z_001(&plt);
   }
   void set_yrange(REAL ymin,REAL ymax){
+    this->ymin = ymin;
+    this->ymax = ymax;
     SVGPLOT__SET_RANGE_Y_003(&plt,ymin,ymax);
   }
   void set_zrange(REAL zmin,REAL zmax){
+    this->zmin = zmin;
+    this->zmax = zmax;
     SVGPLOT__SET_RANGE_Z_003(&plt,zmin,zmax);
   }
   void add_plot(const INT plot_id,
@@ -67,6 +83,180 @@ private:
                       1);
   }
 public:
+  void add(const EVector &epoch,
+           const RVector &var){
+    x[num] = epoch;
+    y[num] = var;
+    dim[num] = 1;
+    yscaletype[num] = 0;
+    zscaletype[num] = 1;
+    num++;
+  }
+  void add(const EVector &epoch,
+           const RVector &var1,
+           const RMatrix &var2){
+    x[num] = epoch;
+    y[num] = var1;
+    z[num] = var2;
+    dim[num] = 2;
+    yscaletype[num] = 0;
+    zscaletype[num] = 1;
+    num++;
+  }
+  void newplot(){
+    INT isinit;
+
+    if((xmin == 0LL) && (xmax == 0LL)){
+      isinit = 0;
+      for(INT i = 0;i < num;i++){
+        for(INT j = 0;j < x[i].get_dim();j++){
+          if(!isinit){
+            xmin = x[i][j];
+            xmax = x[i][j];
+            isinit = 1;
+          }else{
+            if(xmin > x[i][j]){
+              xmin = x[i][j];
+            }
+            if(xmax < x[i][j]){
+              xmax = x[i][j];
+            }
+          }
+        }
+      }
+    }
+
+    if((ymin == 0.0) && (ymax == 0.0)){
+      isinit = 0;
+      for(INT i = 0;i < num;i++){
+        for(INT j = 0;j < y[i].get_dim();j++){
+          if(!isinit){
+            ymin = y[i][j];
+            ymax = y[i][j];
+            isinit = 1;
+          }else{
+            if(ymin > y[i][j]){
+              ymin = y[i][j];
+            }
+            if(ymax < y[i][j]){
+              ymax = y[i][j];
+            }
+          }
+        }
+      }
+    }
+
+    if((zmin == 0.0) && (zmax == 0.0)){
+      isinit = 0;
+      for(INT i = 0;i < num;i++){
+        if(dim[i] != 2){
+          continue;
+        }
+        for(INT j = 0;j < z[i].get_row();j++){
+          for(INT k = 0;k < z[i].get_col();k++){
+            if(!isinit){
+              zmin = z[i][j][k];
+              zmax = z[i][j][k];
+              isinit = 1;
+            }else{
+              if(zmin > z[i][j][k]){
+                zmin = z[i][j][k];
+              }
+              if(zmax < z[i][j][k]){
+                zmax = z[i][j][k];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    SVGPLOT__SET_RANGE_X_003(&plt,xmin,xmax);
+    SVGPLOT__SET_RANGE_Y_003(&plt,ymin,ymax);
+    SVGPLOT__SET_RANGE_Z_003(&plt,zmin,zmax);
+    SVGPLOT__SET_SCALETYPE_Y(&plt,yscaletype[0]);        
+    SVGPLOT__SET_SCALETYPE_Z(&plt,zscaletype[0]);
+
+      const CHAR *lstroke;
+  const CHAR *lstroke_width;
+  const CHAR *lstroke_dasharray;
+  REAL8       pointsize;
+  INT4        pointtype;
+  const CHAR *pstroke;
+  const CHAR *pstroke_width;
+  const CHAR *pstroke_dasharray;
+  const CHAR *pfill;
+    	lstroke           = "#FF2800";
+	lstroke_width     = "3.0px";
+	lstroke_dasharray = NULL;
+	pointsize         = 4.0;
+	pointtype         = 0;
+	pstroke           = lstroke;
+	pstroke_width     = lstroke_width;
+	pstroke_dasharray = NULL;      
+	pfill             = pstroke;
+    
+    for(INT i = 0;i < num;i++){
+      if(dim[i] == 1){
+        if(i == 1){
+          lstroke           = "#FFFF00";//黄色
+          lstroke_width     = "3.0px";
+          lstroke_dasharray = NULL;
+          pointsize         = 4.0;
+          pointtype         = 0;
+          pstroke           = lstroke;
+          pstroke_width     = lstroke_width;
+          pstroke_dasharray = NULL;      
+          pfill             = pstroke;
+        }
+        if(i == 2){
+          lstroke           = "#FFA5FF";//マゼンタ
+          lstroke_width     = "3.0px";
+          lstroke_dasharray = NULL;
+          pointsize         = 4.0;
+          pointtype         = 0;
+          pstroke           = lstroke;
+          pstroke_width     = lstroke_width;
+          pstroke_dasharray = NULL;      
+          pfill             = pstroke;
+        }
+        SVGPLOT__TY_LPLOT(&plt,
+                          x[i].get_dat(),y[i].get_dat(),x[i].get_row(),-1.0,-1.0,0,
+                          "1.0",lstroke,lstroke_width,lstroke_dasharray,NULL,"round","round");
+        /*
+        SVGPLOT__ADD_BY_DAT_TY(&plt,x[i].get_dat(),y[i].get_dat(),x[i].get_row(),
+                               0,//点なし
+                               "i");
+        SVGPLOT__PLOT_TY(&plt);
+        */
+      }else{
+        SVGPLOT__TYZ_CONTOUR(&plt,
+                             x[i].get_dat(),x[i].get_row(),
+                             y[i].get_dat(),y[i].get_col(),
+                             z[i].get_dat(),
+                             -1.0,//tgap
+                             -1.0,//ygap
+                             1);  //mode 0:最近傍 1: Bilinear補間
+      }
+    }
+    SVGPLOT__TY_AUX(&plt,
+                    1,1,1,1,
+                    1,1,1,1,
+                    1,0,1,0,
+                    1);
+    SVGPLOT__COLORBAR(&plt,
+                      1,1,
+                      2,2,
+                      2,0,
+                      1);
+
+    num  = 0;
+    ymin = 0.0;
+    ymax = 0.0;
+    zmin = 0.0;
+    zmax = 0.0;
+  }
+
   void add(const EVector &epoch,
            const RVector &var,
            const CHAR    *label){

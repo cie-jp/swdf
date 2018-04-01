@@ -11,7 +11,7 @@ public:
 public:
   ERG_ofa(STRING epoch_s,STRING epoch_e,STRING level,STRING version){
     //STRING        datatype = "spec";
-    STRING        datatype = "matrix";
+    STRING        datatype = "spec";
     DTIME         dtime_s;
     DTIME         dtime_e;
     TIME_TT2000   date;

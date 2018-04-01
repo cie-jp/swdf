@@ -223,6 +223,80 @@ void DTensor__fetch(TTensor<DATA> &A,
   CDFcloseCDF(id);
 }
 
+void multiplot2(){
+  STRING  filename = "output2.svg";
+  SVGPlot plt(filename);
+  INT plot_num = 3;
+  STRING ts = "2017-03-28";
+  STRING te = "2017-03-29";
+
+  plt.set_plot_region(0,3);
+  plt.timespan(ts,te);
+  //plt.set_yrange(0.032,20.0);
+  plt.set_yrange(0.032,20.0);
+  plt.set_zrange(1.0e-6,1.0e-2);
+
+  plt.set_title("ERG衛星データ");
+  
+  // =================================================
+  // OFA
+  // =================================================
+  ERG_ofa erg_ofa(ts,te,"l2","01");
+
+  //plt.set_scaletype("y","log");
+  //plt.set_scaletype("z","log");
+  plt.add(erg_ofa.epoch,
+          erg_ofa.freq,
+          erg_ofa.E_spectra);
+  plt.set_label("y","OFA");
+  plt.set_label("z","Spectra");
+
+  // =================================================
+  // MGF
+  // =================================================
+  ERG_mgf erg_mgf(ts,te,"l2","01");
+  RMatrix gse0,gse1,gse2,mag,fce,fce_half;
+
+  gse0 = erg_mgf.mag_gse | 0;
+  gse1 = erg_mgf.mag_gse | 1;
+  gse2 = erg_mgf.mag_gse | 2;
+  mag  = sqrt(gse0 % gse0 + gse1 % gse1 + gse2 % gse2);
+  fce  = get_fce(mag);
+  fce_half = get_fce_half(mag);
+  //fce /= 1000.0;
+  //fce_half /= 1000.0;
+  plt.add(erg_mgf.epoch,fce     );
+  plt.add(erg_mgf.epoch,fce_half);
+  //plt.set_scaletype("y","linear");
+  plt.set_plot_region(0,3);
+  //plt.set_label("y","MGF");
+  plt.newplot();
+
+  // =================================================
+  // ORBIT
+  // =================================================
+  plt.set_plot_region(2,3);
+
+  ERG_orbit erg_orbit(ts,te,"l2","01");
+  RVector   gsm0,gsm1,gsm2;
+
+  gsm0 = erg_orbit.pos_gsm | 0;
+  gsm1 = erg_orbit.pos_gsm | 1;
+  gsm2 = erg_orbit.pos_gsm | 2;
+  
+  plt.add(erg_orbit.epoch,gsm0);
+  plt.add(erg_orbit.epoch,gsm1);
+  plt.add(erg_orbit.epoch,gsm2);
+  plt.set_label("y","Orbit");
+
+  // =================================================
+  // 時間軸ラベルの表示
+  // =================================================
+  plt.newplot();
+  plt.draw_time();
+  plt.set_label("x","Time");
+}
+
 int main(int argc,char *argv[]){
   //multiplot();
   //ofa_l1_prime_download("complex");
@@ -234,6 +308,7 @@ int main(int argc,char *argv[]){
   cerr << (T[1] | 0) << endl;
   cerr << A << endl;
   cerr << ~A[0] << endl;*/
+  /*
   TTensor<DATA> F;
   TMatrix<DATA> dat_epoch;
   TMatrix<DATA> dat_H;
@@ -271,6 +346,7 @@ int main(int argc,char *argv[]){
   plt2.set_scaletype("z","log");
   plt2.tplot(F1,epoch,V,1);
   plt2.draw_time();
-  
+  */
+  multiplot2();
   return 0;
 }
