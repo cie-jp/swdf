@@ -169,10 +169,11 @@ int main(int argc,char *argv[]){
   //ofa_l1_prime_download("complex");
   //wfc_l1_prime_download();
   CTensor T = CTensor::random(4,3,7);
-
+  CTensor A = T;
   cerr << T << endl;
   cerr << T[1] << endl;
   cerr << (T[1] | 0) << endl;
-  
+  cerr << A << endl;
+  cerr << ~A[0] << endl;
   return 0;
 }

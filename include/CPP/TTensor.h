@@ -35,12 +35,17 @@ public:
  ~TTensor(){
     TTensor<TYPE>::finalize  (*this);
   }
+
+  TTensor(const TTensor<TYPE>  &A);
+
+  TTensor<TYPE>  &operator  =(const TTensor<TYPE>  &);
+
   TMatrix<TYPE>         &operator [](const INT n)const{return this->dat[n];}
 
   friend ostream        &operator << <>(ostream&        os,const TTensor<TYPE> &A);
 
   static TTensor<TYPE> random(const INT num = 1,const INT row = 1,const INT col = 1){
-    TTensor<TYPE> C(num);
+    TTensor<TYPE> C(num,row,col);
     INT           i;
 
     for(i = 0;i < num;i++){
@@ -49,6 +54,28 @@ public:
     return C;
   }
 };
+
+template<typename TYPE> 
+TTensor<TYPE>::TTensor(const TTensor<TYPE>  &A){
+  INT i;
+
+  TTensor<TYPE>::initialize(*this,A.num,A.dat[0].get_row(),A.dat[0].get_col());
+  for(i = 0;i < A.num;i++){
+    this->dat[i] = A.dat[i];
+  }
+}
+
+template<typename TYPE> 
+TTensor<TYPE> &TTensor<TYPE>::operator  =(const TTensor<TYPE>  &A){
+  INT i;
+
+  TTensor<TYPE>::finalize  (*this);
+  TTensor<TYPE>::initialize(*this,A.num,A.dat[0].get_row(),A.dat[0].get_col());
+  for(i = 0;i < A.num;i++){
+    this->dat[i] = A.dat[i];
+  }
+  return *this;
+}
 
 template<typename TYPE>
 ostream &operator <<(ostream &os,const TTensor<TYPE> &A){
