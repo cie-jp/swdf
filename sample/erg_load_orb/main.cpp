@@ -164,16 +164,113 @@ void multiplot(){
   plt.set_label("x","Time");
 }
 
+void DTensor__fetch(TTensor<DATA> &A,
+                    const char    *varName,  //z変数名
+                    const char    *filename){//CDFファイル名  
+  CDFid     id;
+  CDFstatus status;
+  long      varNum;
+  long      numRecs;
+  long      numDims;
+  long      dimSizes[CDF_MAX_DIMS];
+  long      numValues;
+  long      dataType;
+  long      dataSize;
+  BYTE     *buffer;
+  int       i,j,k;
+
+  //CDFファイルを開く
+  status    = CDFopenCDF(filename,&id);
+  //CDFのz変数名からz変数のIDを取得
+  varNum    = CDFgetVarNum(id,(char*)varName);
+  //CDFファイルに書かれたレコードの最大番号を取得
+  status    = CDFgetzVarMaxWrittenRecNum(id,varNum,&numRecs);
+  //z変数の次元を取得
+  status    = CDFgetzVarNumDims(id,varNum,&numDims);
+  //z変数の各次元の要素数を取得
+  status    = CDFgetzVarDimSizes(id,varNum,dimSizes);
+  //z変数の1レコード文の要素数を計算
+  numValues = 1;
+  for(i = 0;i < numDims;i++){
+    numValues *= dimSizes[i];
+  }
+  INT4 depend_0_num =  numRecs + 1;
+  INT4 depend_1_num = (0 <= numDims) ? dimSizes[0] : 1;  
+  INT4 depend_2_num = (1 <= numDims) ? dimSizes[1] : 1;
+  status = CDFgetzVarDataType(id,varNum,&dataType);
+  CDFgetDataTypeSize(dataType,&dataSize);
+  //情報の表示
+  printf("numDims = %ld | numRecs = %ld\n",numDims,numRecs);
+  printf("numValues = %d, numRecs = %d\n",(int)numValues,(int)numRecs);
+  for(i = 0;i < numDims;i++){
+    printf("%d %ld\n",i,dimSizes[i]);
+  }
+
+  if((buffer = (BYTE*)malloc(dataSize * (numRecs + 1) * numValues)) == NULL){
+    exit(EXIT_FAILURE);
+  }
+  A = TTensor<DATA>(depend_2_num,depend_0_num,depend_1_num);
+  status = CDFgetzVarAllRecordsByVarID(id,varNum,buffer);
+  for(i = 0;i <= numRecs;i++){
+    for(j = 0;j < depend_1_num;j++){
+      for(k = 0;k < depend_2_num;k++){
+        DATA__COPY(&A[k][i][j],DATA__GET_DATATYPE(dataType),buffer + (i * numValues + j * depend_2_num + k) * dataSize);
+      }
+    }
+  }
+  free(buffer);
+  
+  CDFcloseCDF(id);
+}
+
 int main(int argc,char *argv[]){
   //multiplot();
   //ofa_l1_prime_download("complex");
   //wfc_l1_prime_download();
-  CTensor T = CTensor::random(4,3,7);
+  /*CTensor T = CTensor::random(4,3,7);
   CTensor A = T;
   cerr << T << endl;
   cerr << T[1] << endl;
   cerr << (T[1] | 0) << endl;
   cerr << A << endl;
-  cerr << ~A[0] << endl;
+  cerr << ~A[0] << endl;*/
+  TTensor<DATA> F;
+  TMatrix<DATA> dat_epoch;
+  TMatrix<DATA> dat_H;
+  TMatrix<DATA> dat_V;
+  EVector       epoch;
+  RVector       H;
+  RVector       V;
+  RMatrix       F0,F1;
+  SVGPlot       plt("test.svg");
+
+  Matrix__fetch(dat_epoch,"epoch","/Users/schwarz/Desktop/mrr2_l1_050_20170825_v02.cdf");
+  epoch = dat_epoch;
+  Matrix__fetch(dat_H,"H","/Users/schwarz/Desktop/mrr2_l1_050_20170825_v02.cdf");
+  H = dat_H;
+  Matrix__fetch(dat_V,"V","/Users/schwarz/Desktop/mrr2_l1_050_20170825_v02.cdf");
+  V = dat_V;  
+  DTensor__fetch(F,"F","/Users/schwarz/Desktop/mrr2_l1_050_20170825_v02.cdf");
+  //F[depend_2_id(V)][depend_0_id(epoch)][depend_1_id(H)]
+  INT V_idx = 27;
+  F0 = F[V_idx];//F(epoch,H)
+  INT H_idx =  4;
+  F1 = F[0] | H_idx;
+  for(INT i = 1;i < dat_V.get_col();i++){
+    F1 |= F[i] | H_idx;
+  }
+
+  plt.timespan("2017-08-25","2017-08-26");
+  plt.set_scaletype("z","log");
+  plt.tplot(F0,epoch,H,1);
+  plt.draw_time();
+  cerr << (epoch) << endl;
+
+  SVGPlot plt2("test2.svg");
+  plt2.timespan("2017-08-25 09","2017-08-25 12");
+  plt2.set_scaletype("z","log");
+  plt2.tplot(F1,epoch,V,1);
+  plt2.draw_time();
+  
   return 0;
 }

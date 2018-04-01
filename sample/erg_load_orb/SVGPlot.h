@@ -45,6 +45,7 @@ private:
              TMatrix<TIME_TT2000> depend_0,
              TMatrix<REAL8>       depend_1,
              INT mode = 0){
+    //SVGPLOT__SET_RANGE_X_001(&plt);
     SVGPLOT__TYZ_CONTOUR(&plt,
                          depend_0.get_dat(),depend_0.get_row(),
                          depend_1.get_dat(),depend_1.get_col(),
