@@ -7,6 +7,77 @@ using namespace CLDIA;
 #include"ERG_mgf.h"
 #include"ERG_ofa.h"
 
+void ofa_l1_prime_download(const STRING &datatype = "spec"){
+  INT2   YYYY = 2017;
+  INT1   MM   =   04;
+  INT1   DD   =   04;
+  //CHAR   comptype = 'e';
+  CHAR   comptype = '*';
+  STRING level    = "l1_prime";
+  STRING level_u  = "L1_prime";
+  //STRING sfreq    = "65khz";
+  STRING sfreq    = "*";
+  //STRING pts      = "132pts";
+  STRING pts      = "*";  
+  //STRING version  = "10";
+  STRING version  = "*";
+  STRING filename;
+  STRING remotedir;
+  STRING remotepath;
+  STRING localdir;
+  STRING localpath;
+  STRING command;
+
+  filename   = STRING("erg_pwe_ofa_%s_%c_%s_%s_%s_%04d%02d%02d_v%s.cdf",&level[0],comptype,&datatype[0],&sfreq[0],&pts[0],YYYY,MM,DD,&version[0]);
+  remotedir  = "cie.is.t.kanazawa-u.ac.jp:/remote/raid6/Arase/pwe/cdf/OFA/" + level_u + "/" + datatype + "/" + STRING("%04d",YYYY) + "/";          
+  remotepath = remotedir + filename;
+  localdir   = "./";
+  localpath  =  localdir + filename;
+  cerr << remotepath << endl;
+  cerr << localpath  << endl;
+  command = STRING("scp -P 22 -i %s %s@%s ./",
+                   "/Users/schwarz/.ssh/id_rsa",
+                   "ota",
+                   &remotepath[0]);
+  cerr << command    << endl;
+  system(&command[0]);
+}
+
+void wfc_l1_prime_download(const STRING &datatype = "data"){
+  INT2   YYYY = 2017;
+  INT1   MM   =   04;
+  INT1   DD   =   04;
+  INT1   hh   =   03;
+  //CHAR   comptype = 'e';
+  CHAR   comptype = '*';
+  STRING level    = "l1_prime";
+  STRING level_u  = "L1_prime";
+  //STRING sfreq    = "65khz";
+  STRING sfreq    = "*";
+  //STRING version  = "10";
+  STRING version  = "*";
+  STRING filename;
+  STRING remotedir;
+  STRING remotepath;
+  STRING localdir;
+  STRING localpath;
+  STRING command;
+
+  filename   = STRING("erg_pwe_wfc_%c_%s_%s_%04d%02d%02d%02d_v%s.cdf",comptype,&level[0],&sfreq[0],YYYY,MM,DD,hh,&version[0]);
+  remotedir  = "cie.is.t.kanazawa-u.ac.jp:/remote/raid6/Arase/pwe/cdf/WFC/" + level_u + "/" + datatype + "/" + STRING("%04d",YYYY) + "/";          
+  remotepath = remotedir + filename;
+  localdir   = "./";
+  localpath  =  localdir + filename;
+  cerr << remotepath << endl;
+  cerr << localpath  << endl;
+  command = STRING("scp -P 22 -i %s %s@%s ./",
+                   "/Users/schwarz/.ssh/id_rsa",
+                   "ota",
+                   &remotepath[0]);
+  cerr << command    << endl;
+  system(&command[0]);
+}
+
 void PLOT_ERG_PWE_OFA_L1_prime(SVGPlot &plt){
   CDFData   cdf("E_spectra_132","~/Desktop/erg_pwe_ofa_l1_prime_e_spec_65khz_132pts_20180323_v06.cdf");
 
@@ -94,6 +165,8 @@ void multiplot(){
 }
 
 int main(int argc,char *argv[]){
-  multiplot();
+  //multiplot();
+  ofa_l1_prime_download("complex");
+  wfc_l1_prime_download();
   return 0;
 }

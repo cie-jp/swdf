@@ -10,7 +10,8 @@ public:
   TMatrix<REAL>        freq;
 public:
   ERG_ofa(STRING epoch_s,STRING epoch_e,STRING level,STRING version){
-    STRING        datatype = "spec";
+    //STRING        datatype = "spec";
+    STRING        datatype = "matrix";
     DTIME         dtime_s;
     DTIME         dtime_e;
     TIME_TT2000   date;
