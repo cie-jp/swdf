@@ -180,7 +180,7 @@ namespace CLDIA{
       return *this;
     }
     STRING  &operator  =(      STRING &&str){
-      this->dat =  str.dat;
+      this->dat = (str.dat == &str.nul) ? &this->nul : str.dat;
       this->nul =     '\0';
       str.dat   = &str.nul;
       str.nul   =     '\0';
