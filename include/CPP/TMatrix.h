@@ -330,7 +330,8 @@ TMatrix<TYPE>::TMatrix(const TMatrix<TYPE>  &A){
 
 template<typename TYPE> 
 TMatrix<TYPE>::TMatrix(      TMatrix<TYPE> &&A){
-  this->dat = A.dat;
+  this->dat = ((A.row == 1) && (A.col == 1)) ? &this->scl : A.dat;
+  this->scl = A.dat[0];
   this->row = A.row;
   this->col = A.col;
   TMatrix<TYPE>::release   (A);
@@ -357,7 +358,8 @@ TMatrix<TYPE> &TMatrix<TYPE>::operator  =(const TMatrix<TYPE>  &A){
 template<typename TYPE> 
 TMatrix<TYPE> &TMatrix<TYPE>::operator  =(      TMatrix<TYPE> &&A){
   TMatrix<TYPE>::finalize  (*this);
-  this->dat = A.dat;
+  this->dat = ((A.row == 1) && (A.col == 1)) ? &this->scl : A.dat;
+  this->scl = A.dat[0];
   this->row = A.row;
   this->col = A.col;
   TMatrix<TYPE>::release   (A);

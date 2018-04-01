@@ -23,6 +23,7 @@
 #include"CPP/STRINGS.h"
 
 #include"CPP/TMatrix.h"
+#include"CPP/TTensor.h"
 
 typedef TMatrix<REAL>        RMatrix;
 typedef TMatrix<COMP>        CMatrix;
@@ -31,6 +32,10 @@ typedef TMatrix<TIME_TT2000> EMatrix;
 typedef TVector<REAL>        RVector;
 typedef TVector<COMP>        CVector;
 typedef TVector<TIME_TT2000> EVector;
+
+typedef TTensor<REAL>        RTensor;
+typedef TTensor<COMP>        CTensor;
+typedef TTensor<TIME_TT2000> ETensor;
 
 #include"CPP/CDFData.h"
 #include"CPP/ERG_orbit.h"

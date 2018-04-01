@@ -21,9 +21,14 @@ template<typename TYPE> class TVector : public TMatrix<TYPE>{
   }  
   // TMatrix<TYPE>クラスから初期化(名前なしインスタンス)
   TVector(      TMatrix<TYPE> &&A){
-    this->dat = A.get_dat();
-    this->row = A.get_row();
-    this->col = A.get_col();
+    INT   row = A.get_row();
+    INT   col = A.get_col();
+    TYPE *dat = A.get_dat();
+
+    this->dat = ((row == 1) && (col == 1)) ? &this->scl : dat;
+    this->scl = dat[0];
+    this->row = row;
+    this->col = col;
     TMatrix<TYPE>::release(A);
   }  
 
@@ -50,8 +55,13 @@ template<typename TYPE> class TVector : public TMatrix<TYPE>{
   }
   //   代入演算子(名前なしインスタンス)
   TVector<TYPE> &operator  =(      TMatrix<TYPE> &&A){
+    INT   row = A.get_row();
+    INT   col = A.get_col();
+    TYPE *dat = A.get_dat();
+        
     TMatrix<TYPE>::finalize(*this);
-    this->dat = A.get_dat();
+    this->dat = ((row == 1) && (col == 1)) ? &this->scl : dat;
+    this->scl = dat[0];
     this->row = A.get_row();
     this->col = A.get_col();
     TMatrix<TYPE>::release (A);

@@ -166,7 +166,13 @@ void multiplot(){
 
 int main(int argc,char *argv[]){
   //multiplot();
-  ofa_l1_prime_download("complex");
-  wfc_l1_prime_download();
+  //ofa_l1_prime_download("complex");
+  //wfc_l1_prime_download();
+  CTensor T = CTensor::random(4,3,7);
+
+  cerr << T << endl;
+  cerr << T[1] << endl;
+  cerr << (T[1] | 0) << endl;
+  
   return 0;
 }
