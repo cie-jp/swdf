@@ -599,7 +599,7 @@ ostream &operator <<(ostream     &os,const TMatrix<REAL> &A){
   for(i = 0;i < A.row;i++){
     os << "| "; 
     for(j = 0;j < A.col;j++){
-      sprintf(str,"%+10.5f ",fabs(A.dat[i * A.col + j]));
+      sprintf(str,"%+10.5f ",A.dat[i * A.col + j]);
       os << str;
     }
     os << "|" << endl;
