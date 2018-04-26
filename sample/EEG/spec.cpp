@@ -7,6 +7,8 @@
  * 
  *****************************************************************/
 
+// データ個数 = 45 * 3 - 2 * 3 = 129サンプル
+
 #include"CLDIA.h"
 
 using namespace std;
@@ -69,7 +71,7 @@ int main(int argc,char *argv[]){
   REAL    p[8][250];
   RMatrix power(48 * 8,4 * div);//1サンプル(スペクトログラム) (48個の周波数成分(3Hz~51Hz), 8ch), (4 * div) スペクトログラムの時間サンプル
   FILE   *fp;
-
+  CHAR    filename[2048];
   INT4 ans[45 * 3] = {//0: グー, 1: チョキ, 2: パー
     1,2,0,1,1,0,2,1,2,1,2,0,2,1,0,1,2,0,1,2,1,0,1,0,2,1,0,1,2,1,0,0,1,2,1,0,2,1,0,2,1,2,0,2,1,
     1,2,0,0,2,1,2,1,2,1,0,0,2,1,2,1,2,0,2,1,0,2,1,0,1,2,0,1,0,1,2,1,0,1,0,1,2,1,2,0,0,2,0,1,0,
@@ -78,6 +80,11 @@ int main(int argc,char *argv[]){
   INT4 answer_label;
 
   data = RMatrix__fetch_csv("./EEG_DATA.txt"," ","");
+
+
+  if((fp = fopen("inputdata.txt","w")) == NULL){
+    exit(EXIT_FAILURE);
+  }
 
   // ======================================
   // EEGデータの内, 解析に用いるデータを出力する. 
@@ -159,24 +166,35 @@ int main(int argc,char *argv[]){
     // power[48 * 8][4 * div(規定値:5)] : スペクトログラム
     // answer_label                     : 教師ラベル(0,1,2)
     // ===================================================================
-    if(frame == 1){
-      if((fp = fopen("power.txt","w")) == NULL){
-	exit(EXIT_FAILURE);
+    /*
+      sprintf(filename,"power%d.txt",frame);
+      if((fp = fopen(filename,"w")) == NULL){
+      exit(EXIT_FAILURE);
       }
       fprintf(fp,"#frame        = %d\n",frame);
       fprintf(fp,"#answer_label = %d\n",answer_label);
       fprintf(fp,"#power\n");
       for(j = 0;j < 4 * div;j++){
-	for(i = 0;i < 48 * 8;i++){
-	  fprintf(fp,"%d %d %e\n",j,i,power[i][j]);
-	}
-	fprintf(fp,"\n");
+      for(i = 0;i < 48 * 8;i++){
+      fprintf(fp,"%d %d %e\n",j,i,power[i][j]);
+      }
+      fprintf(fp,"\n");
       }
       fclose(fp);
+    */
+    for(j = 0;j < 48 * 8;j++){
+      for(i = 0;i < 4 * div;i++){
+	fprintf(fp,"%e ",power[j][i]);
+      }
+      fprintf(fp,"\n");
     }
+    fprintf(fp,"\n");
     // ===================================================================
 
   }
+
+  fclose(fp);
+
 
   return 0;
 }
