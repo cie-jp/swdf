@@ -52,7 +52,7 @@ RMatrix RMatrix__fetch_csv(const CHAR *filename,
   return ret;
 }
 
-#define div (50) //FFTのオーバーラップ率に関係する(オーバラップ率 = 100 / div [%])
+#define div (1) //FFTのオーバーラップ率に関係する(オーバラップ率 = 100 / div [%])
 
 int main(int argc,char *argv[]){
   // ======================================
@@ -70,6 +70,17 @@ int main(int argc,char *argv[]){
   REAL    window;
   REAL    p[8][250];
   RMatrix power(48 * 8,4 * div);//1サンプル(スペクトログラム) (48個の周波数成分(3Hz~51Hz), 8ch), (4 * div) スペクトログラムの時間サンプル
+  RVector mean_g(48 * 8);
+  RVector mean_t(48 * 8);
+  RVector mean_p(48 * 8);
+  RVector std_g(48 * 8);
+  RVector std_t(48 * 8);
+  RVector std_p(48 * 8);
+
+  INT4    count_g = 0;
+  INT4    count_t = 0;
+  INT4    count_p = 0;
+
   FILE   *fp;
   CHAR    filename[2048];
   INT4 ans[45 * 3] = {//0: グー, 1: チョキ, 2: パー
@@ -168,7 +179,7 @@ int main(int argc,char *argv[]){
 	  FFT(re,im,250);
 	  //パワーを出力する. 
 	  for(i = 0;i < 250 / 2;i++){
-	    p[k][i] = 10.0 * log10(re[i] * re[i] + im[i] * im[i]);
+	    p[k][i] = re[i] * re[i] + im[i] * im[i];
 	  }
 	}
 	//P[0][0]   : 時刻0で, 3Hzのch1,パワー
@@ -208,25 +219,44 @@ int main(int argc,char *argv[]){
     // ===================================================================
     // (内訳)
     // frame                            : サンプルID
-    // power[48 * 8][4 * div(規定値:5)] : スペクトログラム
+    // power[48 * 8][4 * div(規定値:1)] : スペクトログラム
     // answer_label                     : 教師ラベル(0,1,2)
     // ===================================================================
 
-      sprintf(filename,"power%d.txt",frame);
-      if((fp = fopen(filename,"w")) == NULL){
-      exit(EXIT_FAILURE);
+    for(i = 0;i < 48 * 8;i++){
+      if(answer_label == 0){
+        mean_g[i] += power[i][3];
+        std_g[i]  += power[i][3] * power[i][3];
+        count_g++;
       }
-      fprintf(fp,"#frame        = %d\n",frame);
-      fprintf(fp,"#answer_label = %d\n",answer_label);
-      fprintf(fp,"#power\n");
-      for(j = 0;j < 4 * div;j++){
+      if(answer_label == 1){
+        mean_t[i] += power[i][3];
+        std_t[i]  += power[i][3] * power[i][3];
+        count_t++;
+      }
+      if(answer_label == 2){
+        mean_p[i] += power[i][3];
+        std_p[i]  += power[i][3] * power[i][3];
+        count_p++;
+      }        
+    }
+    /*
+    sprintf(filename,"power%d.txt",frame);
+    if((fp = fopen(filename,"w")) == NULL){
+      exit(EXIT_FAILURE);
+    }
+    fprintf(fp,"#frame        = %d\n",frame);
+    fprintf(fp,"#answer_label = %d\n",answer_label);
+    fprintf(fp,"#power\n");
+    for(j = 0;j < 4 * div;j++){
       for(i = 0;i < 48 * 8;i++){
-      fprintf(fp,"%d %d %e\n",j,i,power[i][j]);
+        fprintf(fp,"%d %d %e\n",j,i,power[i][j]);
       }
       fprintf(fp,"\n");
-      }
-      fclose(fp);
-
+    }
+    fclose(fp);
+    */
+    
     /*
     for(j = 0;j < 48 * 8;j++){
       for(i = 0;i < 4 * div;i++){
@@ -242,6 +272,32 @@ int main(int argc,char *argv[]){
 
   fclose(fp);
 
+  for(i = 0;i < 48 * 8;i++){
+    mean_g[i] /= (REAL)count_g;
+    mean_t[i] /= (REAL)count_t;
+    mean_p[i] /= (REAL)count_p;
+    std_g[i] /= (REAL)count_g;
+    std_t[i] /= (REAL)count_t;
+    std_p[i] /= (REAL)count_p;
+    std_g[i]  = sqrt(std_g[i] - mean_g[i] * mean_g[i]);
+    std_t[i]  = sqrt(std_t[i] - mean_t[i] * mean_t[i]);
+    std_p[i]  = sqrt(std_p[i] - mean_p[i] * mean_p[i]);
+  }
+ 
+  if((fp = fopen("mean.txt","w")) == NULL){
+    exit(EXIT_FAILURE);
+  }
+  for(i = 0;i < 48 * 8;i++){
+    fprintf(fp,"%d %e %e %e %e %e %e\n",i,
+            mean_g[i] - std_g[i] * 0.0,
+            mean_g[i] + std_g[i] * 0.0,
+            mean_t[i] - std_t[i] * 0.0,
+            mean_t[i] + std_t[i] * 0.0,
+            mean_p[i] - std_p[i] * 0.0,
+            mean_p[i] + std_p[i] * 0.0);
+  }
 
+  fclose(fp);
+  
   return 0;
 }
