@@ -26,6 +26,9 @@ private:
   RMatrix Y ;//中間データセット Y(入力データ数, 次元圧縮後の次元) Y[n][l]
   RMatrix P ;//出力データセット P(入力データ数, クラスタ数)       P[n][k]  
   REAL    a ;//学習率
+  REAL    max_test_accuracy;//最大テスト精度
+  RMatrix W1opt;
+  RMatrix W2opt;
 public:
 
   RMatrix prediction(RMatrix Xtmp){
@@ -47,9 +50,9 @@ public:
       for(l = 0;l < L;l++){
 	tmp  = 0.0;
 	for(d = 0;d < D;d++){
-	  tmp += W1[l][d] * Xtmp[n][d];
+	  tmp += W1opt[l][d] * Xtmp[n][d];
 	}
-	tmp += W1[l][D];
+	tmp += W1opt[l][D];
 	Ytmp[n][l] = tmp;
       }      
     }
@@ -59,9 +62,9 @@ public:
       for(k = 0;k < K;k++){
 	tmp  = 0.0;
 	for(l = 0;l < L;l++){
-	  tmp += W2[k][l] * Ytmp[n][l];
+	  tmp += W2opt[k][l] * Ytmp[n][l];
 	}
-	tmp += W2[k][L];
+	tmp += W2opt[k][L];
 	Ptmp[n][k] = tmp;
       }
       max = Ptmp[n][k];
@@ -91,6 +94,30 @@ public:
     }
     return Ztmp;
   }
+
+  REAL test_accuracy(RMatrix &Xtest,RMatrix &Ztest){
+    INT4    count;
+    INT4    n,k;
+    RMatrix Ztest_pred;
+    REAL    test_accuracy;
+
+    Ztest_pred = prediction(Xtest);
+    
+    count = 0;
+    for(n = 0;n < Ztest.get_row();n++){
+      for(k = 0;k < Ztest.get_col();k++){
+	count += Ztest_pred[n][k] * Ztest[n][k];
+      }
+    }
+    test_accuracy = (REAL)count / (REAL)Ztest.get_row() * 100.0;
+    if(test_accuracy > max_test_accuracy){
+      max_test_accuracy = test_accuracy;
+      W1opt = W1;
+      W2opt = W2;
+    }
+    return test_accuracy;
+  }
+
 
   void calculate_Y_and_P(){
     INT4 n,d,l,k;
@@ -250,6 +277,9 @@ public:
     this->Y  = RMatrix        (this->N,this->L);
     this->P  = RMatrix        (this->N,this->K);
     this->a  = a;
+    max_test_accuracy = 0.0;
+    W1opt = W1;
+    W2opt = W2;
   }
     
 };

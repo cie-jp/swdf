@@ -18,7 +18,9 @@ using namespace CLDIA;
 
 #include"classifier.hpp"
 #include"RMatrix__fetch_csv.hpp"
+#include"eeg.hpp"
 
+/*
 #define D (250 * 4 * 8)
 #define K (3)
 #define L (3)
@@ -104,5 +106,79 @@ int main(int argc,char *argv[]){
   }
   fprintf(stderr,"count = %d / data num = %d, accuracy = %.2f[%%]\n",count,Z2.get_row(),(REAL)count / (REAL)Z2.get_row() * 100.0);
 
+  return 0;
+}
+*/
+
+int main(int argc,char *argv[]){
+  RMatrix    X = EEG__READ_X();
+  RMatrix    Z = EEG__READ_Z();
+  INT4       L = 3;    //3次元まで圧縮する
+  REAL       a = 0.001;//学習率
+  INT4       loop;
+  RMatrix    Xtrain,Xtest;
+  RMatrix    Ztrain,Ztest;
+  RMatrix    X3;
+  RMatrix    Z3;
+  INT4       n;
+
+  Xtrain = (X & 0);
+  for(n =  1;n < 30;n++){
+    Xtrain &= (X & n);
+  }
+  for(n = 45;n < 75;n++){
+    Xtrain &= (X & n);
+  }
+
+  Ztrain = (Z & 0);
+  for(n =  1;n < 30;n++){
+    Ztrain &= (Z & n);
+  }
+  for(n = 45;n < 75;n++){
+    Ztrain &= (Z & n);
+  }
+
+  Xtest = (X & 30);
+  for(n = 31;n < 45;n++){
+    Xtest &= (X & n);
+  }
+  for(n = 75;n < 90;n++){
+    Xtest &= (X & n);
+  }
+  Ztest = (Z & 30);
+  for(n = 31;n < 45;n++){
+    Ztest &= (Z & n);
+  }
+  for(n = 75;n < 90;n++){
+    Ztest &= (Z & n);
+  }
+
+  X3 = (X & 90);
+  for(n = 91;n < 135;n++){
+    X3 &= (X & n);
+  }
+  Z3 = (Z & 90);
+  for(n = 91;n < 135;n++){
+    Z3 &= (Z & n);
+  }
+
+  Classifier cl(Xtrain,Ztrain,L,a);
+  REAL       test_accuracy;
+  REAL       max;
+
+  max = 0.0;
+  cl.show_info();
+  for(loop = 0;loop < 3000;loop++){
+    cl.update_W1_and_W2();
+    cl.show_info();
+    test_accuracy = cl.test_accuracy(Xtest,Ztest);
+    if(max < test_accuracy){
+       max = test_accuracy;
+    }
+    fprintf(stderr,"LOOP[%5d] %.2f[%%]\n",loop,test_accuracy);
+  }  
+  fprintf(stderr,"Test  : Accuracy = %.2f[%%]\n",max);
+  fprintf(stderr,"Set 3 : Accuracy = %.2f[%%]\n",cl.test_accuracy(X3,Z3));
+  
   return 0;
 }
