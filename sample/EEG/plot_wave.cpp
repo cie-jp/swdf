@@ -16,7 +16,12 @@ using namespace CLDIA;
 void proc(RVector &wav){
   INT4 n;
   REAL ave;
-
+  REAL re[1000];
+  REAL im[1000];
+  REAL re2[1000];
+  REAL im2[1000];
+  REAL f;
+  
   ave = 0.0;
   for(n = 1000;n < 2000;n++){
     ave += wav[n];
@@ -25,6 +30,32 @@ void proc(RVector &wav){
   for(n = 1000;n < 2000;n++){
     wav[n] -= ave;
   }
+
+  for(n = 1000;n < 2000;n++){
+    re[n - 1000] = wav[n] * (0.54 - 0.46 * cos(2.0 * M_PI * (n - 1000.0) / 1000.0));
+    im[n - 1000] = 0.0;  
+  }
+  FFT(re,im,1000);
+
+  for(n = 0;n < 1000;n++){
+    re2[n] = 0.0;
+    im2[n] = 0.0;
+  }
+  for(n = 0;n < 1000;n++){
+    f = n * 0.25;
+    if((3.0 <= f) && (f <= 50.0)){
+      re2[n] = re[n];
+      im2[n] = im[n];
+      re2[1000 - n] =  re[n];
+      im2[1000 - n] = -im[n];
+    }
+  }
+  IFFT(re2,im2,1000);
+  for(n = 1000;n < 2000;n++){
+    wav[n] = re2[n - 1000] / (0.54 - 0.46 * cos(2.0 * M_PI * (n - 1000.0) / 1000.0));
+    fprintf(stderr,"%e\n",im2[n - 1000]);
+  }
+
 }
           
 int main(int argc,char *argv[]){
