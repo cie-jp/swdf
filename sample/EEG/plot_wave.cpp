@@ -18,11 +18,11 @@ void proc(RVector &wav){
   REAL ave;
 
   ave = 0.0;
-  for(n = 0;n < 1000;n++){
+  for(n = 1000;n < 2000;n++){
     ave += wav[n];
   }
   ave /= 1000.0;
-  for(n = 0;n < 1000;n++){
+  for(n = 1000;n < 2000;n++){
     wav[n] -= ave;
   }
 }
@@ -58,7 +58,7 @@ int main(int argc,char *argv[]){
   if((fp = fopen("wave.dat","w")) == NULL){
     exit(EXIT_FAILURE);
   }
-  for(n = 0;n < 1000;n++){
+  for(n = 1000;n < 2000;n++){
     fprintf(fp,"%e %e %e %e %e %e %e %e %e\n",
             t[n],
             ch[0][n],
