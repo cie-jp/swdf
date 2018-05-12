@@ -23,7 +23,7 @@ void proc(RVector &wav){
   }
   ave /= 1000.0;
   for(n = 0;n < 1000;n++){
-    wav[n] /= ave;
+    wav[n] -= ave;
   }
 }
           
