@@ -22,8 +22,8 @@ void PLASMA__MEANS_METHOD_E0_H3(REAL8   *theta, //[rad]
     ky = -ky;
     kz = -kz;
   }
-  theta = atan2(sqrt(kx * kx + ky * ky),kz);
-  phi   = atan2(ky,kx);
+  *theta = atan2(sqrt(kx * kx + ky * ky),kz);
+  *phi   = atan2(ky,kx);
 }
 
 void PLASMA__MEANS_METHOD_E3_H3(REAL8   *theta, //[rad]
@@ -47,7 +47,5 @@ void PLASMA__MEANS_METHOD_E3_H3(REAL8   *theta, //[rad]
 
   ux = sin(*theta) * cos(*phi);
   uy = sin(*theta) * sin(*phi);
-  uz = cos(*theta);
-
-  
+  uz = cos(*theta);  
 }

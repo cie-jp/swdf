@@ -65,8 +65,21 @@ a_{0}&b_{0}&0&\ldots &0&0&0\\
 \end{align}
 
 Householder変換により上2重対角化を行い, 対角成分の積を計算する. 
+
+正方行列を上2重対角化する場合, 
+$(D-1)$回$A$の左から, $(D-2)$回右から行列式-1のHouseholder直交変換行列を作用させる必要がある. 
 \begin{align}
-\det \bm{B}=\prod _{n=1}^{N}a_{n}
+\bm{B}&=\bm{U}_{D-1}\cdots \bm{U}_{2}\bm{U}_{1}\bm{A}\bm{V}_{1}^{\dag}\bm{V}_{2}^{\dag}\cdots \bm{V}_{D-2}^{\dag}
+\end{align}
+すなわち, 
+\begin{align}
+\bm{A}&=\bm{V}_{D-2}\cdots \bm{V}_{2}\bm{V}_{1}\bm{B}\bm{U}_{1}^{\dag}\bm{U}_{2}^{\dag}\cdots \bm{U}_{D-1}^{\dag}
+\end{align}
+となる. よって
+\begin{align}
+\det \bm{A}&=(-1)^{D-2}\times \det \bm{B}\times (-1)^{D-1}\nonumber\\
+&=-\det \bm{B}\nonumber\\
+&=-\prod _{d=1}^{D}b_{0d}
 \end{align}
 
 

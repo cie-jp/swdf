@@ -22,7 +22,15 @@ int main(int argc,char *argv[]){
   cerr << trace(C.diag()) << endl;
   cerr << E << endl;
   */
-  hoge();
+  //hoge();
   //hist(C,-3.0,3.0,100,"test.svg");
+
+
+  TMatrix<REAL> A = TMatrix<REAL>::random(6,6);
+  
+  cerr << A << endl;
+  cerr << det(A) << endl;
+  cerr << det_lu(A) << endl;
+  cerr << det_bidiag(A) << endl;
   return 0;
 }

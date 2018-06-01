@@ -1673,21 +1673,25 @@ REAL          CLDIA::det_lu(const TMatrix<REAL> &A  ){
 
 template<>
 REAL          CLDIA::det_bidiag(const TMatrix<REAL> &A  ){
-  TMatrix<REAL> B;
+  TVector<REAL> b0;
+  TVector<REAL> b1;
   TVector<REAL> wu;
   TVector<REAL> wv;
   REAL          d;
   INT           i;
 
-  B  = A;
-  wu = TVector<REAL>(B.get_row());
-  wv = TVector<REAL>(B.get_col());
-  REAL__MATRIX_BIDIAGONALIZATION(&B[0][0],&wu[0],&wv[0],B.get_row(),B.get_col());
+  b0 = TVector<REAL>(A.get_col());
+  b1 = TVector<REAL>(A.get_col() - 1);
+  wu = TVector<REAL>(A.get_col());
+  wv = TVector<REAL>(A.get_col() - 1);
+  
+  REAL__MATRIX_BIDIAG(&b0[0],&b1[0],&wu[0],&wv[0],&A[0][0],A.get_row(),A.get_col());
+
   d = 1.0;
-  for(i = 0;i < B.get_row();i++){
-    d *= B[i][i];
+  for(i = 0;i < b0.get_dim();i++){
+    d *= b0[i];
   }
-  return d;
+  return -d;
 }
 
 void CLDIA::svd  (      TMatrix<REAL> &s,
