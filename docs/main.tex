@@ -35,6 +35,25 @@ morecomment=[l]{//}
 
 \begin{document}
 \section{メモ}
+\begin{lstlisting}[caption=行列式メモ(現在の関数定義),label=ほげ]
+REAL CLDIA::TMatrix<REAL>::det(); 
+は行列式の絶対値を特異値分解により求める. 絶対値になっているので, 符号を考慮する際に注意が必要. 
+
+REAL CLDIA::TMatrix<REAL>::det_lu(); 
+はLU分解により, 
+REAL CLDIA::TMatrix<REAL>::det_bidiag(); 
+は, 2重対角化により行列式を求める. 符号を含めて正確に計算される. 
+\end{lstlisting}
+
+\begin{lstlisting}[caption=行列式メモ(最終的に目指す関数定義),label=ほげ]
+// 行列式を計算する. 
+void CLDIA::det(const TMatrix<REAL> &A);
+REAL CLDIA::TMatrix<REAL>.det();
+
+// 行列式の絶対値の自然対数を計算する. 
+void CLDIA::ln_abs_det(const TMatrix<REAL> &A);
+REAL CLDIA::TMatrix<REAL>.ln_abs_det();
+\end{lstlisting}
 
 \subsubsection{上2重対角化}
 \begin{lstlisting}[caption=上2重対角化,label=ほげ]
@@ -82,6 +101,7 @@ $(D-1)$回$A$の左から, $(D-2)$回右から行列式-1のHouseholder直交変
 &=-\prod _{d=1}^{D}b_{0d}
 \end{align}
 
+\subsection{Householder変換によるQR分解を用いた行列式の計算}
 
 \begin{lstlisting}[caption=上2重対角化,label=ほげ]
 
