@@ -80,6 +80,7 @@ namespace CLDIA{
 
   template<typename TYPE> TYPE          det  (const TMatrix<TYPE> &A  );
   template<typename TYPE> TYPE          det_lu(const TMatrix<TYPE> &A  );
+  template<typename TYPE> TYPE          det_bidiag(const TMatrix<TYPE> &A  );
 
   void          svd  (      TMatrix<REAL> &s,
                             TMatrix<REAL> &U,
@@ -1666,6 +1667,25 @@ REAL          CLDIA::det_lu(const TMatrix<REAL> &A  ){
   d = 1.0;
   for(i = 0;i < U.get_row();i++){
     d *= U[i][i];
+  }
+  return d;
+}
+
+template<>
+REAL          CLDIA::det_bidiag(const TMatrix<REAL> &A  ){
+  TMatrix<REAL> B;
+  TVector<REAL> wu;
+  TVector<REAL> wv;
+  REAL          d;
+  INT           i;
+
+  B  = A;
+  wu = TVector<REAL>(B.get_row());
+  wv = TVector<REAL>(B.get_col());
+  REAL__MATRIX_BIDIAGONALIZATION(&B[0][0],&wu[0],&wv[0],B.get_row(),B.get_col());
+  d = 1.0;
+  for(i = 0;i < B.get_row();i++){
+    d *= B[i][i];
   }
   return d;
 }

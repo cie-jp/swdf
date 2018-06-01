@@ -1,0 +1,102 @@
+\documentclass[a4j]{jsarticle}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{comment}
+\usepackage{braket}
+
+\usepackage{listings}
+\usepackage{./style/jlisting}
+
+\lstset{
+language={C++},
+backgroundcolor={\color[gray]{.98}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.2,0.2,1.0}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{1,0.2,0.2}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+
+\begin{document}
+\section{メモ}
+
+\subsubsection{上2重対角化}
+\begin{lstlisting}[caption=上2重対角化,label=ほげ]
+// void REAL__MATRIX_BIDIAGONALIZATION(REAL A[],REAL wu[],REAL wv[],INT row,INT col);
+
+#define ROW 7
+#define COL 5
+
+REAL A[ROW * COL];// 入力行列
+REAL wu[ROW];     // 重み1
+REAL wv[COL];     // 重み2
+
+REAL__MATRIX_BIDIAGONALIZATION(A,wu,wv,ROW,COL);// Aが変更され上2重対角化される. 
+
+\end{lstlisting}
+
+\subsubsection{行列式}
+行列式の計算をどのように行うか?
+
+2重対角行列
+\begin{align}
+\bm{B}&=
+\begin{bmatrix}
+a_{0}&b_{0}&0&\ldots &0&0&0\\
+0&a_{1}&b_{1}&0&\ldots &0&0\\
+0&0&a_{2}&b_{2}&0&\ldots &0\\
+\end{bmatrix}
+\end{align}
+
+Householder変換により上2重対角化を行い, 対角成分の積を計算する. 
+\begin{align}
+\det \bm{B}=\prod _{n=1}^{N}a_{n}
+\end{align}
+
+
+\begin{lstlisting}[caption=上2重対角化,label=ほげ]
+
+
+REAL A[ROW * COL];// 入力行列
+REAL wu[ROW];     // 重み1
+REAL wv[COL];     // 重み2
+
+REAL__MATRIX_BIDIAGONALIZATION(A,wu,wv,ROW,COL);// Aが変更され上2重対角化される. 
+
+\end{lstlisting}
+
+%REAL__MATRIX_LU_DECOMPOSITION
+
+\subsubsection{LU分解}
+\subsubsection{特異値分解}
+符号の計算. 
+./include/CPP/TMatrix.h
+
+
+%template<>
+%REAL          CLDIA::det  (const TMatrix<REAL> &A  );
+
+
+\section{TMatrix<REAL>}
+
+
+
+\lstinputlisting[caption=TMatrixのサンプル,label=ラベル]{./srcs/tmatrix.cpp}
+
+\end{document}
