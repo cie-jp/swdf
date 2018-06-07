@@ -78,6 +78,8 @@ namespace CLDIA{
 
   template<typename TYPE> TYPE          cond (const TMatrix<TYPE> &A  );
 
+  template<typename TYPE> TYPE          ln_det(const TMatrix<TYPE> &A  );
+
   template<typename TYPE> TYPE          det  (const TMatrix<TYPE> &A  );
   template<typename TYPE> TYPE          det_lu(const TMatrix<TYPE> &A  );
   template<typename TYPE> TYPE          det_bidiag(const TMatrix<TYPE> &A  );
@@ -1642,6 +1644,22 @@ REAL          CLDIA::cond (const TMatrix<REAL> &A  ){
 }
 
 template<>
+REAL          CLDIA::ln_det  (const TMatrix<REAL> &A  ){
+  TMatrix<REAL> s;
+  TMatrix<REAL> U;
+  TMatrix<REAL> V;
+  REAL       ln_d;
+  INT           i;
+  
+  CLDIA::svd(s,U,V,A);
+  ln_d = 0.0;
+  for(i = 0;i < s.get_row();i++){
+    ln_d += log(s[i][0]);
+  }
+  return ln_d;
+}
+
+template<>
 REAL          CLDIA::det  (const TMatrix<REAL> &A  ){
   TMatrix<REAL> s;
   TMatrix<REAL> U;
@@ -1656,6 +1674,7 @@ REAL          CLDIA::det  (const TMatrix<REAL> &A  ){
   }
   return d;
 }
+
 
 template<>
 REAL          CLDIA::det_lu(const TMatrix<REAL> &A  ){

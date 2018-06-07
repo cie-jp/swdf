@@ -167,7 +167,7 @@ void REAL__MATRIX_EIGENVALUE_DECOMPOSITION_TRI(REAL U [],//(out)[n * n] : 直交
 
     }
     if(l == max_iter){
-      ERROR__SHOW("#1");
+      ERROR__SHOW("Iteration > 10000");
       exit(EXIT_FAILURE);
     }
   }
@@ -190,19 +190,21 @@ void REAL__MATRIX_EIGENVALUE_DECOMPOSITION_TRI(REAL U [],//(out)[n * n] : 直交
     }
   }
 
-  fprintf(stdout,"======= Eigenvalues  =======\n");
-  for(i = 0;i < n - 1;i++){
+  /*
+    fprintf(stdout,"======= Eigenvalues  =======\n");
+    for(i = 0;i < n - 1;i++){
     fprintf(stdout,"%e %e\n",t0[i],t1[i]);
-  }
-  fprintf(stdout,"%e\n",t0[n - 1]);
-  fprintf(stdout,"======= Eigenvectors =======\n");
-  for(i = 0;i < n;i++){
+    }
+    fprintf(stdout,"%e\n",t0[n - 1]);
+    fprintf(stdout,"======= Eigenvectors =======\n");
+    for(i = 0;i < n;i++){
     for(j = 0;j < n;j++){
-      fprintf(stdout,"%20e ",U[i * n + j]);
+    fprintf(stdout,"%20e ",U[i * n + j]);
     }
     fprintf(stdout,"\n");
-  }
-  fprintf(stdout,"\n");
+    }
+    fprintf(stdout,"\n");
+  */
   
   // ******************************************************************
   // 14. 作業変数のメモリ解放
