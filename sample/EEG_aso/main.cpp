@@ -16,6 +16,7 @@ using namespace CLDIA;
 
 REAL ln_S(RVector &x,RVector &mu,RMatrix &Q,REAL ln_det_Q,REAL f){
   INT D = x.get_row();
+
   return lgamma((f + D) / 2.0) - lgamma(f / 2.0) - D / 2.0 * log(M_PI * f) + 0.5 * ln_det_Q - (f + D) / 2.0 * log(1.0 + (1.0 / f) * ~(x - mu) * Q * (x - mu));
 }
 
@@ -30,7 +31,7 @@ int main(int argc,char *argv[]){
 
   RVector e;
   RVector z;
-  RMatrix X[C];
+  RMatrix X     [C];
 
   RVector e_test;
   RVector z_test;
@@ -81,40 +82,55 @@ int main(int argc,char *argv[]){
   INT  total;
   INT  e_idx_opt;
   INT  z_idx_opt;
-  
+
+  INT  correct0_r;//環境が分からない場合
+  INT  correct1_r;//環境を知っている場合
+  INT  total_r;
+
+  FILE *fp;
+
+  if((fp = fopen("accuracy_alpha.dat","w")) == NULL){
+    exit(EXIT_FAILURE);
+  }
+
   // ================================================
   // データの入力
   // ================================================
   
   dat = RMatrix__fetch_csv("./train.csv",", \t,","%");
 
-  DC  = dat.get_col() - 2;
+  DC  = dat.get_col() - 3;
   N   = dat.get_row();
   D   = DC / C;
 
-  e   = dat |  0;
-  z   = dat |  1;
+  e   = dat |  1;
+  z   = dat |  2;
   
   for(c_idx = 0;c_idx < C;c_idx++){
-    X[c_idx]    = dat | (2 + c_idx * D);
+    X[c_idx]    = dat | (3 + c_idx * D);
     for(m = 1;m < D;m++){
-      X[c_idx] |= dat | (2 + c_idx * D + m);
+      X[c_idx] |= dat | (3 + c_idx * D + m);
     }
   }
 
   dat = RMatrix__fetch_csv("./test.csv",", \t,","%");
 
-  N_test   = dat.get_row();
-  e_test   = dat |  0;
-  z_test   = dat |  1;
+  N_test = dat.get_row();
+
+  e_test = dat |  1;
+  z_test = dat |  2;
   
   for(c_idx = 0;c_idx < C;c_idx++){
-    X_test[c_idx]    = dat | (2 + c_idx * D);
+    X_test[c_idx]    = dat | (3 + c_idx * D);
     for(m = 1;m < D;m++){
-      X_test[c_idx] |= dat | (2 + c_idx * D + m);
+      X_test[c_idx] |= dat | (3 + c_idx * D + m);
     }
   }
 
+  /*
+  cerr << (e | z | e_test | z_test) << endl;
+  cerr << D << endl;
+  */
   fprintf(stderr,"Data Input Completed!\n");
 
   // ================================================
@@ -148,11 +164,20 @@ int main(int argc,char *argv[]){
         xbar[c_idx][e_idx][z_idx] /= num [c_idx][e_idx][z_idx];
         S   [c_idx][e_idx][z_idx] /= num [c_idx][e_idx][z_idx];
         S   [c_idx][e_idx][z_idx] -= xbar[c_idx][e_idx][z_idx] * ~xbar[c_idx][e_idx][z_idx];
+	/*
+	  fprintf(stdout,"(c,e,z) = (%d,%d,%d)\n",c_idx,e_idx,z_idx);
+	  cout << num[c_idx][e_idx][z_idx] << endl;
+	  cout << xbar[c_idx][e_idx][z_idx] << endl;
+	  cout << S   [c_idx][e_idx][z_idx] << endl;
+	  getchar();
+	*/
       }
     }
   }
 
-  for(alpha = 3.0e-3;alpha <= 1.0e+2;alpha *= 2.0){
+  fprintf(stderr,"num/xbar/S were calculated!\n");
+
+  for(alpha = 1.0e-7;alpha <= 1.0e+7;alpha *= 1.05){
     // ================================================
     // 事前分布のハイパーパラメータ設定
     // ================================================
@@ -161,7 +186,7 @@ int main(int argc,char *argv[]){
     eye(W0,D,D);
     W0   *= alpha;
     nu0   = D + 1;
-
+    
     // ================================================
     // 事後分布のパラメータ計算
     // ================================================
@@ -177,11 +202,12 @@ int main(int argc,char *argv[]){
 	  W_ast   [c_idx][e_idx][z_idx] = !( !W0 + num_cez * S_cez + beta0 * num_cez / (beta0 + num_cez) * (xbar_cez - m0) * ~(xbar_cez - m0));
 	  nu_ast  [c_idx][e_idx][z_idx] =    nu0 + num_cez;
 	  /*
-	    fprintf(stderr,"(c,e,z) = (%d,%d,%d)\n",c_idx,e_idx,z_idx);
-	    cerr << m_ast   [c_idx][e_idx][z_idx] << endl;
-	    cerr << beta_ast[c_idx][e_idx][z_idx] << endl;
-	    cerr << W_ast   [c_idx][e_idx][z_idx] << endl;
-	    cerr << nu_ast  [c_idx][e_idx][z_idx] << endl;
+	  fprintf(stderr,"(c,e,z) = (%d,%d,%d)\n",c_idx,e_idx,z_idx);
+	  cerr << m_ast   [c_idx][e_idx][z_idx] << endl;
+	  cerr << beta_ast[c_idx][e_idx][z_idx] << endl;
+	  cerr << W_ast   [c_idx][e_idx][z_idx] << endl;
+	  cerr << nu_ast  [c_idx][e_idx][z_idx] << endl;
+	  getchar();
 	  */
 	}
       }
@@ -195,8 +221,16 @@ int main(int argc,char *argv[]){
 	for(z_idx = 0;z_idx < K;z_idx++){        
 	  mu      [c_idx][e_idx][z_idx] =   m_ast  [c_idx][e_idx][z_idx];
 	  Q       [c_idx][e_idx][z_idx] = (nu_ast  [c_idx][e_idx][z_idx] + 1.0 - D) * beta_ast[c_idx][e_idx][z_idx] / (beta_ast[c_idx][e_idx][z_idx] + 1.0) * W_ast[c_idx][e_idx][z_idx];
-	  ln_det_Q[c_idx][e_idx][z_idx] =  ln_det(Q[c_idx][e_idx][z_idx]);
+	  ln_det_Q[c_idx][e_idx][z_idx] = ln_det_bidiag(Q[c_idx][e_idx][z_idx]);
 	  f       [c_idx][e_idx][z_idx] =  nu_ast  [c_idx][e_idx][z_idx] + 1.0 - D;
+	  /*
+	  fprintf(stderr,"(c,e,z) = (%d,%d,%d)\n",c_idx,e_idx,z_idx);
+	  cerr << mu      [c_idx][e_idx][z_idx] << endl;
+	  cerr << Q       [c_idx][e_idx][z_idx] << endl;
+	  cerr << ln_det_Q[c_idx][e_idx][z_idx] << endl;
+	  cerr << f       [c_idx][e_idx][z_idx] << endl;
+	  getchar();
+	  */
 	}
       }
     }
@@ -209,7 +243,11 @@ int main(int argc,char *argv[]){
 	xcn = ~(X_test[c_idx] & n);
 	for(e_idx = 0;e_idx < E;e_idx++){
 	  for(z_idx = 0;z_idx < K;z_idx++){        
-	    ln_prob0[c_idx][e_idx][z_idx][n] = (num[c_idx][e_idx][z_idx] != 0.0) ? ln_S(xcn,mu[c_idx][e_idx][z_idx],Q[c_idx][e_idx][z_idx],ln_det_Q[c_idx][e_idx][z_idx],f[c_idx][e_idx][z_idx]) : log(0.0);
+	    ln_prob0[c_idx][e_idx][z_idx][n] = (num[c_idx][e_idx][z_idx] != 0.0) ? ln_S(xcn,
+											mu      [c_idx][e_idx][z_idx],
+											Q       [c_idx][e_idx][z_idx],
+											ln_det_Q[c_idx][e_idx][z_idx],
+											f       [c_idx][e_idx][z_idx]) : log(0.0);
 	  }
 	}
       }
@@ -256,7 +294,7 @@ int main(int argc,char *argv[]){
       e_idx_opt = (INT)e_test[n];
       z_idx_opt = 0;
       for(z_idx = 0;z_idx < K;z_idx++){
-	if(ln_prob1[e_idx_opt][z_idx_opt][n] < ln_prob1[e_idx][z_idx][n]){
+	if(ln_prob1[e_idx_opt][z_idx_opt][n] < ln_prob1[e_idx_opt][z_idx][n]){
 	  z_idx_opt = z_idx;
 	}
       }
@@ -268,6 +306,49 @@ int main(int argc,char *argv[]){
     }
 
     // ================================================
+    // 判別精度の計算(動作なしを省いた分類)
+    // ================================================  
+    correct0_r  = 0;
+    correct1_r  = 0;
+    total_r     = 0;
+
+    for(n = 0;n < N_test;n++){
+      if((INT)z_test[n] == 3){
+	continue;
+      }
+      // argmax _{(e,z)} P(e,z)
+      e_idx_opt = 0;
+      z_idx_opt = 0;
+      for(e_idx = 0;e_idx < E;e_idx++){
+	for(z_idx = 0;z_idx < K - 1;z_idx++){
+	  if(ln_prob1[e_idx_opt][z_idx_opt][n] < ln_prob1[e_idx][z_idx][n]){
+	    e_idx_opt = e_idx;
+	    z_idx_opt = z_idx;
+	  }
+	}
+      }
+      //fprintf(stderr,"ln_prob1[%d][%d][%d] = %e\n",e_idx_opt,z_idx_opt,n,ln_prob1[e_idx_opt][z_idx_opt][n]);
+      if((e_idx_opt == (INT)e_test[n]) && (z_idx_opt == (INT)z_test[n])){
+	correct0_r++;
+      }
+
+      // argmax _{(e,z)} P(e,z) s.t. e = e_test
+      e_idx_opt = (INT)e_test[n];
+      z_idx_opt = 0;
+      for(z_idx = 0;z_idx < K - 1;z_idx++){
+	if(ln_prob1[e_idx_opt][z_idx_opt][n] < ln_prob1[e_idx_opt][z_idx][n]){
+	  z_idx_opt = z_idx;
+	}
+      }
+      if( z_idx_opt == (INT)z_test[n] ){
+	correct1_r++;
+      }
+
+      total_r++;
+    }
+    
+
+    // ================================================
     // 判別精度の出力(correct0よりcorrect1が精度が高ければ環境情報が判別に影響することが示唆される)
     // ================================================      
     fprintf(stderr,"alpha : %e | correct0 / total = %d / %d = %.2f | correct1 / total = %d / %d = %.2f\n",
@@ -275,12 +356,21 @@ int main(int argc,char *argv[]){
 	    correct0,total,(REAL)correct0 / (REAL)total,
 	    correct1,total,(REAL)correct1 / (REAL)total);
 
-    fprintf(stdout,"%e %e %e\n",
+    fprintf(stderr,"alpha : %e | correct0_r / total_r = %d / %d = %.2f | correct1_r / total_r = %d / %d = %.2f\n",
+	    alpha,
+	    correct0_r,total_r,(REAL)correct0_r / (REAL)total_r,
+	    correct1_r,total_r,(REAL)correct1_r / (REAL)total_r);
+
+    fprintf(fp,"%e %e %e %e %e\n",
 	    alpha,
 	    (REAL)correct0 / (REAL)total * 100.0,
-	    (REAL)correct1 / (REAL)total * 100.0);
+	    (REAL)correct1 / (REAL)total * 100.0,
+	    (REAL)correct0_r / (REAL)total_r * 100.0,
+	    (REAL)correct1_r / (REAL)total_r * 100.0);
 
   }
+
+  fclose(fp);
   
   return 0;
 }

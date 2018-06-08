@@ -83,6 +83,7 @@ namespace CLDIA{
   template<typename TYPE> TYPE          det  (const TMatrix<TYPE> &A  );
   template<typename TYPE> TYPE          det_lu(const TMatrix<TYPE> &A  );
   template<typename TYPE> TYPE          det_bidiag(const TMatrix<TYPE> &A  );
+  template<typename TYPE> TYPE          ln_det_bidiag(const TMatrix<TYPE> &A  );
 
   void          svd  (      TMatrix<REAL> &s,
                             TMatrix<REAL> &U,
@@ -1692,6 +1693,7 @@ REAL          CLDIA::det_lu(const TMatrix<REAL> &A  ){
 
 template<>
 REAL          CLDIA::det_bidiag(const TMatrix<REAL> &A  ){
+  TMatrix<REAL> T = A;
   TVector<REAL> b0;
   TVector<REAL> b1;
   TVector<REAL> wu;
@@ -1699,12 +1701,12 @@ REAL          CLDIA::det_bidiag(const TMatrix<REAL> &A  ){
   REAL          d;
   INT           i;
 
-  b0 = TVector<REAL>(A.get_col());
-  b1 = TVector<REAL>(A.get_col() - 1);
-  wu = TVector<REAL>(A.get_col());
-  wv = TVector<REAL>(A.get_col() - 1);
+  b0 = TVector<REAL>(T.get_col());
+  b1 = TVector<REAL>(T.get_col() - 1);
+  wu = TVector<REAL>(T.get_col());
+  wv = TVector<REAL>(T.get_col() - 1);
   
-  REAL__MATRIX_BIDIAG(&b0[0],&b1[0],&wu[0],&wv[0],&A[0][0],A.get_row(),A.get_col());
+  REAL__MATRIX_BIDIAG(&b0[0],&b1[0],&wu[0],&wv[0],&T[0][0],T.get_row(),T.get_col());
 
   d = 1.0;
   for(i = 0;i < b0.get_dim();i++){
@@ -1712,6 +1714,31 @@ REAL          CLDIA::det_bidiag(const TMatrix<REAL> &A  ){
   }
   return -d;
 }
+
+template<>
+REAL          CLDIA::ln_det_bidiag(const TMatrix<REAL> &A  ){
+  TMatrix<REAL> T = A;
+  TVector<REAL> b0;
+  TVector<REAL> b1;
+  TVector<REAL> wu;
+  TVector<REAL> wv;
+  REAL          d;
+  INT           i;
+
+  b0 = TVector<REAL>(T.get_col());
+  b1 = TVector<REAL>(T.get_col() - 1);
+  wu = TVector<REAL>(T.get_col());
+  wv = TVector<REAL>(T.get_col() - 1);
+  
+  REAL__MATRIX_BIDIAG(&b0[0],&b1[0],&wu[0],&wv[0],&T[0][0],T.get_row(),T.get_col());
+
+  d = 0.0;
+  for(i = 0;i < b0.get_dim();i++){
+    d += log(fabs(b0[i]));
+  }
+  return d;
+}
+
 
 void CLDIA::svd  (      TMatrix<REAL> &s,
                         TMatrix<REAL> &U,
