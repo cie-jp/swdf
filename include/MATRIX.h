@@ -113,6 +113,17 @@ extern "C" {
                            INT  row,
                            INT  col);
 
+  void REAL__MATRIX_QR(REAL b0[],
+                       REAL wu[],
+                       REAL A [],
+                       INT  row,
+                       INT  col);
+  void COMP__MATRIX_QR(REAL b0[],
+                       COMP wu[],
+                       COMP A [],
+                       INT  row,
+                       INT  col);
+
   // ***********************************
   // 実行列の構造体宣言
   // ***********************************
