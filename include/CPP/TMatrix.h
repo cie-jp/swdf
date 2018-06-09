@@ -96,6 +96,14 @@ namespace CLDIA{
   void          lu   (      TMatrix<REAL> &L,
                             TMatrix<REAL> &U,
                       const TMatrix<REAL> &A);
+  void          lu   (      TMatrix<COMP> &L,
+                            TMatrix<COMP> &U,
+                      const TMatrix<COMP> &A);
+  void          choleskey(      TMatrix<REAL> &L,
+                                const TMatrix<REAL> &A);
+  void          choleskey(      TMatrix<COMP> &L,
+                                const TMatrix<COMP> &A);
+  
 }
 
 template<typename TYPE> class TMatrix{
@@ -1815,6 +1823,115 @@ void CLDIA::lu   (      TMatrix<REAL> &L,
       if(i <= j){
         U[i][j] = LU[i][j];
       }
+    }
+  }
+}
+
+void CLDIA::lu   (      TMatrix<COMP> &L,
+                        TMatrix<COMP> &U,
+                  const TMatrix<COMP> &A){
+  TMatrix<COMP> LU;
+  INT           i,j;
+  INT           dim;
+    
+  if(!A.is_square()){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  dim = A.get_row();
+
+  LU  = A;
+  L   = TMatrix<COMP>(dim,dim);
+  U   = TMatrix<COMP>(dim,dim);
+  
+  COMP__MATRIX_LU_DECOMPOSITION(&LU[0][0],dim);
+    
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      if(i >  j){
+        L[i][j] = LU[i][j];
+      }
+      if(i == j){
+        L[i][j] = COMP__ONE();
+      }
+    }
+  }
+  
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      if(i <= j){
+        U[i][j] = LU[i][j];
+      }
+    }
+  }
+}
+
+void CLDIA::choleskey(      TMatrix<REAL> &L,
+                            const TMatrix<REAL> &A){
+  TMatrix<REAL> LU;
+  INT           i,j;
+  INT           dim;
+    
+  if(!A.is_square()){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  dim = A.get_row();
+
+  LU  = A;
+  L   = TMatrix<REAL>(dim,dim);
+  
+  REAL__MATRIX_LU_DECOMPOSITION(&LU[0][0],dim);
+    
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      if(i >  j){
+        L[i][j] = LU[i][j];
+      }
+      if(i == j){
+        L[i][j] = 1.0;
+      }
+    }
+  }
+
+  for(j = 0;j < dim;j++){
+    for(i = 0;i < dim;i++){
+      L[i][j] *= sqrt(LU[j][j]);
+    }
+  }
+}
+
+void CLDIA::choleskey(      TMatrix<COMP> &L,
+                            const TMatrix<COMP> &A){
+  TMatrix<COMP> LU;
+  INT           i,j;
+  INT           dim;
+    
+  if(!A.is_square()){
+    ERROR__SHOW("#1");
+    exit(EXIT_FAILURE);
+  }
+  dim = A.get_row();
+
+  LU  = A;
+  L   = TMatrix<COMP>(dim,dim);
+  
+  COMP__MATRIX_LU_DECOMPOSITION(&LU[0][0],dim);
+    
+  for(i = 0;i < dim;i++){
+    for(j = 0;j < dim;j++){
+      if(i >  j){
+        L[i][j] = LU[i][j];
+      }
+      if(i == j){
+        L[i][j] = COMP__ONE();
+      }
+    }
+  }
+
+  for(j = 0;j < dim;j++){
+    for(i = 0;i < dim;i++){
+      L[i][j] = COMPLEX__MUL(L[i][j],COMPLEX__MAKE_REAL(sqrt(COMPLEX__REAL(LU[j][j]))));
     }
   }
 }
