@@ -2073,4 +2073,6 @@ namespace CLDIA{
   
 }
 
+#include"Probability.h"
+
 #endif
