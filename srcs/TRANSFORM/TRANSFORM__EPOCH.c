@@ -73,7 +73,8 @@ int    DATE_to_DOY (int  year, //西暦年(8 ~ 2800)
   static int old_month = -99;
   static int old_day   = -99;
   static int old_doy   = -99;
-
+  int        m;
+  
   if((old_year == year) && (old_month == month) && (old_day == day)){
     return old_doy;
   }
@@ -101,7 +102,7 @@ int    DATE_to_DOY (int  year, //西暦年(8 ~ 2800)
     exit(EXIT_FAILURE);
   }
 
-  for(int m = 1;m < month;m++){
+  for(m = 1;m < month;m++){
     day_of_year  += days_per_month[leap_year_flag][m - 1];
   }
   day_of_year += (day - 1);
@@ -125,7 +126,8 @@ double DATE_to_JD  (int  year, //西暦年(8 ~ 2800)
   static int    old_month = -99  ;
   static int    old_day   = -99  ;
   static double old_jd    = -99.0;
-
+  int           y;
+  
   if((old_year == year) && (old_month == month) && (old_day == day)){
     return old_jd;
   }
@@ -133,7 +135,7 @@ double DATE_to_JD  (int  year, //西暦年(8 ~ 2800)
   const double jd0 = 1723979.5;//西暦8年1月1日00:00UT(ユリウス暦)のユリウス通日
   double       jd  = jd0;
 
-  for(int y = 8;y < year;y++){
+  for(y = 8;y < year;y++){
     if(y == 1582){
       jd += 355;
     }else{

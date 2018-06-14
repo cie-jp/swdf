@@ -29,7 +29,7 @@ AR			= ar rv
 RANLIB			= ranlib
 MAKE			= make --no-print-directory
 
-CC			= gcc
+CC			= gcc 
 CC_INCLUDE		= $(patsubst %,-I%,$(INCSDIRS)) -I$(CDF_LIBRARY_PATH)/include
 
 TEST_SRCSDIR		= ./test/srcs

@@ -1,5 +1,5 @@
 /***************************************************************** 
- *
+1;95;0c *
  * Simplex法
  *
  *
@@ -22,7 +22,8 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
   double  w,w_tmp;
   int     idx1;
   int     idx2;
-
+  int     i, j;
+  
   if((c == NULL) || (A == NULL) || (b == NULL) || (T == NULL) || (row < 1) || (col < 1) || (eps < 0.0)){
     fprintf(stderr,"Error : simplex_phase1 - Invalid argument.");
     return -1;
@@ -44,15 +45,15 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
   w_tmp = DBL_MAX;
   w     = 0.0;
   while(1){
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if(T[i] < n){
-	for(int j = 0;j < n;j++){
+	for(j = 0;j < n;j++){
 	  B[j * n + T[i]]     = A[j * m + i];
 	 BT[T[i] * n + j]     = A[j * m + i];
 	}
 	cB[T[i]]     = c[i];
       }else{
-	for(int j = 0;j < n;j++){
+	for(j = 0;j < n;j++){
 	  N[j * l + T[i] - n] = A[j * m + i];
 	}
 	cN[T[i] - n] = c[i];
@@ -62,8 +63,8 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
       free(B);
       return -1;
     }
-    for(int j = 0;j < l;j++){
-      for(int i = 0;i < n;i++){
+    for(j = 0;j < l;j++){
+      for(i = 0;i < n;i++){
 	cN[j] -= N[i * l + j] * c0[i];
       }
     }
@@ -72,7 +73,7 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
       return -1;
     }
     w = 0.0;
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if(T[i] < n){
 	w += c[i] * bb[T[i]];
       }
@@ -83,7 +84,7 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
     w_tmp = w;
     min   = cN[0];
     s     = 0;
-    for(int j = 1;j < l;j++){
+    for(j = 1;j < l;j++){
       if(min > cN[j]){
 	 min = cN[j];
 	 s   = j;
@@ -93,14 +94,14 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
       break;
     }
     buf = 0;
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if((s + n) == T[i]){
 	buf = i;
 	break;
       }
     }
     s = buf;
-    for(int j = 0;j < n;j++){
+    for(j = 0;j < n;j++){
       as[j] = A[j * m + s];
     }  
     if(la_solve(ab,B ,as,n) == -1){
@@ -109,7 +110,7 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
     }
     max = 0.0;
     r   = 0;
-    for(int j = 0;j < n;j++){
+    for(j = 0;j < n;j++){
       if(max < ab[j]){
 	 max = ab[j];
 	 r   = j;
@@ -121,7 +122,7 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
       return -1;
     }
     min = bb[r] / ab[r];
-    for(int j = 0;j < n;j++){
+    for(j = 0;j < n;j++){
       if(ab[j] <= 0.0){
 	continue;
       }
@@ -132,7 +133,7 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
       }
     }
     buf = 0;
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if(r == T[i]){
 	buf = i;
 	break;
@@ -144,14 +145,14 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
     T[r]  = buf ;  
   }
   idx1 = 0;
-  for(int i = 0;i < l;i++){
+  for(i = 0;i < l;i++){
     if(T[i] < n){
        T[i] = idx1++;
     }
   }
   idx2 = idx1;
   if(!is_nonnegative){ 
-    for(int i = 0;i < l;i++){
+    for(i = 0;i < l;i++){
       if((T[i] < idx1) && (T[i] != -1)){
 	if( i < l / 2){
 	  T[i + l / 2] = -1;
@@ -160,24 +161,24 @@ int simplex_phase1(double c[],double *A,double b[],int T[],int row,int col,doubl
 	}
       }
     }
-    for(int i = 0;i < l;i++){
+    for(i = 0;i < l;i++){
       if(T[i] >= idx1){
 	 T[i]  = idx2++;
       }
     }    
-    for(int i = 0;i < l;i++){
+    for(i = 0;i < l;i++){
       if(T[i] == -1){
 	 T[i]  = idx2++;
       }
     }
   }else{
-    for(int i = 0;i < l;i++){
+    for(i = 0;i < l;i++){
       if(T[i] >= idx1){
 	 T[i]  = idx2++;
       }
     }
   }
-  for(int i = l;i < m;i++){
+  for(i = l;i < m;i++){
     T[i] = idx2++;
   }
   free(B);
@@ -198,7 +199,8 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
   int     s,r,buf;
   double  min,max,tmp;
   double  w,w_tmp;
-
+  int     i, j;
+  
   if((x == NULL) || (c == NULL) || (A == NULL) || (b == NULL) || (T == NULL) || (row < 1) || (col < 1)){
     fprintf(stderr,"Error : simplex_phase2 - Invalid argument.");
     return -1;
@@ -220,15 +222,15 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
   w_tmp = DBL_MAX;
   w     = 0.0;
   while(1){
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if(T[i] < n){
-	for(int j = 0;j < n;j++){
+	for(j = 0;j < n;j++){
 	  B[j * n + T[i]]     = A[j * m + i];
 	 BT[T[i] * n + j]     = A[j * m + i];
 	}
 	cB[T[i]]     = c[i];
       }else{
-	for(int j = 0;j < n;j++){
+	for(j = 0;j < n;j++){
 	  N[j * l + T[i] - n] = A[j * m + i];
 	}
 	cN[T[i] - n] = c[i];
@@ -238,8 +240,8 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
       free(B);
       return -1;
     }
-    for(int j = 0;j < l;j++){
-      for(int i = 0;i < n;i++){
+    for(j = 0;j < l;j++){
+      for(i = 0;i < n;i++){
 	cN[j] -= N[i * l + j] * c0[i];
       }
     }
@@ -248,7 +250,7 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
       return -1;
     }
     w = 0.0;
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if(T[i] < n){
 	w += c[i] * bb[T[i]];
       }
@@ -259,7 +261,7 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
     w_tmp = w;
     min   = cN[0];
     s     = 0;
-    for(int j = 1;j < l;j++){
+    for(j = 1;j < l;j++){
       if(min > cN[j]){
 	 min = cN[j];
 	 s   = j;
@@ -269,14 +271,14 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
       break;
     }
     buf = 0;
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if((s + n) == T[i]){
 	buf = i;
 	break;
       }
     }
     s = buf;
-    for(int j = 0;j < n;j++){
+    for(j = 0;j < n;j++){
       as[j] = A[j * m + s];
     }  
     if(la_solve(ab,B ,as,n) == -1){
@@ -285,7 +287,7 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
     }
     max = 0.0;
     r   = 0;
-    for(int j = 0;j < n;j++){
+    for(j = 0;j < n;j++){
       if(max < ab[j]){
 	 max = ab[j];
 	 r   = j;
@@ -297,7 +299,7 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
       return -1;
     }
     min = bb[r] / ab[r];
-    for(int j = 0;j < n;j++){
+    for(j = 0;j < n;j++){
       if(ab[j] <= 0.0){
 	continue;
       }
@@ -308,7 +310,7 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
       }
     }
     buf = 0;
-    for(int i = 0;i < m;i++){
+    for(i = 0;i < m;i++){
       if(r == T[i]){
 	buf = i;
 	break;
@@ -319,7 +321,7 @@ int simplex_phase2(double x[],double c[],double *A,double b[],int T[],int row,in
     T[s]  = T[r];
     T[r]  = buf ;  
   }
-  for(int i = 0;i < m;i++){
+  for(i = 0;i < m;i++){
     x[i] = (T[i] < n) ? bb[T[i]] : 0.0;
   }  
   free(B);
@@ -333,7 +335,8 @@ int reviced_simplex0(double x[],double c[],double *A,double b[],int row,int col,
   int     *T;
   double  *_c,*_A,*_b;
   int      size;
-
+  int      i, j;
+  
   if((x == NULL) || (c == NULL) || (A == NULL) || (b == NULL) || (row < 1) || (col < 1)){
     fprintf(stderr,"Error : reviced_simplex0 - Invalid argument.\n");
     return -1;
@@ -347,20 +350,20 @@ int reviced_simplex0(double x[],double c[],double *A,double b[],int row,int col,
   _c = (double*)(T + m);
   _A = _c + m;
   _b = _A + n * m;
-  for(int i = 0;i < l;i++){
+  for(i = 0;i < l;i++){
     T[i] = i + n;
   }
-  for(int i = 0;i < n;i++){
+  for(i = 0;i < n;i++){
     T[i + l] = i;
   }
-  for(int j = 0;j < n;j++){
+  for(j = 0;j < n;j++){
     if(b[j] >= 0.0){
-      for(int i = 0;i < l;i++){
+      for(i = 0;i < l;i++){
 	_A[j * m + i] = +A[j * l + i];
       }
       _b[j] = +b[j];
     }else{
-      for(int i = 0;i < l;i++){
+      for(i = 0;i < l;i++){
 	_A[j * m + i] = -A[j * l + i];
       }
       _b[j] = -b[j];
@@ -372,13 +375,13 @@ int reviced_simplex0(double x[],double c[],double *A,double b[],int row,int col,
     free(T);
     return -1;
   }
-  for(int j = 0;j < n;j++){
+  for(j = 0;j < n;j++){
     if(b[j] >= 0.0){
-      for(int i = 0;i < l;i++){
+      for(i = 0;i < l;i++){
 	_A[j * l + i] = +A[j * l + i];
       }
     }else{
-      for(int i = 0;i < l;i++){
+      for(i = 0;i < l;i++){
 	_A[j * l + i] = -A[j * l + i];
       }
     }
@@ -401,7 +404,8 @@ int reviced_simplex2(double x[],double c[],double *A,double b[],int row,int col)
   int      m2 = col * 2;
   double *_x,*_c,*_A;
   int      size;
-
+  int      i, j;
+  
   if((x == NULL) || (c == NULL) || (A == NULL) || (b == NULL) || (row < 1) || (col < 1)){
     fprintf(stderr,"Error : reviced_simplex2 - Invalid argument.\n");
     return -1;
@@ -414,11 +418,11 @@ int reviced_simplex2(double x[],double c[],double *A,double b[],int row,int col)
   memset(_x,0x00,size);
   _c = _x + m2;
   _A = _c + m2;
-  for(int j = 0;j < m;j++){
+  for(j = 0;j < m;j++){
     _c[j] = _c[j + m] = c[j];
   }
-  for(int j = 0;j < n;j++){
-    for(int i = 0;i < m;i++){
+  for(j = 0;j < n;j++){
+    for(i = 0;i < m;i++){
       _A[j * m2 + i]     = +A[j * m + i];
       _A[j * m2 + i + m] = -A[j * m + i];
     }
@@ -427,7 +431,7 @@ int reviced_simplex2(double x[],double c[],double *A,double b[],int row,int col)
     free( _x);
     return -1;
   }
-  for(int j = 0;j < m;j++){
+  for(j = 0;j < m;j++){
     x[j] = _x[j] - _x[j + m];
   }
   free(_x);

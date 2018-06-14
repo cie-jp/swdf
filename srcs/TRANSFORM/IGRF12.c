@@ -87,7 +87,8 @@ void IGRF12__Update__(IGRF12 *igrf,
     double       dy;
     long double  sf;
     long double  inv_Mx,inv_My,inv_Mz;
-
+    int          n,m;
+    
     if((year < 1900) || (2020 < year)){
       fprintf(stderr,"IGRF12 : ERROR [(year < 1900) || (2020 < year)]\n");
       exit(EXIT_FAILURE);
@@ -214,16 +215,16 @@ void IGRF12__Update__(IGRF12 *igrf,
          (1910 <= year) ? &IGRF12__1910_0_dh[0][0] :
          (1905 <= year) ? &IGRF12__1905_0_dh[0][0] : &IGRF12__1900_0_dh[0][0];
    
-    for(int n = 0;n < 14;n++){
-      for(int m = 0;m < 14;m++){
+    for(n = 0;n < 14;n++){
+      for(m = 0;m < 14;m++){
 	igrf->G[n][m] = (g[14 * n + m] + dg[14 * n + m] * dy) * 1e-9;
 	igrf->H[n][m] = (h[14 * n + m] + dh[14 * n + m] * dy) * 1e-9;
       }
     }
     
-    for(int n = 0;n < 14;n++){
+    for(n = 0;n < 14;n++){
       sf = sqrtl(2.0);
-      for(int m = 1;m < 14;m++){
+      for(m = 1;m < 14;m++){
 	sf /= sqrtl((long double)((n + m) * (n - m + 1)));
 	igrf->G[n][m] *= sf;
 	igrf->H[n][m] *= sf;
@@ -264,76 +265,10 @@ void IGRF12__Calc__(IGRF12 *igrf,
   // r     の更新時の処理
   // ***************************************************************
   const double a0 = 6371.2e3;
+  int          n, m;
 
-  if(igrf->prev_r != r){
-    // a_r[n] = (基準球面の半径 / r)^{2 + n}を計算する    
-    long double ratio;
-    ratio  = a0  / r; 
-    igrf->a_r[0] = ratio * ratio;
-    for(int n = 1;n < 14;n++){
-      igrf->a_r[n] = igrf->a_r[n - 1] * ratio;
-    }
-  }
-  // ***************************************************************
-  // theta の更新時の処理
-  // ***************************************************************
-  if(igrf->prev_theta != theta){
-    
-    igrf->cos_theta = cosl(theta);
-    igrf->sin_theta = sinl(theta);
-    // ルジャンドル陪関数を計算する      
-    igrf->P[0][0] =  1.0; 
-    igrf->P[1][0] =  igrf->cos_theta; 
-    igrf->P[1][1] =  igrf->sin_theta;
-    for(int n = 2;n < 14;n++){
-      igrf->P[n][0] = ((2 * n - 1) * igrf->cos_theta * igrf->P[n - 1][0] - (n - 1) * igrf->P[n - 2][0]) / (long double)n;
-      for(int m = 1;m < n;m++){
-	if(igrf->sin_theta > 0.175){
-	  igrf->P[n][m] = ((n + m - 1) * igrf->P[n - 1][m - 1] - (n - m + 1) * igrf->cos_theta * igrf->P[n][m - 1]) / igrf->sin_theta;
-	}else{
-	  igrf->P[n][m] = (              igrf->P[n - 1][m    ] + (n - m + 1) * igrf->sin_theta * igrf->P[n][m - 1]) / igrf->cos_theta;
-	}
-      }
-      igrf->P[n][n] = (2 * n - 1) * igrf->sin_theta * igrf->P[n - 1][n - 1];
-    }
-    igrf->Q[0][0] =  0.0;
-    igrf->Q[1][0] = -igrf->sin_theta;
-    igrf->Q[1][1] =  igrf->cos_theta;
-    for(int n = 2;n < 14;n++){
-      igrf->Q[n][0] = -igrf->P[n][1];
-      for(int m = 1;m < n;m++){
-	igrf->Q[n][m] = ((n + m) * (n - m + 1) * igrf->P[n][m - 1] - igrf->P[n][m + 1]) / 2.0;
-      }
-      igrf->Q[n][n] = (2 * n - 1) * (igrf->cos_theta * igrf->P[n - 1][n - 1] + igrf->sin_theta * igrf->Q[n - 1][n - 1]);
-    }
-    igrf->R[0][0] =  0.0;
-    igrf->R[1][0] = -igrf->cos_theta;
-    igrf->R[1][1] = -igrf->sin_theta;
-    for(int n = 2;n < 14;n++){
-      igrf->R[n][0] = -igrf->Q[n][1];
-      for(int m = 1;m < n;m++){
-	igrf->R[n][m] = ((n + m) * (n - m + 1) * igrf->Q[n][m - 1] - igrf->Q[n][m + 1]) / 2.0;
-      }
-      igrf->R[n][n] = (2 * n - 1) * (2.0 * igrf->cos_theta * igrf->Q[n - 1][n - 1] + igrf->sin_theta * (igrf->R[n - 1][n - 1] - igrf->P[n - 1][n - 1]));
-    }
-  }
-  // ***************************************************************
-  // phi   の更新時の処理
-  // ***************************************************************
-  if(igrf->prev_phi != phi){
-    
-    // cos_phi[m] = cos(m * phi)
-    // sin_phi[m] = sin(m * phi) を計算する
-    for(int m = 0;m < 14;m++){      
-      igrf->cos_phi[m] = cosl((long double)m * phi);
-      igrf->sin_phi[m] = sinl((long double)m * phi);
-    }
-    
-  }
-  
-  // ***************************************************************
-  // 磁場の計算
-  // ***************************************************************
+  long double  ratio;
+
   long double tmp_brr;
   long double tmp_bth;
   long double tmp_bph;
@@ -348,6 +283,74 @@ void IGRF12__Calc__(IGRF12 *igrf,
   long double a_r0;
   long double a_r1;
 
+  if(igrf->prev_r != r){
+    // a_r[n] = (基準球面の半径 / r)^{2 + n}を計算する    
+    ratio  = a0  / r; 
+    igrf->a_r[0] = ratio * ratio;
+    for(n = 1;n < 14;n++){
+      igrf->a_r[n] = igrf->a_r[n - 1] * ratio;
+    }
+  }
+  // ***************************************************************
+  // theta の更新時の処理
+  // ***************************************************************
+  if(igrf->prev_theta != theta){
+    
+    igrf->cos_theta = cosl(theta);
+    igrf->sin_theta = sinl(theta);
+    // ルジャンドル陪関数を計算する      
+    igrf->P[0][0] =  1.0; 
+    igrf->P[1][0] =  igrf->cos_theta; 
+    igrf->P[1][1] =  igrf->sin_theta;
+    for(n = 2;n < 14;n++){
+      igrf->P[n][0] = ((2 * n - 1) * igrf->cos_theta * igrf->P[n - 1][0] - (n - 1) * igrf->P[n - 2][0]) / (long double)n;
+      for(m = 1;m < n;m++){
+	if(igrf->sin_theta > 0.175){
+	  igrf->P[n][m] = ((n + m - 1) * igrf->P[n - 1][m - 1] - (n - m + 1) * igrf->cos_theta * igrf->P[n][m - 1]) / igrf->sin_theta;
+	}else{
+	  igrf->P[n][m] = (              igrf->P[n - 1][m    ] + (n - m + 1) * igrf->sin_theta * igrf->P[n][m - 1]) / igrf->cos_theta;
+	}
+      }
+      igrf->P[n][n] = (2 * n - 1) * igrf->sin_theta * igrf->P[n - 1][n - 1];
+    }
+    igrf->Q[0][0] =  0.0;
+    igrf->Q[1][0] = -igrf->sin_theta;
+    igrf->Q[1][1] =  igrf->cos_theta;
+    for(n = 2;n < 14;n++){
+      igrf->Q[n][0] = -igrf->P[n][1];
+      for(m = 1;m < n;m++){
+	igrf->Q[n][m] = ((n + m) * (n - m + 1) * igrf->P[n][m - 1] - igrf->P[n][m + 1]) / 2.0;
+      }
+      igrf->Q[n][n] = (2 * n - 1) * (igrf->cos_theta * igrf->P[n - 1][n - 1] + igrf->sin_theta * igrf->Q[n - 1][n - 1]);
+    }
+    igrf->R[0][0] =  0.0;
+    igrf->R[1][0] = -igrf->cos_theta;
+    igrf->R[1][1] = -igrf->sin_theta;
+    for(n = 2;n < 14;n++){
+      igrf->R[n][0] = -igrf->Q[n][1];
+      for(m = 1;m < n;m++){
+	igrf->R[n][m] = ((n + m) * (n - m + 1) * igrf->Q[n][m - 1] - igrf->Q[n][m + 1]) / 2.0;
+      }
+      igrf->R[n][n] = (2 * n - 1) * (2.0 * igrf->cos_theta * igrf->Q[n - 1][n - 1] + igrf->sin_theta * (igrf->R[n - 1][n - 1] - igrf->P[n - 1][n - 1]));
+    }
+  }
+  // ***************************************************************
+  // phi   の更新時の処理
+  // ***************************************************************
+  if(igrf->prev_phi != phi){
+    
+    // cos_phi[m] = cos(m * phi)
+    // sin_phi[m] = sin(m * phi) を計算する
+    for(m = 0;m < 14;m++){      
+      igrf->cos_phi[m] = cosl((long double)m * phi);
+      igrf->sin_phi[m] = sinl((long double)m * phi);
+    }
+    
+  }
+  
+  // ***************************************************************
+  // 磁場の計算
+  // ***************************************************************
   igrf->brr        = 0.0;
   igrf->bth        = 0.0;
   igrf->bph        = 0.0;
@@ -360,7 +363,7 @@ void IGRF12__Calc__(IGRF12 *igrf,
   igrf->dbrr_dph   = 0.0;
   igrf->dbth_dph   = 0.0;
   igrf->dbph_dph   = 0.0;
-  for(int n = 1;n < 14;n++){
+  for(n = 1;n < 14;n++){
     tmp_brr      = 0.0;
     tmp_bth      = 0.0;
     tmp_bph      = 0.0; 
@@ -370,7 +373,7 @@ void IGRF12__Calc__(IGRF12 *igrf,
     tmp_dbrr_dph = 0.0;
     tmp_dbth_dph = 0.0;
     tmp_dbph_dph = 0.0; 
-    for(int m = 0;m <= n;m++){	
+    for(m = 0;m <= n;m++){	
       GcHs = igrf->G[n][m] * igrf->cos_phi[m] + igrf->H[n][m] * igrf->sin_phi[m];
       GsHc = igrf->G[n][m] * igrf->sin_phi[m] - igrf->H[n][m] * igrf->cos_phi[m];
       tmp_brr      +=     GcHs * igrf->P[n][m];
