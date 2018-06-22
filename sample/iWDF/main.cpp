@@ -143,7 +143,11 @@ int main(int argc,char *argv[]){
   TMatrix<REAL> SigmaN0_0 = !Lambda + ~Phi(x[0]) * !AN0 * Phi(x[0]);
   TMatrix<REAL> VN__0 = SigmaN__0 - !Lambda;
   cerr << (muN__0 | muN0_0 | (y[0] + !Lambda * !(!Lambda - VN__0) * (muN__0 - y[0]))) << endl;
-  cerr << (SigmaN__0 | SigmaN0_0 | (!Lambda + !Lambda * !(!Lambda - VN__0) * (SigmaN__0 - !Lambda))) << endl;
+  cerr << (SigmaN__0 | SigmaN0_0 | (!Lambda + !Lambda * !(!Lambda - VN__0) * (SigmaN__0 - !Lambda)) | (!Lambda * !(2.0 * !Lambda - SigmaN__0) * !Lambda)) << endl;
+
+
+  cerr << (~(y[0] - muN0_0) * !SigmaN0_0 * (y[0] - muN0_0)) << endl;
+  cerr << (~(y[0] - muN__0) * !(!Lambda - VN__0) * (y[0] - muN__0)) << endl;
   /*
   Multivariate_Normal_Distribution mnd(mN,!AN);  
   
