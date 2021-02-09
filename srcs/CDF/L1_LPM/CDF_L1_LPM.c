@@ -11,6 +11,8 @@
 #include"CDF_L1_LPM.h"
 
 extern void CDF_L1_LPM__Set_zVar_epoch                     (CDFid id);//20,21
+extern void CDF_L1_LPM__Set_zVar_ND                        (CDFid id);//93
+extern void CDF_L1_LPM__Set_zVar_Nv                        (CDFid id);//93
 extern void CDF_L1_LPM__Set_zVar_Dv_histgram               (CDFid id);//93
 extern void CDF_L1_LPM__Set_zVar_D                         (CDFid id);
 extern void CDF_L1_LPM__Set_zVar_dD                        (CDFid id);
@@ -18,6 +20,8 @@ extern void CDF_L1_LPM__Set_zVar_v                         (CDFid id);
 extern void CDF_L1_LPM__Set_zVar_dv                        (CDFid id);
 
 extern void CDF_L1_LPM__Set_Data_epoch                     (CDFid id,long recNum,CDF__TIME_TT2000 *value);
+extern void CDF_L1_LPM__Set_Data_ND                        (CDFid id,long recNum,CDF__UINT2 *value);
+extern void CDF_L1_LPM__Set_Data_Nv                        (CDFid id,long recNum,CDF__UINT2 *value);
 extern void CDF_L1_LPM__Set_Data_Dv_histgram               (CDFid id,long recNum,CDF__UINT2 *value);
 extern void CDF_L1_LPM__Set_Data_D                         (CDFid id,long recNum,CDF__REAL4 *value);
 extern void CDF_L1_LPM__Set_Data_dD                        (CDFid id,long recNum,CDF__REAL4 *value);
@@ -81,6 +85,8 @@ void CDF_L1_LPM__Set_vAttr(CDFid id){
 
 void CDF_L1_LPM__Set_zVars(CDFid id){
     CDF_L1_LPM__Set_zVar_epoch                     (id);
+    CDF_L1_LPM__Set_zVar_ND                        (id);
+    CDF_L1_LPM__Set_zVar_Nv                        (id);
     CDF_L1_LPM__Set_zVar_Dv_histgram               (id);
     CDF_L1_LPM__Set_zVar_D                         (id);
     CDF_L1_LPM__Set_zVar_dD                        (id);
@@ -91,6 +97,8 @@ void CDF_L1_LPM__Set_zVars(CDFid id){
 
 void CDF_L1_LPM__Set_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
     CDF_L1_LPM__Set_Data_epoch                     (id,recNum,&dat->epoch                      );
+    CDF_L1_LPM__Set_Data_ND                        (id,recNum,&dat->ND[0]                      );
+    CDF_L1_LPM__Set_Data_Nv                        (id,recNum,&dat->Nv[0]                      );
     CDF_L1_LPM__Set_Data_Dv_histgram               (id,recNum,&dat->Dv_histgram[0][0]          );
     CDF_L1_LPM__Set_Data_D                         (id,recNum,&dat->D[0]                       );
     CDF_L1_LPM__Set_Data_dD                        (id,recNum,&dat->dD[0]                      );
@@ -100,8 +108,10 @@ void CDF_L1_LPM__Set_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
 }
 
 void CDF_L1_LPM__Get_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
-    char     *varNames[6] = {
+    char     *varNames[8] = {
         "epoch",
+        "ND",
+        "Nv",
         "Dv_histgram",
         "D",
         "dD",
@@ -109,8 +119,10 @@ void CDF_L1_LPM__Get_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
         "dv"
     };
     
-    void     *buffers [6] = {
+    void     *buffers [8] = {
         &dat->epoch,
+        &dat->ND[0],
+        &dat->Nv[0],
         &dat->Dv_histgram[0][0],
         &dat->D[0],
         &dat->dD[0],
@@ -120,7 +132,7 @@ void CDF_L1_LPM__Get_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
     CDFstatus status;
     
     status = CDFgetzVarsRecordData(id,
-                                   6L,
+                                   8L,
                                    varNames,
                                    recNum,
                                    buffers);

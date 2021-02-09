@@ -16,6 +16,9 @@ extern "C" {
 #endif
     
     typedef struct{
+      CDF__TIME_TT2000    epoch;
+      CDF__UINT2          ND[22];
+      CDF__UINT2          Nv[20];
         CDF__UINT2          Dv_histgram[22][20];      //93               epoch   D       v       (時刻x粒径x落下速度)                       linear
         //(Dv_histgram[粒径クラス番号 - 1][速度クラス番号 - 1])
         //補助情報(DEPENDの記述は必要なし)
