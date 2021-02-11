@@ -17,6 +17,11 @@ extern "C" {
     
     typedef struct{
       CDF__TIME_TT2000    epoch;
+      CDF__REAL4          R;
+      CDF__REAL4          R_liquid;
+      CDF__REAL4          R_solid;
+      CDF__REAL4          Z;      
+      CDF__UINT2          N;
       CDF__UINT2          ND[22];
       CDF__UINT2          Nv[20];
         CDF__UINT2          Dv_histgram[22][20];      //93               epoch   D       v       (時刻x粒径x落下速度)                       linear
