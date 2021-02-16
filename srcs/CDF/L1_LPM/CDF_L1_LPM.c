@@ -23,6 +23,9 @@ extern void CDF_L1_LPM__Set_zVar_D                         (CDFid id);
 extern void CDF_L1_LPM__Set_zVar_dD                        (CDFid id);
 extern void CDF_L1_LPM__Set_zVar_v                         (CDFid id);
 extern void CDF_L1_LPM__Set_zVar_dv                        (CDFid id);
+extern void CDF_L1_LPM__Set_zVar_weathercode_rain          (CDFid id);
+extern void CDF_L1_LPM__Set_zVar_weathercode_snow          (CDFid id);
+extern void CDF_L1_LPM__Set_zVar_weathercode_intensity     (CDFid id);
 
 extern void CDF_L1_LPM__Set_Data_epoch                     (CDFid id,long recNum,CDF__TIME_TT2000 *value);
 extern void CDF_L1_LPM__Set_Data_R                         (CDFid id,long recNum,CDF__REAL4 *value);
@@ -37,6 +40,10 @@ extern void CDF_L1_LPM__Set_Data_D                         (CDFid id,long recNum
 extern void CDF_L1_LPM__Set_Data_dD                        (CDFid id,long recNum,CDF__REAL4 *value);
 extern void CDF_L1_LPM__Set_Data_v                         (CDFid id,long recNum,CDF__REAL4 *value);
 extern void CDF_L1_LPM__Set_Data_dv                        (CDFid id,long recNum,CDF__REAL4 *value);
+extern void CDF_L1_LPM__Set_Data_weathercode_rain          (CDFid id,long recNum,CDF__INT2 *value);
+extern void CDF_L1_LPM__Set_Data_weathercode_snow          (CDFid id,long recNum,CDF__INT2 *value);
+extern void CDF_L1_LPM__Set_Data_weathercode_intensity     (CDFid id,long recNum,CDF__INT2 *value);
+
 
 void CDF_L1_LPM__Create   (CDFid      *id_ptr,
                                 const char *filepath,const char *data_version){
@@ -107,7 +114,9 @@ void CDF_L1_LPM__Set_zVars(CDFid id){
     CDF_L1_LPM__Set_zVar_dD                        (id);
     CDF_L1_LPM__Set_zVar_v                         (id);
     CDF_L1_LPM__Set_zVar_dv                        (id);
-    
+    CDF_L1_LPM__Set_zVar_weathercode_rain          (id);
+    CDF_L1_LPM__Set_zVar_weathercode_snow          (id);
+    CDF_L1_LPM__Set_zVar_weathercode_intensity     (id);    
 }
 
 void CDF_L1_LPM__Set_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
@@ -124,11 +133,13 @@ void CDF_L1_LPM__Set_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
     CDF_L1_LPM__Set_Data_dD                        (id,recNum,&dat->dD[0]                      );
     CDF_L1_LPM__Set_Data_v                         (id,recNum,&dat->v[0]                       );
     CDF_L1_LPM__Set_Data_dv                        (id,recNum,&dat->dv[0]                      );
-    
+    CDF_L1_LPM__Set_Data_weathercode_rain          (id,recNum,&dat->weathercode_rain           );
+    CDF_L1_LPM__Set_Data_weathercode_snow          (id,recNum,&dat->weathercode_snow           );
+    CDF_L1_LPM__Set_Data_weathercode_intensity     (id,recNum,&dat->weathercode_intensity      ); 
 }
 
 void CDF_L1_LPM__Get_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
-    char     *varNames[13] = {
+    char     *varNames[16] = {
         "epoch",
         "R",
         "R_liquid",
@@ -141,10 +152,13 @@ void CDF_L1_LPM__Get_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
         "D",
         "dD",
         "v",
-        "dv"
+        "dv",
+        "weathercode_rain",
+        "weathercode_snow",
+        "weathercode_intensity"
     };
     
-    void     *buffers [13] = {
+    void     *buffers [16] = {
         &dat->epoch,
         &dat->R,
         &dat->R_liquid,
@@ -157,12 +171,15 @@ void CDF_L1_LPM__Get_Data(CDF_L1_LPM__DATA *dat,CDFid id,long recNum){
         &dat->D[0],
         &dat->dD[0],
         &dat->v[0],
-        &dat->dv[0]
+        &dat->dv[0],
+        &dat->weathercode_rain,
+        &dat->weathercode_snow,
+        &dat->weathercode_intensity
     };
     CDFstatus status;
     
     status = CDFgetzVarsRecordData(id,
-                                   13L,
+                                   16L,
                                    varNames,
                                    recNum,
                                    buffers);

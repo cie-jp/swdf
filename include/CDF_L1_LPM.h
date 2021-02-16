@@ -31,6 +31,10 @@ extern "C" {
         CDF__REAL4          dD[22];                   //各クラスの粒径幅      (CDF_L1_LPM__dD)
         CDF__REAL4          v [20];                   //各クラスの平均落下速度 (CDF_L1_LPM__v )
         CDF__REAL4          dv[20];                   //各クラスの落下速度幅   (CDF_L1_LPM__dv)
+        CDF__INT2           weathercode_rain;
+        CDF__INT2           weathercode_snow;
+        CDF__INT2           weathercode_intensity;
+
     }CDF_L1_LPM__DATA;
     
     void CDF_L1_LPM__Create   (CDFid      *id_ptr,
