@@ -7,40 +7,23 @@ if(@ARGV < 1){
     exit(0);
 }
 
-#入力ファイル名(.csv) 
-#フォーマット : (経度,緯度,強度)
 $input_file    = $ARGV[0];
-#epsファイル名(.eps)
 $eps_file      = "$input_file.eps";
-#pdfファイル名(.pdf)
 $pdf_file      = "$input_file.pdf";
-#grdファイル名(.grd)
 $grd_file      = "$input_file.grd";
-#cptファイル名(.cpt)
 $cpt_file      = "$input_file.cpt";
-#grdファイルの刻み幅[deg]
 $grid_spacing  = 1.01;
-#カラーパレット
 $color_palette = "jet";
-#強度の最小値
 $min_intensity = 0.0;
-#A4の横幅[cm]
 $a4_width      = 21.0;
-#A4の縦幅[cm]
 $a4_height     = 29.7;
-#球の直径[cm]
 $diameter      =  5.0;
-#紙の中心から球の中心までの幅[cm]
 $distance      = $diameter / 2.0 + 1.0;
 
-#古いgmt.confを削除
 `rm gmt.conf`;
 
-#csvファイルからgrdファイルの作成
-#`gmt nearneighbor ${input_file} -G${grd_file} -R0/360/-90/+90 -I${grid_spacing} -S1.5`;
 `gmt surface ${input_file} -G${grd_file} -R0/360/-90/+90 -I${grid_spacing} -T0.25`;
 
-#強度の最大値と刻み幅の計算
 if(@ARGV != 1){
     $max  = $ARGV[1] + 0;
 }else{
@@ -71,13 +54,10 @@ $z_spacing     = ($eff >= 5.0) ? $sft       :
 $z_spacing    *=  2.0;
 $max_intensity = ceil($max / $z_spacing) *  $z_spacing;
 
-#cptファイルの刻み幅
 $color_spacing = $max_intensity / 1000.0;
 
-#cptファイルの作成
 `gmt makecpt -C${color_palette} -T${min_intensity}/${max_intensity}/${color_spacing} -D > ${cpt_file}`;
 
-#GMTの設定
 `gmt gmtset PS_MEDIA a4`;
 `gmt gmtset FONT_ANNOT_PRIMARY 10p,Times-Roman,black`;
 `gmt gmtset FONT_ANNOT_SECONDARY 10p,Times-Roman,black`;
@@ -85,15 +65,12 @@ $color_spacing = $max_intensity / 1000.0;
 `gmt gmtset FONT_LOGO 10p,Times-Roman,black`;
 `gmt gmtset FONT_TITLE 10p,Times-Roman,black`;
 
-#北半球の描画
 $origin_x = $a4_width  / 2.0 - $diameter / 2.0 - $distance;
 $origin_y = $a4_height / 2.0 - $diameter / 2.0;
 
 `gmt gmtset MAP_FRAME_PEN 0.5p,0/0/100`;
 `gmt gmtset MAP_GRID_PEN_PRIMARY 0.1p,150/150/255,.-`;
 `gmt grdimage ${grd_file} -R0/360/-90/+90 -JG-90/+89.99/${diameter}c -Bg30/g10 -C${cpt_file} -Xa${origin_x}c -Ya${origin_y}c -P -K > ${eps_file}`;
-
-#`grdcontour ${grd_file} -R0/360/-90/+90 -JG-90/+89.99/${diameter}c -C${z_spacing} -W0.1p,0/0/100 -Xa${origin_x}c -Ya${origin_y}c -P -K -O >> ${eps_file}`;
 
 $str = "gmt pstext -R0/360/0/1 -JP${diameter}c -F+f10p,Times-Roman,black+jCM -N -Xa${origin_x}c -Ya${origin_y}c -P -K -O << EOF >> ${eps_file}\n";
 $str.= "  0    1.2    0@~\260@~\n";
@@ -113,15 +90,12 @@ $str.= "EOF\n";
 
 `$str`;
 
-#南半球の描画
 $origin_x = $a4_width  / 2.0 - $diameter / 2.0 + $distance;
 $origin_y = $a4_height / 2.0 - $diameter / 2.0;
 
 `gmt gmtset MAP_FRAME_PEN 0.5p,0/0/100`;
 `gmt gmtset MAP_GRID_PEN_PRIMARY 0.1p,150/150/255,.-`;
 `gmt grdimage ${grd_file} -R0/360/-90/90 -JG+90/-89.99/${diameter}c -Bg30/g10 -C${cpt_file} -Xa${origin_x}c -Ya${origin_y}c -P -K -O >> ${eps_file}`;
-
-#`grdcontour ${grd_file} -R0/360/-90/+90 -JG+90/-89.99/${diameter}c -C${z_spacing} -W0.1p,0/0/100 -Xa${origin_x}c -Ya${origin_y}c -P -K -O >> ${eps_file}`;
 
 $str = "gmt pstext -R0/360/0/1 -JP${diameter}c -F+f10p,Times-Roman,black+jCM -N -Xa${origin_x}c -Ya${origin_y}c -P -K -O << EOF >> ${eps_file}\n";
 $str.= "  0    1.2  180@~\260@~\n";
@@ -141,7 +115,6 @@ $str.= "EOF\n";
 
 `$str`;
 
-#スケールの描画
 $origin_x = $a4_width  / 2.0;
 $origin_y = $a4_height / 2.0 - $diameter / 2.0 - 1.0;
 
@@ -151,11 +124,8 @@ $scale_length = $diameter * 2.0 * 0.7;
 `gmt gmtset MAP_GRID_PEN_PRIMARY 0.1p,black`;
 `gmt psscale -D0c/0c/${scale_length}c/0.3ch -C${cpt_file} -Ba${z_spacing}g${z_spacing}:\"Power Density [J/m\@+3\@+]\": -Xa${origin_x}c -Ya${origin_y}c -P -O >> ${eps_file}`;
 
-#EPSをPDFに変換
 `gmt ps2raster ${eps_file} -A -Tf`;
 
-#不要なファイルの削除
 `rm ${eps_file} ${grd_file} ${cpt_file} gmt.conf`;
 
-#PDFファイルの表示
 `open -a Preview.app ${pdf_file}`
