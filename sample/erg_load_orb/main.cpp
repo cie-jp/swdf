@@ -29,7 +29,7 @@ void ofa_l1_prime_download(const STRING &datatype = "spec"){
   STRING command;
 
   filename   = STRING("erg_pwe_ofa_%s_%c_%s_%s_%s_%04d%02d%02d_v%s.cdf",&level[0],comptype,&datatype[0],&sfreq[0],&pts[0],YYYY,MM,DD,&version[0]);
-  remotedir  = "cie.is.t.kanazawa-u.ac.jp:/remote/raid6/Arase/pwe/cdf/OFA/" + level_u + "/" + datatype + "/" + STRING("%04d",YYYY) + "/";          
+  remotedir  = "cie.is.t.kanazawa-u.ac.jp:/remote/Arase-NAS/Arase/pwe/cdf/OFA/" + level_u + "/" + datatype + "/" + STRING("%04d",YYYY) + "/";          
   remotepath = remotedir + filename;
   localdir   = "./";
   localpath  =  localdir + filename;
@@ -64,7 +64,7 @@ void wfc_l1_prime_download(const STRING &datatype = "data"){
   STRING command;
 
   filename   = STRING("erg_pwe_wfc_%c_%s_%s_%04d%02d%02d%02d_v%s.cdf",comptype,&level[0],&sfreq[0],YYYY,MM,DD,hh,&version[0]);
-  remotedir  = "cie.is.t.kanazawa-u.ac.jp:/remote/raid6/Arase/pwe/cdf/WFC/" + level_u + "/" + datatype + "/" + STRING("%04d",YYYY) + "/";          
+  remotedir  = "cie.is.t.kanazawa-u.ac.jp:/remote/Arase-NAS/Arase/pwe/cdf/WFC/" + level_u + "/" + datatype + "/" + STRING("%04d",YYYY) + "/";          
   remotepath = remotedir + filename;
   localdir   = "./";
   localpath  =  localdir + filename;
@@ -77,7 +77,7 @@ void wfc_l1_prime_download(const STRING &datatype = "data"){
   cerr << command    << endl;
   system(&command[0]);
 }
-
+/*
 void PLOT_ERG_PWE_OFA_L1_prime(SVGPlot &plt){
   CDFData   cdf("E_spectra_132","~/Desktop/erg_pwe_ofa_l1_prime_e_spec_65khz_132pts_20180323_v06.cdf");
 
@@ -87,7 +87,7 @@ void PLOT_ERG_PWE_OFA_L1_prime(SVGPlot &plt){
   plt.output2();
   //plt.aux(cdf.depend_0_label,cdf.depend_1_label,"CDFPLOT");
 }
-
+*/
 void multiplot(){
   STRING  filename = "output.svg";
   SVGPlot plt(filename);
@@ -110,8 +110,8 @@ void multiplot(){
   plt.set_zrange(1.0e-6,1.0e-2);
   plt.set_plot_region(0,3);
   plt.tplot(erg_ofa.E_spectra,
-            erg_ofa.epoch,
-            erg_ofa.freq,
+            erg_ofa.E_epoch,
+            erg_ofa.E_freq,
             1);
   plt.set_label("y","OFA");
   plt.set_label("z","Spectra");
@@ -227,12 +227,11 @@ void multiplot2(){
   STRING  filename = "output2.svg";
   SVGPlot plt(filename);
   INT plot_num = 3;
-  STRING ts = "2017-03-28";
-  STRING te = "2017-03-29";
+  STRING ts = "2017-04-15 00:00:00";
+  STRING te = "2017-04-15 03:00:00";
 
   plt.set_plot_region(0,3);
   plt.timespan(ts,te);
-  //plt.set_yrange(0.032,20.0);
   plt.set_yrange(0.032,20.0);
   plt.set_zrange(1.0e-6,1.0e-2);
 
@@ -241,20 +240,20 @@ void multiplot2(){
   // =================================================
   // OFA
   // =================================================
-  ERG_ofa erg_ofa(ts,te,"l2","01");
+  ERG_ofa erg_ofa(ts,te,"l2","02");
 
   //plt.set_scaletype("y","log");
   //plt.set_scaletype("z","log");
-  plt.add(erg_ofa.epoch,
-          erg_ofa.freq,
+  plt.add(erg_ofa.E_epoch,
+          erg_ofa.E_freq,
           erg_ofa.E_spectra);
-  plt.set_label("y","OFA");
+  plt.set_label("y","OFA-E");
   plt.set_label("z","Spectra");
 
   // =================================================
   // MGF
   // =================================================
-  ERG_mgf erg_mgf(ts,te,"l2","01");
+  ERG_mgf erg_mgf(ts,te,"l2","03");
   RMatrix gse0,gse1,gse2,mag,fce,fce_half;
 
   gse0 = erg_mgf.mag_gse | 0;
@@ -270,14 +269,27 @@ void multiplot2(){
   //plt.set_scaletype("y","linear");
   plt.set_plot_region(0,3);
   //plt.set_label("y","MGF");
-  plt.newplot();
+  plt.newplot(SCALETYPE_LOG,SCALETYPE_LOG);
 
+  plt.set_plot_region(1,3);
+  plt.set_yrange(0.032,20.0);
+  plt.set_zrange(1.0e-3,1.0e+0);
+  plt.add(erg_ofa.B_epoch,
+          erg_ofa.B_freq,
+          erg_ofa.B_spectra);
+  plt.set_label("y","OFA-B");
+  plt.set_label("z","Spectra");
+  plt.add(erg_mgf.epoch,fce     );
+  plt.add(erg_mgf.epoch,fce_half);
+  plt.newplot(SCALETYPE_LOG,SCALETYPE_LOG);  
+  
   // =================================================
   // ORBIT
   // =================================================
+  
   plt.set_plot_region(2,3);
 
-  ERG_orbit erg_orbit(ts,te,"l2","01");
+  ERG_orbit erg_orbit(ts,te,"l2","03");
   RVector   gsm0,gsm1,gsm2;
 
   gsm0 = erg_orbit.pos_gsm | 0;
@@ -288,11 +300,11 @@ void multiplot2(){
   plt.add(erg_orbit.epoch,gsm1);
   plt.add(erg_orbit.epoch,gsm2);
   plt.set_label("y","Orbit");
-
+  
   // =================================================
   // 時間軸ラベルの表示
   // =================================================
-  plt.newplot();
+  plt.newplot(SCALETYPE_LINEAR,SCALETYPE_LINEAR);
   plt.draw_time();
   plt.set_label("x","Time");
 }

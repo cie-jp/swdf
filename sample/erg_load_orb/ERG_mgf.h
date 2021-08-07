@@ -83,8 +83,8 @@ public:
           if((date < this->epoch_s) || (this->epoch_e < date)){
             continue;
           }
-          filename   = STRING("erg_mgf_%s_8sec_%04d%02d%02d_v%s.00.cdf",&level[0],YYYY,MM,DD,&version[0]);
-          remotedir  = "http://ergsc.isee.nagoya-u.ac.jp/data/ergsc/satellite/erg/mgf/" + level + "/" + "8sec" + "/" + STRING("%04d",YYYY) + "/";
+          filename   = STRING("erg_mgf_%s_8sec_%04d%02d%02d_v%s.04.cdf",&level[0],YYYY,MM,DD,&version[0]);
+          remotedir  = "http://ergsc.isee.nagoya-u.ac.jp/data/ergsc/satellite/erg/mgf/" + level + "/" + "8sec" + "/" + STRING("%04d",YYYY) + "/" + STRING("%02d",MM) + "/";
           remotepath = remotedir + filename;
           localdir   = "./";
           localpath  =  localdir + filename;

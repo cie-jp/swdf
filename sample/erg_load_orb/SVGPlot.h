@@ -1,3 +1,6 @@
+#define SCALETYPE_LINEAR (0)
+#define SCALETYPE_LOG    (1)
+
 class PlotElement{
  public:
   STRING xlabel1;
@@ -13,6 +16,7 @@ class PlotElement{
   DATA   zmin;
   DATA   zmax;  
 };
+
 
 class SVGPlot{
  private:
@@ -88,8 +92,6 @@ public:
     x[num] = epoch;
     y[num] = var;
     dim[num] = 1;
-    yscaletype[num] = 0;
-    zscaletype[num] = 1;
     num++;
   }
   void add(const EVector &epoch,
@@ -99,11 +101,10 @@ public:
     y[num] = var1;
     z[num] = var2;
     dim[num] = 2;
-    yscaletype[num] = 0;
-    zscaletype[num] = 1;
     num++;
   }
-  void newplot(){
+  void newplot(int yscaletype = SCALETYPE_LINEAR,
+               int zscaletype = SCALETYPE_LINEAR){
     INT isinit;
 
     if((xmin == 0LL) && (xmax == 0LL)){
@@ -174,18 +175,18 @@ public:
     SVGPLOT__SET_RANGE_X_003(&plt,xmin,xmax);
     SVGPLOT__SET_RANGE_Y_003(&plt,ymin,ymax);
     SVGPLOT__SET_RANGE_Z_003(&plt,zmin,zmax);
-    SVGPLOT__SET_SCALETYPE_Y(&plt,yscaletype[0]);        
-    SVGPLOT__SET_SCALETYPE_Z(&plt,zscaletype[0]);
+    SVGPLOT__SET_SCALETYPE_Y(&plt,yscaletype);        
+    SVGPLOT__SET_SCALETYPE_Z(&plt,zscaletype);
 
-      const CHAR *lstroke;
-  const CHAR *lstroke_width;
-  const CHAR *lstroke_dasharray;
-  REAL8       pointsize;
-  INT4        pointtype;
-  const CHAR *pstroke;
-  const CHAR *pstroke_width;
-  const CHAR *pstroke_dasharray;
-  const CHAR *pfill;
+    const CHAR *lstroke;
+    const CHAR *lstroke_width;
+    const CHAR *lstroke_dasharray;
+    REAL8       pointsize;
+    INT4        pointtype;
+    const CHAR *pstroke;
+    const CHAR *pstroke_width;
+    const CHAR *pstroke_dasharray;
+    const CHAR *pfill;
     	lstroke           = "#FF2800";
 	lstroke_width     = "3.0px";
 	lstroke_dasharray = NULL;
@@ -242,14 +243,23 @@ public:
     SVGPLOT__TY_AUX(&plt,
                     1,1,1,1,
                     1,1,1,1,
-                    1,0,1,0,
+                    0,0,1,0,
                     1);
-    SVGPLOT__COLORBAR(&plt,
-                      1,1,
-                      2,2,
-                      2,0,
-                      1);
+    INT flag;
 
+    flag = 0;
+    for(INT i = 0;i < num;i++){
+      if(dim[i] == 2){
+        flag = 1;
+      }
+    }
+    if(flag){
+      SVGPLOT__COLORBAR(&plt,
+                        1,1,
+                        2,2,
+                        2,0,
+                        1);
+    }
     num  = 0;
     ymin = 0.0;
     ymax = 0.0;
